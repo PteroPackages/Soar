@@ -1,9 +1,9 @@
 export interface LogConfig {
-    strictMode:       boolean;
-    showDebug:        boolean;
-    showHTTPLog:      boolean;
-    showWebSocketLog: boolean;
-    errorOutDir:      string;
+    strictMode:  boolean;
+    showDebug:   boolean;
+    showHttpLog: boolean;
+    showWsLog:   boolean;
+    errorOutDir: string;
 }
 
 export interface Auth {
@@ -31,9 +31,15 @@ export interface AppUser {
 
 export function parseStruct<T>(data: any): T {
     const res = {} as unknown as T;
-    for (const [k, v] of Object.entries(data)) {
+
+    for (let [k, v] of Object.entries(data)) {
+        if (
+            typeof v === 'object' &&
+            v !== undefined
+        ) v = parseStruct<unknown>(v);
         res[camelCase(k)] = v;
     }
+
     return res;
 }
 
@@ -51,5 +57,6 @@ function camelCase(str: string): string {
             res += c;
         }
     }
+
     return res;
 }
