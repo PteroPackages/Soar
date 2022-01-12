@@ -1,3 +1,5 @@
+import * as errors from '../errors';
+
 export const COLOURS = {
     BASE: '\x1b[',
     RESET: '\x1b[0m',
@@ -22,15 +24,22 @@ export function warn(type: string, message: string[]): void {
     console.log(fmt);
 }
 
-export function error(type: string, message: string | string[], exit?: boolean): void | never {
+export function error(type: string, message?: string | string[], exit?: boolean): void | never {
     const border = `${BASE} ${COLOURS.RED}error${COLOURS.RESET}: `;
-    let fmt = '';
-    if (type.length) fmt = border + type + '\n';
+    let fmt = border +'\n';
 
-    if (Array.isArray(message)) {
-        fmt += message.map(m => border + m).join('\n');
+    if (!message) {
+        if (errors.tryGet(type)) {
+            fmt += errors.get(type);
+        } else {
+            fmt += 'INVALID LOG MESSSAGE';
+        }
     } else {
-        fmt += border + message;
+        if (Array.isArray(message)) {
+            fmt += message.map(m => border + m).join('\n');
+        } else {
+            fmt += border + message;
+        }
     }
 
     console.log(fmt);
@@ -38,5 +47,5 @@ export function error(type: string, message: string | string[], exit?: boolean):
 }
 
 export function fromError(_error: Error, exit?: boolean): void | never {
-    return error('', _error.stack, exit);
+    return error('Internal Errror', _error.stack, exit);
 }
