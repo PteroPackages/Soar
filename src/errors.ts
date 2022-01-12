@@ -4,12 +4,18 @@ export const ERRORS = {
     CANNOT_READ_ENV: 'Soar config file could not be opened. Please make sure Soar has the necessary permissions.'
 }
 
-export class SoarError extends Error {}
-
-export default function get(key: string): SoarError {
+export function get(key: string): string {
     if (!ERRORS[key]) {
         const lowerKeys = Object.keys(ERRORS).map(k => k.toLowerCase());
         if (!lowerKeys.includes(key)) throw new Error(`Invalid error key '${key}'.`);
     }
-    return new SoarError(ERRORS[key]);
+    return ERRORS[key];
+}
+
+export function tryGet(key: string): string | null {
+    try {
+        return get(key);
+    } catch {
+        return null;
+    }
 }

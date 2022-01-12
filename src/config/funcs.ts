@@ -1,18 +1,17 @@
 import yaml from 'yaml';
 import { existsSync, readFileSync } from 'fs';
 import { error } from '../log';
-import { ERRORS } from '../errors';
-import { Config } from '../structs';
+import { parseStruct, Config } from '../structs';
 
 export function getConfig() {
-    if (!process.env.SOAR_PATH) error('PathError', ERRORS.MISSING_ENV, true);
-    if (!existsSync(process.env.SOAR_PATH)) error('PathError', ERRORS.INVALID_ENV, true);
+    if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
+    if (!existsSync(process.env.SOAR_PATH)) error('INVALID_ENV', null, true);
 
     try {
         const config = yaml.parse(readFileSync(process.env.SOAR_PATH, 'utf-8'));
-        return config as Config;
+        return parseStruct<Config>(config);
     } catch {
-        error('SoarError', ERRORS.CANNOT_READ_ENV, true);
+        error('CANNOT_READ_ENV', null, true);
     }
 }
 
