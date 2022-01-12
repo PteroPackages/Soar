@@ -1,0 +1,16 @@
+version: 0.0.1a
+
+application:
+  - url: ""
+    key: ""
+
+client:
+  - url: ""
+    key: ""
+
+logs:
+  strict_mode: false
+  show_debug: false
+  show_http_log: false
+  show_ws_log: false
+  error_out_dir: ""

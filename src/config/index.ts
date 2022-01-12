@@ -8,21 +8,21 @@ Soar Config
 ====================
 Application Details
 
-url: ${config.application.url}
-key: ${config.application.key}
+url: ${config.application.url || 'Not Set'}
+key: ${config.application.key || 'Not Set'}
 uses: 0
 
 Client Details
-url: ${config.client.url}
-key: ${config.client.key}
+url: ${config.client.url || 'Not Set'}
+key: ${config.client.key || 'Not Set'}
 
 General
 use strict mode:            ${config.logs.strictMode}
 output debug messages:      ${config.logs.showDebug}
-output http responses:      ${config.logs.showHTTPLog}
-output websocket responses: ${config.logs.showWebSocketLog}
+output http responses:      ${config.logs.showHttpLog}
+output websocket responses: ${config.logs.showWsLog}
 
-Error Directory: ${config.logs.errorOutDir}
+Error Directory: ${config.logs.errorOutDir || 'Not Set'}
     `);
 });
 
