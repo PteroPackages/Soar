@@ -2,12 +2,12 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 import yaml from 'yaml';
 
-export function formatString(res: string): string {
+export function formatString(res: object): string {
     return '';
 }
 
-export function formatYAML(res: string): string {
-    return yaml.stringify(yaml.parse(res));
+export function formatYAML(res: object): string {
+    return yaml.stringify(res);
 }
 
 export function writeFileResponse(ext: string, res: string) {
