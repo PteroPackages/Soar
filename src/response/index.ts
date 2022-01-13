@@ -1,5 +1,6 @@
 import { createInterface } from 'readline';
 import * as writer from './writer';
+import { FlagOptions } from '../structs';
 
 export function getBoolInput(message: string): boolean {
     const input = createInterface(process.stdin);
@@ -20,10 +21,10 @@ export function getStringInput(message: string, allowEmpty: boolean): string {
 }
 
 export function getOptionInput(
-    message: string,
-    options: string[],
-    _default?: string,
-    errorMessage?: string
+        message: string,
+        options: string[],
+        _default?: string,
+        errorMessage?: string
     ): string {
     const res = getStringInput(message, _default !== null);
     if (!res) return _default;
@@ -34,4 +35,21 @@ export function getOptionInput(
     return res;
 }
 
-export function handleCloseInterface(args: string[]) {}
+export function handleCloseInterface(data: object, options: FlagOptions): string | void {
+    let parsed: string;
+
+    switch (options.responseType) {
+        case 'str': parsed = writer.formatString(data); break;
+        case 'yaml': parsed = writer.formatYAML(data); break;
+        default: parsed = JSON.stringify(data); break;
+    }
+
+    if (options.writeFile.length) {
+        writer.writeFileResponse(options.responseType, parsed);
+        return;
+    } else if (options.prompt) {
+        return;
+    }
+
+    return parsed;
+}
