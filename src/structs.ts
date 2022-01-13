@@ -43,6 +43,20 @@ export function parseStruct<T>(data: any): T {
     return res;
 }
 
+export function jsonStruct<T>(data: T): object {
+    const res = {};
+
+    for (let [k, v] of Object.entries(data)) {
+        if (
+            typeof v === 'object' &&
+            v !== undefined
+        ) v = jsonStruct(v);
+        res[snakeCase(k)] = v;
+    }
+
+    return res;
+}
+
 function camelCase(str: string): string {
     let res = '';
     let next = false;
@@ -56,6 +70,19 @@ function camelCase(str: string): string {
         } else {
             res += c;
         }
+    }
+
+    return res;
+}
+
+function snakeCase(str: string): string {
+    let res = '';
+
+    const isUpper = (c: string) => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.includes(c);
+
+    for (const c of str.split('')) {
+        if (isUpper(c)) res += '_';
+        res += c.toLowerCase();
     }
 
     return res;
