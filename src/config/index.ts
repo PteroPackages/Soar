@@ -1,6 +1,8 @@
 import { Command } from 'commander';
 import { getConfig } from './funcs';
 
+import setupCmd from './setup';
+
 const infoCmd = new Command('info').action(() => {
     const config = getConfig();
     console.log(`
@@ -28,6 +30,7 @@ Error Directory: ${config.logs.errorOutDir || 'Not Set'}
 
 const main = new Command('config')
     .addHelpText('before', 'Manages the internal Soar configurations.')
-    .addCommand(infoCmd);
+    .addCommand(infoCmd)
+    .addCommand(setupCmd);
 
 export default main;
