@@ -15,7 +15,7 @@ export function getConfig() {
     }
 }
 
-export function createConfig(options: Config): void {
+export function createConfig(options?: Config): void {
     if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
     let config: Config;
 
@@ -26,7 +26,12 @@ export function createConfig(options: Config): void {
         fromError(err, true);
     }
 
-    const data = jsonStruct<Config>(compareConfigs(config, options));
+    let data: object;
+    if (options) {
+        data = jsonStruct<Config>(compareConfigs(config, options));
+    } else {
+        data = jsonStruct(config);
+    }
 
     try {
         writeFileSync(
