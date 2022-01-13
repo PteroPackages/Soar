@@ -18,6 +18,12 @@ export interface Config {
     logs:        LogConfig;
 }
 
+export interface FlagOptions {
+    writeFile:    string | null;
+    responseType: string;
+    prompt:       boolean;
+}
+
 export interface AppUser {
     id:         number;
     uuid:       string;
