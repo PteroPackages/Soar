@@ -1,7 +1,7 @@
 import yaml from 'yaml';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { error, fromError } from '../log';
-import { parseStruct, Config, jsonStruct } from '../structs';
+import { existsSync, readFileSync } from 'fs';
+import { error } from '../log';
+import { parseStruct, Config } from '../structs';
 
 export function getConfig() {
     if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
@@ -15,38 +15,6 @@ export function getConfig() {
     }
 }
 
-export function createConfig(options: Config): void {
-    if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
-    let config: Config;
-
-    try {
-        const temp = yaml.parse(readFileSync('../../config.ex.yml', 'utf-8'));
-        config = parseStruct(temp);
-    } catch (err) {
-        fromError(err, true);
-    }
-
-    const data = jsonStruct<Config>(compareConfigs(config, options));
-
-    try {
-        writeFileSync(
-            process.env.SOAR_PATH,
-            yaml.stringify(data),
-            { encoding: 'utf-8' }
-        );
-    } catch {
-        error('MISSING_PERMISSIONS', null, true);
-    }
-}
-
 export function updateConfig(newConfig: Config): void {}
 
-function compareConfigs(_old: Config, _new: Config): Config {
-    for (const [k, v] of Object.entries(_new)) {
-        if (
-            _old[k] === undefined ||
-            _old[k] === ''
-        ) _old[k] = v;
-    }
-    return _old;
-}
+function compareConfigs(_old: Config, _new: Config)/*: Config */{}
