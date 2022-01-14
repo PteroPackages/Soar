@@ -2,5 +2,6 @@
 /build
 /scripts
 
+soar_log_*
 *.test.*
 *.exe
