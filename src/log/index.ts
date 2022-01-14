@@ -65,12 +65,8 @@ export function error(name: string, message?: string | string[], exit?: boolean)
     const border = parse(`${BASE} %rerror%R: `);
     let fmt: string[] = [name];
 
-    if (!message) {
-        if (errors.tryGet(name)) {
-            fmt.push(errors.get(name));
-        } else {
-            fmt.push('INVALID LOG MESSAGE');
-        }
+    if (!message && errors.tryGet(name)) {
+        fmt.push(errors.get(name));
     } else {
         if (Array.isArray(message)) {
             fmt = fmt.concat(message);
@@ -85,4 +81,23 @@ export function error(name: string, message?: string | string[], exit?: boolean)
 
 export function fromError(_error: Error, exit?: boolean): void | never {
     return error('Internal Errror', _error.stack, exit);
+}
+
+interface pteroError {
+    errors:{
+        code:   string;
+        // status: string;
+        detail: string;
+    }[];
+}
+
+export function fromPtero(data: pteroError, exit?: boolean): void | never {
+    error('API Error', `Pterodactyl panel returned ${data.errors.length} error(s).`);
+
+    for (const err of data.errors) {
+        error('\u200b');
+        error(err.code, err.detail || '[no details received]');
+    }
+
+    if (exit) process.exit(1);
 }
