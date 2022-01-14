@@ -10,10 +10,10 @@ export function formatYAML(res: object): string {
     return yaml.stringify(res);
 }
 
-export function writeFileResponse(ext: string, res: string) {
+export function writeFileResponse(name: string, res: string) {
     try {
         writeFileSync(
-            join(process.cwd(), `soar_log_${Date.now()}.${ext}`),
+            join(process.cwd(), name),
             Buffer.from(res),
             { encoding: 'utf-8' }
         );

@@ -39,13 +39,13 @@ export function handleCloseInterface(data: object, options: FlagOptions): string
     let parsed: string;
 
     switch (options.responseType) {
-        case 'str': parsed = writer.formatString(data); break;
+        case 'text': parsed = writer.formatString(data); break;
         case 'yaml': parsed = writer.formatYAML(data); break;
         default: parsed = JSON.stringify(data); break;
     }
 
     if (options.writeFile.length) {
-        writer.writeFileResponse(options.responseType, parsed);
+        writer.writeFileResponse(options.writeFile, parsed);
         return;
     } else if (options.prompt) {
         return;
