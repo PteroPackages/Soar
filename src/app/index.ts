@@ -18,14 +18,14 @@ const getUsersCmd = new Command('get-users')
 
         if (!options.silent) {
             waiter = new Waiter(log.parse('%yfetching%R /application/users', 'info'))
-                .onEnd(t => log.parse(`%gfetched%R /application/users (${t}ms taken)`, 'success'));
-            waiter.start();
+                .onEnd(t => log.parse(`%gfetched%R /application/users (${t}ms taken)`, 'info'))
+                .start();
         }
 
         const data = await handleRequest('GET', '/api/application/users');
         if (!options.silent) {
             waiter.stop();
-            log.print('Request Result:\n');
+            log.info('request result:\n');
         }
 
         const out = res.handleCloseInterface(data, options);
