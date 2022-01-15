@@ -46,9 +46,12 @@ export function handleCloseInterface(data: object, options: FlagOptions): string
 
     if (options.writeFile.length) {
         writer.writeFileResponse(options.writeFile, parsed);
-        return;
-    } else if (options.prompt) {
-        return;
+    } else if (options.prompt && !options.silent) {
+        const res = getBoolInput('Should this request be saved? (y/n)');
+        if (res) {
+            const fp = getStringInput('Enter the file path to save to: ', true);
+            if (fp) writer.writeFileResponse(`soar_log_${Date.now()}`, parsed);
+        }
     }
 
     return parsed;
