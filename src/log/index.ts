@@ -50,6 +50,10 @@ export function info(message: string): void {
     console.log(`${BASE} ${COLOURS.BLUE}info${COLOURS.RESET}: ${message}`);
 }
 
+export function notice(message: string): void {
+    console.log(`${BASE} ${COLOURS.CYAN}notice${COLOURS.RESET}: ${message}`);
+}
+
 export function success(message: string): void {
     console.log(`${BASE} ${COLOURS.GREEN}success${COLOURS.RESET}: ${message}`);
 }
@@ -90,6 +94,7 @@ export function fromError(_error: Error, exit?: boolean): void | never {
 interface pteroError {
     errors:{
         code:   string;
+        status: string;
         detail: string;
     }[];
 }
@@ -101,6 +106,13 @@ export function fromPtero(data: pteroError, exit?: boolean): void | never {
     for (const err of data.errors) {
         error('');
         error(err.code, err.detail || '[no details received]');
+    }
+
+    if (data.errors.some(e => e.status === '403')) {
+        notice(
+            'Please ensure that your API key has the necessary'+
+            ' read/write permissions before making requests.'
+        );
     }
 
     if (exit) process.exit(1);
