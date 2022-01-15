@@ -19,9 +19,10 @@ export interface Config {
 }
 
 export interface FlagOptions {
-    writeFile:    string | null;
+    writeFile:    string;
     responseType: string;
     prompt:       boolean;
+    silent:       boolean;
 }
 
 export interface AppUser {
