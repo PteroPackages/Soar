@@ -16,11 +16,12 @@ export default class ProgressWaiter {
         return this;
     }
 
-    public start() {
+    public start(): this {
         if (!this.message) throw new Error('No message provided.');
         this.startAt = Date.now();
         this.write(true);
         this.interval = setInterval<void[]>(() => this.handle(), 200).unref();
+        return this;
     }
 
     public stop() {
@@ -28,7 +29,7 @@ export default class ProgressWaiter {
         const res = this.endFunc(Date.now() - this.startAt);
         process.stdout.clearLine(0);
         process.stdout.cursorTo(0);
-        process.stdout.write(res && res +'\n' || '\n');
+        if (res) process.stdout.write(res +'\n');
     }
 
     private write(_new: boolean = false) {
