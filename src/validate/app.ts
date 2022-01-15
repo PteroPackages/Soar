@@ -17,3 +17,13 @@ export function parseUserGroup(args: object): FlagOptions {
         responseType: type
     } as FlagOptions;
 }
+
+export function buildUser(args: object): string {
+    let base = '/api/application/users';
+    if (args['id']) return `${base}/${args['id']}`;
+    if (args['email']) return `${base}?filter[email]=${args['email']}`;
+    if (args['uuid']) return `${base}?filter[uuid]=${args['uuid']}`;
+    if (args['username']) return `${base}?filter[username]=${args['username']}`;
+    if (args['external']) return `${base}?filter[external_id]=${args['external']}`;
+    return base;
+}
