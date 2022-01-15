@@ -43,7 +43,7 @@ export function parse(
 }
 
 export function print(message: string): void {
-    console.log(parse(message));
+    console.log(BASE +' '+ parse(message));
 }
 
 export function info(message: string): void {
