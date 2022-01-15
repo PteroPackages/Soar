@@ -71,12 +71,16 @@ export function error(name: string, message?: string | string[], exit?: boolean)
         if (Array.isArray(message)) {
             fmt = fmt.concat(message);
         } else {
-            fmt.push(message);
+            if (message) fmt.push(message);
         }
     }
 
+    if (exit) {
+        process.emit('beforeExit', 1);
+        console.log(fmt.map(m => border + m).join('\n'));
+        process.exit(1);
+    }
     console.log(fmt.map(m => border + m).join('\n'));
-    if (exit) process.exit(1);
 }
 
 export function fromError(_error: Error, exit?: boolean): void | never {
@@ -86,16 +90,16 @@ export function fromError(_error: Error, exit?: boolean): void | never {
 interface pteroError {
     errors:{
         code:   string;
-        // status: string;
         detail: string;
     }[];
 }
 
 export function fromPtero(data: pteroError, exit?: boolean): void | never {
-    error('API Error', `Pterodactyl panel returned ${data.errors.length} error(s).`);
+    if (exit) process.emit('beforeExit', 1);
+    error('API Request Error', `Pterodactyl panel returned ${data.errors.length} error(s).`);
 
     for (const err of data.errors) {
-        error('\u200b');
+        error('');
         error(err.code, err.detail || '[no details received]');
     }
 

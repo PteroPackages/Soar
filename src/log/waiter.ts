@@ -21,6 +21,13 @@ export default class ProgressWaiter {
         this.startAt = Date.now();
         this.write(true);
         this.interval = setInterval<void[]>(() => this.handle(), 200).unref();
+
+        process.on('beforeExit', () => {
+            if (this.interval) clearInterval(this.interval);
+            process.stdout.clearLine(0);
+            process.stdout.cursorTo(0);
+        });
+
         return this;
     }
 
