@@ -8,10 +8,11 @@ export function parseUserGroup(args: object): FlagOptions {
         if (typeof args['output'] === 'boolean') file = `soar_log_${Date.now()}`;
         else file = args['output'];
     }
-    if (!file.endsWith('.'+ type)) file += '.'+ type;
+    if (file.length && !file.endsWith('.'+ type)) file += '.'+ type;
 
     return {
-        prompt: args['silent'],
+        silent: args['silent'],
+        prompt: args['prompt'],
         writeFile: file,
         responseType: type
     } as FlagOptions;
