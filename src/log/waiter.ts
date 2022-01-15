@@ -28,7 +28,7 @@ export default class ProgressWaiter {
         const res = this.endFunc(Date.now() - this.startAt);
         process.stdout.clearLine(0);
         process.stdout.cursorTo(0);
-        process.stdout.write(res || '\n');
+        process.stdout.write(res && res +'\n' || '\n');
     }
 
     private write(_new: boolean = false) {
