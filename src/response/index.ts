@@ -67,8 +67,9 @@ function formatString(data: object): string {
             typeof val === 'object' &&
             val !== null
         ) {
-            fmt += '<object ref>\n';
+            fmt += '<object ref>\n\n';
             fmt += formatString(val);
+            fmt += '\n';
         } else {
             fmt += `${val}`;
         }
