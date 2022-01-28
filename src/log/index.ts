@@ -1,8 +1,8 @@
 import * as errors from '../errors';
 
 export const COLOURS = {
-    BASE: '\x1b[',
     RESET: '\x1b[0m',
+    BOLD: '\x1b[1m',
     RED: '\x1b[31m',
     YELLOW: '\x1b[33m',
     GREEN: '\x1b[32m',
@@ -13,6 +13,7 @@ export const COLOURS = {
 
 export const CODE_MAP = {
     '%R': COLOURS.RESET,
+    '%B': COLOURS.BOLD,
     '%r': COLOURS.RED,
     '%y': COLOURS.YELLOW,
     '%g': COLOURS.GREEN,
@@ -25,7 +26,7 @@ const BASE = `[${COLOURS.CYAN}soar${COLOURS.RESET}]`;
 
 export function parse(
         message: string,
-        type?: 'info' | 'success' | 'notice' | 'warn' | 'error'
+        type?: 'info' | 'success' | 'notice' | 'debug' | 'warn' | 'error'
     ): string {
     for (const [k, c] of Object.entries<string>(CODE_MAP)) message = message.replaceAll(k, c);
 
@@ -34,6 +35,7 @@ export function parse(
             case 'info': message = `${BASE} ${COLOURS.BLUE}info${COLOURS.RESET}: ${message}`; break;
             case 'success': message = `${BASE} ${COLOURS.GREEN}success${COLOURS.RESET}: ${message}`; break;
             case 'notice': message = `${BASE} ${COLOURS.BLUE}notice${COLOURS.RESET}: ${message}`; break;
+            case 'debug': message = `${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET} ${message}`; break;
             case 'warn': message = `${BASE} ${COLOURS.YELLOW}warning${COLOURS.RESET}: ${message}`; break;
             case 'error': message = `${BASE} ${COLOURS.RED}error${COLOURS.RESET}: ${message}`; break;
         }
@@ -52,6 +54,10 @@ export function info(message: string): void {
 
 export function notice(message: string): void {
     console.log(`${BASE} ${COLOURS.CYAN}notice${COLOURS.RESET}: ${message}`);
+}
+
+export function debug(message: string): void {
+    console.log(`${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET}: ${message}`);
 }
 
 export function success(message: string): void {
