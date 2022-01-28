@@ -61,8 +61,20 @@ const updateUsersCmd = new Command('update-users')
         try {
             json = JSON.parse(args['data']);
         } catch (err) {
-            log.fromError(err, true);
+            log.error(
+                'Argument Error',
+                [
+                    'Couldn\'t parse JSON data argument:',
+                    err.message
+                ],
+                true
+            );
         }
+        if (!Object.entries(json).length) log.error(
+            'Argument Error',
+            'No JSON was provided to update.',
+            true
+        );
 
         const user = await handleRequest('GET', buildUser({ id }));
         if (!user) log.error('NOT_FOUND_USER', null, true);
