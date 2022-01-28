@@ -1,7 +1,12 @@
 export const ERRORS = {
     MISSING_ENV: "Environment variable 'SOAR_PATH' is not set. Please set this to the path of the Soar library.",
     INVALID_ENV: "Environment variable 'SOAR_PATH' path does not exist.",
-    CANNOT_READ_ENV: 'Soar config file could not be opened. Please make sure Soar has the necessary permissions.'
+    CANNOT_READ_ENV: 'Soar config file could not be opened. Please make sure Soar has the necessary permissions.',
+
+    NOT_FOUND_USER: 'An account with the associated identifiers was not found.',
+    NOT_FOUND_SERVER: 'A server with the associated identifiers was not found.',
+    NOT_FOUND_NODE: 'A node with the associated identifiers was not found.',
+    NOT_FOUND_LOCATION: 'A node location with the associated identifiers was not found.'
 }
 
 export function get(key: string): string {
