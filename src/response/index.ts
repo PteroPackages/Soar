@@ -55,7 +55,7 @@ function getMaxLength(data: object): number {
     return max;
 }
 
-function formatString(data: object): string {
+export function formatString(data: object): string {
     const max = getMaxLength(data);
     let res: string[] = [];
 
