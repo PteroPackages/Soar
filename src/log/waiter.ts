@@ -40,7 +40,6 @@ export default class ProgressWaiter {
     }
 
     private write(_new: boolean = false) {
-        if (_new) process.stdout.write('\n');
         process.stdout.clearLine(0);
         process.stdout.cursorTo(0);
         process.stdout.write(this.message);
