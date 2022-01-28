@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { version } from '../package.json';
+import { fromError } from './log';
 
 import app from './app';
 import config from './config';
@@ -9,4 +10,8 @@ const root = new Command('soar')
     .addCommand(app)
     .addCommand(config);
 
-root.parse(process.argv);
+try {
+    root.parse(process.argv);
+} catch (err) {
+    fromError(err, true);
+}
