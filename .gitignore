@@ -5,3 +5,4 @@
 soar_log_*
 *.test.*
 *.exe
+.soar-local.yml
