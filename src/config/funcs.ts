@@ -9,7 +9,7 @@ export function getConfig() {
     if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
         fp = join(process.cwd(), '.soar-local.yml');
     } else {
-        if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
+        if (!process.env.SOAR_PATH) error('MISSING_CONFIG', null, true);
         fp = join(process.env.SOAR_PATH, 'config.yml');
         if (!existsSync(fp)) error('INVALID_ENV', null, true);
     }
