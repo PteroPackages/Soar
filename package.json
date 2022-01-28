@@ -6,10 +6,14 @@
   "scripts": {
     "build": "tsc && pkg build/. && rename ptero-soar.exe soar.exe"
   },
-  "bin":"src/index.js",
-  "pkg":{
-    "assets":[ "src/**/*.js" ],
-    "targets":[ "node16-win-x64" ]
+  "bin": "src/index.js",
+  "pkg": {
+    "assets": [
+      "src/**/*.js"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ]
   },
   "repository": {
     "type": "git",
