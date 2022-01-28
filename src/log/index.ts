@@ -88,7 +88,7 @@ export function error(name: string, message?: string | string[], exit?: boolean)
 }
 
 export function fromError(_error: Error, exit?: boolean): void | never {
-    return error('Internal Errror', _error.stack, exit);
+    return error('Internal Errror', _error.stack.split('\n'), exit);
 }
 
 interface pteroError {
@@ -101,7 +101,10 @@ interface pteroError {
 
 export function fromPtero(data: pteroError, exit?: boolean): void | never {
     if (exit) process.emit('beforeExit', 1);
-    error('API Request Error', `Pterodactyl panel returned ${data.errors.length} error(s).`);
+    error(
+        'API Request Error',
+        `Pterodactyl panel returned ${data.errors.length} error${data.errors.length > 1 ? 's' : ''}.`
+    );
 
     for (const err of data.errors) {
         error('');
