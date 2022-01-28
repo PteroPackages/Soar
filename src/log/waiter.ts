@@ -33,7 +33,7 @@ export default class ProgressWaiter {
 
     public stop() {
         clearInterval(this.interval);
-        const res = this.endFunc(Date.now() - this.startAt);
+        const res = this.endFunc?.(Date.now() - this.startAt);
         process.stdout.clearLine(0);
         process.stdout.cursorTo(0);
         if (res) process.stdout.write(res +'\n');
