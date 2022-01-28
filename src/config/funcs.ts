@@ -5,9 +5,14 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { parseStruct, Config, jsonStruct } from '../structs';
 
 export function getConfig() {
-    if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
-    const fp = join(process.env.SOAR_PATH, 'config.yml');
-    if (!existsSync(fp)) error('INVALID_ENV', null, true);
+    let fp: string;
+    if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
+        fp = join(process.cwd(), '.soar-local.yml');
+    } else {
+        if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
+        fp = join(process.env.SOAR_PATH, 'config.yml');
+        if (!existsSync(fp)) error('INVALID_ENV', null, true);
+    }
 
     try {
         const config = yaml.parse(readFileSync(fp, 'utf-8'));
