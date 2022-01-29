@@ -29,11 +29,60 @@ const getUsersCmd = new Command('get-users')
         if (out) console.log(out);
     });
 
+const createUserCmd = new Command('create-user')
+    .addHelpText('before', 'Creates a new user account on the panel.')
+    .option('--json', 'Send the response output as JSON.', true)
+    .option('--yaml', 'Send the response output as YAML.', false)
+    .option('--text', 'Send the response output as formatted text.', false)
+    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request.', false)
+    .option('-s, --silent', 'Don\'t log request messages.', false)
+    .option('-o, --output [file]', 'Writes the output to a file.')
+    .option('-d, --data <json>', 'The json data to create the user with.')
+    .action(async (args: object) => {
+        const options = parseUserGroup(args);
+
+        let json: object;
+        try {
+            json = JSON.parse(args['data']);
+        } catch (err) {
+            log.error(
+                'Argument Error',
+                [
+                    'Couldn\'t parse JSON data argument:',
+                    err.message
+                ],
+                true
+            );
+        }
+
+        const missing: string[] = [];
+        for (const key of ['username', 'email', 'first_name', 'last_name', 'language']) {
+            if (key in json) continue;
+            missing.push(key);
+        }
+        if (missing.length) log.error(
+            'Argument Error',
+            [
+                `Missing required key${missing.length > 1 ? 's' : ''}:`,
+                missing.join(', ')
+            ],
+            true
+        );
+
+        const session = new Session('application', options);
+        await session.handleRequest('POST', buildUser({}), json);
+        const data = await session.handleRequest('GET', buildUser({ email: json['email'] }));
+        if (!options.silent) log.success('account created! request result:\n');
+
+        const out = res.handleCloseInterface(data, options);
+        if (out) console.log(out);
+    });
+
 const updateUserCmd = new Command('update-user')
     .addHelpText('before', 'Updates a specified user account.')
     .argument('<id>', 'The ID of the user account to update.')
-    .option('--json', 'Send the response output as JSON.', true)
-    .option('--yaml', 'Send the response output as YAML.', false)
+    .option('--json', 'Send the response output as JSON.', false)
+    .option('--yaml', 'Send the response output as YAML.', true)
     .option('--text', 'Send the response output as formatted text.', false)
     .option('-n, --no-prompt', 'Don\'t prompt for user response after the request.', false)
     .option('-s, --silent', 'Don\'t log request messages.', false)
@@ -98,6 +147,7 @@ const deleteUserCmd = new Command('delete-user')
 
 export default [
     getUsersCmd,
+    createUserCmd,
     updateUserCmd,
     deleteUserCmd
 ]
