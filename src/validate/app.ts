@@ -2,7 +2,7 @@ import { FlagOptions } from '../structs';
 
 export function parseUserGroup(args: object): FlagOptions {
     const type = (args['text'] && 'text') || (args['yaml'] && 'yaml') || 'json';
-    const silent = process.stdout.readable === false || args['silent'];
+    const silent = !process.stdout.isTTY || args['silent'];
     let file = '';
 
     if (args['output']) {
