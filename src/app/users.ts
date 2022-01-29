@@ -84,7 +84,20 @@ const updateUsersCmd = new Command('update-users')
         }
     });
 
+const deleteUserCmd = new Command('delete-user')
+    .addHelpText('before', 'Deletes a specified user account.')
+    .argument('<id>', 'The ID of the user account to delete.')
+    .option('-s, --silent', 'Don\'t log request messages.', false)
+    .action(async (id: string, args: object) => {
+        const options = parseUserGroup(args);
+        const session = new Session('application', options);
+
+        await session.handleRequest('DELETE', buildUser({ id }));
+        if (!options.silent) log.success('user account deleted!');
+    });
+
 export default [
     getUsersCmd,
-    updateUsersCmd
+    updateUsersCmd,
+    deleteUserCmd
 ]
