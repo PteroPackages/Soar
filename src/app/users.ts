@@ -29,9 +29,9 @@ const getUsersCmd = new Command('get-users')
         if (out) console.log(out);
     });
 
-const updateUsersCmd = new Command('update-users')
+const updateUserCmd = new Command('update-user')
     .addHelpText('before', 'Updates a specified user account.')
-    .argument('<id>', 'The ID of the user to update.')
+    .argument('<id>', 'The ID of the user account to update.')
     .option('--json', 'Send the response output as JSON.', true)
     .option('--yaml', 'Send the response output as YAML.', false)
     .option('--text', 'Send the response output as formatted text.', false)
@@ -39,7 +39,7 @@ const updateUsersCmd = new Command('update-users')
     .option('-s, --silent', 'Don\'t log request messages.', false)
     .option('-o, --output [file]', 'Writes the output to a file.')
     .option('-d, --data <json>', 'The json data to update the user with.')
-    .option('-c, --changes', 'Shows the properties changed in the request.', false)
+    .option('--no-diff', 'Don\'t show the properties changed in the request.', false)
     .action(async (id: string, args: object) => {
         const options = parseUserGroup(args);
 
@@ -75,7 +75,7 @@ const updateUsersCmd = new Command('update-users')
 
         const data = await session.handleRequest('PATCH', buildUser({ id }), json);
         const out = res.handleCloseInterface(data, options);
-        if (out) {
+        if (out && !args['diff']) {
             const view = parseDiffView(options.responseType, user, data);
             log.info(log.parse(
                 `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`
@@ -98,6 +98,6 @@ const deleteUserCmd = new Command('delete-user')
 
 export default [
     getUsersCmd,
-    updateUsersCmd,
+    updateUserCmd,
     deleteUserCmd
 ]
