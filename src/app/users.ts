@@ -32,6 +32,9 @@ const getUsersCmd = new Command('get-users')
 const updateUsersCmd = new Command('update-users')
     .addHelpText('before', 'Updates a specified user account.')
     .argument('<id>', 'The ID of the user to update.')
+    .option('--json', 'Send the response output as JSON.', true)
+    .option('--yaml', 'Send the response output as YAML.', false)
+    .option('--text', 'Send the response output as formatted text.', false)
     .option('-n, --no-prompt', 'Don\'t prompt for user response after the request.', false)
     .option('-s, --silent', 'Don\'t log request messages.', false)
     .option('-o, --output [file]', 'Writes the output to a file.')
@@ -73,7 +76,7 @@ const updateUsersCmd = new Command('update-users')
         const data = await session.handleRequest('PATCH', buildUser({ id }), json);
         const out = res.handleCloseInterface(data, options);
         if (out) {
-            const view = parseDiffView('yaml', user, data);
+            const view = parseDiffView(options.responseType, user, data);
             log.info(log.parse(
                 `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`
             ));

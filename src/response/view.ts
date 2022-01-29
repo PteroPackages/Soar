@@ -5,7 +5,7 @@ import { COLOURS } from '../log';
 export function viewAs(type: string, _old: object, _new: object): [string, string] {
     switch (type) {
         case 'json':{
-            return [JSON.stringify(_old), JSON.stringify(_new)];
+            return [JSON.stringify(_old, null, 2), JSON.stringify(_new, null, 2)];
         }
         case 'yaml':{
             return [yaml.stringify(_old), yaml.stringify(_new)];
