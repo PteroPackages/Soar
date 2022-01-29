@@ -2,19 +2,19 @@ import fetch from 'node-fetch';
 import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
 import * as log from '../log';
-import Waiter from '../log/waiter';
+import Spinner from '../log/spinner';
 
 export default class Session {
     public config:       Config;
     public auth:         Auth;
-    public waiter:       Waiter | null; // tracker
+    public spinner:      Spinner | null;
     public showDebugLog: boolean;
     public showHttpLog:  boolean;
 
     constructor(type: 'application' | 'client', options: FlagOptions) {
         this.config = getConfig();
         this.auth = this.config[type];
-        this.waiter = null;
+        this.spinner = null;
         this.showDebugLog = this.config.logs.showDebug;
         this.showHttpLog = this.config.logs.showHttpLog;
 
@@ -26,13 +26,15 @@ export default class Session {
             this.showDebugLog = false;
             this.showHttpLog = false;
         } else {
-            this.waiter = new Waiter(log.parse('%yfetching%R /application/users', 'info'))
-                .onEnd(t => log.parse(`%gfetched%R /application/users (${t}ms taken)`, 'info'));
+            this.spinner = new Spinner()
+                .setMessage(log.parse('%yfetching%R /application/users', 'info'))
+                .onEnd(t => log.parse(`%gfetched%R /application/users (${t}ms taken)`, 'info'))
+                .onError(t => log.parse(`%rfetch failed%R /application/users (${t}ms timeout)`, 'info'));
         }
     }
 
     private log(type: string, message: string): void {
-        if (this.waiter?.running) return;
+        if (this.spinner?.running) return;
         if (type === 'debug') {
             if (!this.showDebugLog) return;
             log.debug(message);
@@ -45,7 +47,7 @@ export default class Session {
     public async handleRequest(method: string, path: string, data?: object) {
         this.log('debug', 'Starting HTTP request');
         this.log('http', `Sending a request to '${this.auth.url + path}'`);
-        this.waiter?.start();
+        this.spinner?.start();
 
         const res = await fetch(this.auth.url + path, {
             method,
@@ -58,20 +60,23 @@ export default class Session {
             body: data ? JSON.stringify(data) : null
         });
 
-        this.waiter?.stop();
         this.log('http', `Received status: ${res.status}`);
 
         if (res.status === 204) {
             this.log('debug', 'Request ended with no response body');
+            this.spinner?.stop(false);
             return Promise.resolve<void>(null);
         }
         if ([200, 201].includes(res.status)) {
+            this.spinner?.stop(false);
             if (res.headers.get('content-type') === 'application/json')
                 return await res.json();
 
             this.log('debug', 'Buffer response body received, attempting to resolve...');
             return await res.buffer();
         }
+
+        this.spinner?.stop(true);
         if (res.status >= 400 && res.status < 500) return log.fromPtero(await res.json(), true);
 
         log.error(
