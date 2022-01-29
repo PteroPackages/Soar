@@ -2,6 +2,7 @@ import { FlagOptions } from '../structs';
 
 export function parseUserGroup(args: object): FlagOptions {
     const type = (args['text'] && 'text') || (args['yaml'] && 'yaml') || 'json';
+    const silent = process.stdout.readable === false || args['silent'];
     let file = '';
 
     if (args['output']) {
@@ -11,7 +12,7 @@ export function parseUserGroup(args: object): FlagOptions {
     if (file.length && !file.endsWith('.'+ type)) file += '.'+ type;
 
     return {
-        silent: args['silent'],
+        silent,
         prompt: args['prompt'],
         writeFile: file,
         responseType: type
