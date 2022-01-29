@@ -4,11 +4,13 @@ export default class ProgressWaiter {
     public message: string;
     public endFunc: (time: number) => string | void;
     public count: number;
+    public running: boolean;
 
     constructor(message: string) {
         this.startAt = 0;
         this.message = message;
         this.count = 0;
+        this.running = false;
     }
 
     public onEnd(func: (time: number) => string | void): this {
@@ -18,6 +20,7 @@ export default class ProgressWaiter {
 
     public start(): this {
         if (!this.message) throw new Error('No message provided.');
+        if (this.running) return;
         this.startAt = Date.now();
         this.write(true);
         this.interval = setInterval<void[]>(() => this.handle(), 200).unref();
@@ -32,6 +35,7 @@ export default class ProgressWaiter {
     }
 
     public stop() {
+        if (!this.running) return;
         clearInterval(this.interval);
         const res = this.endFunc?.(Date.now() - this.startAt);
         process.stdout.clearLine(0);

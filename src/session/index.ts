@@ -32,7 +32,7 @@ export default class Session {
     }
 
     private log(type: string, message: string): void {
-        // if (this.waiter.running) return;
+        if (this.waiter?.running) return;
         if (type === 'debug') {
             if (!this.showDebugLog) return;
             log.debug(message);
