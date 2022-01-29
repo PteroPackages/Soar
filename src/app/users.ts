@@ -67,7 +67,7 @@ const updateUsersCmd = new Command('update-users')
         json['email'] ||= user['attributes']['email'];
         json['first_name'] ||= user['attributes']['first_name'];
         json['last_name'] ||= user['attributes']['last_name'];
-        json['language'] || user['attributes']['language'];
+        json['language'] ||= user['attributes']['language'];
         json['password'] ||= null;
 
         const data = await session.handleRequest('PATCH', buildUser({ id }), json);
