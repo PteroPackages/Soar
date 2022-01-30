@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import Session from '../session';
 import { handleCloseInterface } from '../response';
 import { buildServer, parseServerGroup } from '../validate';
-import * as log from '../log';
+import log from '../log';
 
 const getServersCmd = new Command('get-servers')
     .addHelpText('before', 'Fetches all servers from the panel.')

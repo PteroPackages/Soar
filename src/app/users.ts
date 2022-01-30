@@ -3,7 +3,7 @@ import Session from '../session';
 import * as res from '../response';
 import parseDiffView, { highlight } from '../response/view';
 import { buildUser, parseUserGroup } from '../validate';
-import * as log from '../log';
+import log from '../log';
 
 const getUsersCmd = new Command('get-users')
     .addHelpText('before', 'Fetches all accounts from the panel (can specify or query with flags).')

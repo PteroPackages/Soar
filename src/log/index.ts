@@ -1,4 +1,4 @@
-import * as errors from '../errors';
+import errors from '../errors';
 
 export const COLOURS = {
     RESET: '\x1b[0m',
@@ -82,7 +82,7 @@ export function error(name: string, message?: string | string[], exit?: boolean)
     const border = parse(`${BASE} %rerror%R: `);
     let fmt: string[] = [name];
 
-    if (!message && errors.tryGet(name)) {
+    if (!message && errors.get(name)) {
         fmt.push(errors.get(name));
     } else {
         if (Array.isArray(message)) {
@@ -92,12 +92,8 @@ export function error(name: string, message?: string | string[], exit?: boolean)
         }
     }
 
-    if (exit) {
-        process.emit('beforeExit', 1);
-        console.log(fmt.map(m => border + m).join('\n'));
-        process.exit(1);
-    }
     console.log(fmt.map(m => border + m).join('\n'));
+    if (exit) process.exit(1);
 }
 
 export function fromError(_error: Error, exit?: boolean): void | never {
@@ -113,7 +109,6 @@ interface pteroError {
 }
 
 export function fromPtero(data: pteroError, exit?: boolean): void | never {
-    if (exit) process.emit('beforeExit', 1);
     error(
         'API Request Error',
         `Pterodactyl panel returned ${data.errors.length} error${data.errors.length > 1 ? 's' : ''}.`
@@ -132,4 +127,17 @@ export function fromPtero(data: pteroError, exit?: boolean): void | never {
     }
 
     if (exit) process.exit(1);
+}
+
+export default {
+    parse,
+    print,
+    info,
+    notice,
+    debug,
+    success,
+    warn,
+    error,
+    fromError,
+    fromPtero
 }

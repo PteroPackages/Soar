@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
-import * as log from '../log';
+import log from '../log';
 import Spinner from '../log/spinner';
 
 export default class Session {

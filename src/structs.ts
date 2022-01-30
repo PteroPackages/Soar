@@ -25,17 +25,6 @@ export interface FlagOptions {
     silent:       boolean;
 }
 
-export interface AppUser {
-    id:         number;
-    uuid:       string;
-    externalId: string | null;
-    username:   string;
-    email:      string;
-    firstName:  string;
-    lastName:   string;
-    language:   string;
-}
-
 export function parseStruct<T>(data: any): T {
     const res = {} as unknown as T;
 

@@ -1,7 +1,7 @@
 import yaml from 'yaml';
 import { join } from 'path';
 import { exec, ExecException } from 'child_process';
-import * as log from '../log';
+import log from '../log';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { parseStruct, Config } from '../structs';
 

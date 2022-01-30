@@ -12,17 +12,10 @@ export const ERRORS = {
 }
 
 export function get(key: string): string {
-    if (!ERRORS[key]) {
-        const lowerKeys = Object.keys(ERRORS).map(k => k.toLowerCase());
-        if (!lowerKeys.includes(key)) throw new Error(`Invalid error key '${key}'.`);
-    }
-    return ERRORS[key];
+    return ERRORS[key.toUpperCase()];
 }
 
-export function tryGet(key: string): string | null {
-    try {
-        return get(key);
-    } catch {
-        return null;
-    }
+export default {
+    ERRORS,
+    get
 }

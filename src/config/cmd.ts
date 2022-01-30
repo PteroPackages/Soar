@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import * as log from '../log';
+import log from '../log';
 import { getBoolInput } from '../response';
 import { getConfig, createConfig } from './funcs';
 
