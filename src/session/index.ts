@@ -67,7 +67,7 @@ export default class Session {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${this.auth.key}`,
-                'User-Agent': `Soar Client v0.0.1`
+                'User-Agent': `Soar Client v0.0.2`
             },
             body: data ? JSON.stringify(data) : null
         });
