@@ -20,16 +20,15 @@ function run(cmd: string): Promise<[string, string | ExecException]> {
     );
 }
 
-export function getConfig(local: boolean = false) {
+export function getConfig(checkLocal: boolean = false): Config {
     let fp: string;
 
-    if (local) {
-        if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
-            fp = join(process.cwd(), '.soar-local.yml');
-        } else {
-            return null;
-        }
-    } else {
+    if (
+        checkLocal &&
+        existsSync(join(process.cwd(), '.soar-local.yml'))
+    ) fp = join(process.cwd(), '.soar-local.yml');
+
+    if (!fp) {
         if (!process.env.SOAR_PATH) log.error('MISSING_CONFIG', null, true);
         fp = join(process.env.SOAR_PATH, 'config.yml');
         if (!existsSync(fp)) log.error('INVALID_ENV', null, true);
