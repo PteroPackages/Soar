@@ -7,10 +7,15 @@ export default class Spinner {
     public errFunc:   (time: number) => string;
 
     public CHAR_REF: { [key: string]: string } = {
-        '/': '-',
-        '-': '\\',
-        '\\': '|',
-        '|': '/'
+        '⠇': '⠏',
+        '⠏': '⠋',
+        '⠋': '⠙',
+        '⠙': '⠹',
+        '⠹': '⠸',
+        '⠸': '⠼',
+        '⠼': '⠴',
+        '⠴': '⠦',
+        '⠦': '⠇'
     }
 
     constructor() {
@@ -22,7 +27,7 @@ export default class Spinner {
     }
 
     public setMessage(message: string): this {
-        this.message = message.trim() + ' (/)';
+        this.message = message.trim() + ' ⠇    ';
         return this;
     }
 
@@ -59,8 +64,8 @@ export default class Spinner {
     }
 
     private handle() {
-        const char = this.message.slice(-2).slice(0, -1);
-        this.message = this.message.slice(0, -2) + this.CHAR_REF[char] +')';
+        const char = this.message.slice(-5).slice(0, -4);
+        this.message = this.message.slice(0, -5) + this.CHAR_REF[char] + '    ';
         this.clear();
         process.stdout.write(this.message);
     }
