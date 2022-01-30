@@ -23,7 +23,7 @@ const getUsersCmd = new Command('get-users')
         const session = new Session('application', options);
 
         const data = await session.handleRequest('GET', buildUser(args));
-        if (!options.silent) log.info('request result:\n');
+        if (!options.silent) log.success('request result:\n');
 
         const out = res.handleCloseInterface(data, options);
         if (out) console.log(out);
@@ -127,9 +127,12 @@ const updateUserCmd = new Command('update-user')
         if (out && args['diff']) {
             const view = parseDiffView(options.responseType, user, data);
             log.info(log.parse(
-                `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`
+                `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`,
+                'success'
             ));
             console.log('\n'+ highlight(view.output));
+        } else {
+            log.success(`updated user account: ${id}`);
         }
     });
 
@@ -142,7 +145,7 @@ const deleteUserCmd = new Command('delete-user')
         const session = new Session('application', options);
 
         await session.handleRequest('DELETE', buildUser({ id }));
-        if (!options.silent) log.success('user account deleted!');
+        if (!options.silent) log.success(`deleted user account: ${id}`);
     });
 
 export default [

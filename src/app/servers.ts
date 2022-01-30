@@ -22,7 +22,7 @@ const getServersCmd = new Command('get-servers')
         const session = new Session('application', options);
 
         const data = await session.handleRequest('GET', buildServer(args));
-        if (!options.silent) log.info('request result:\n');
+        if (!options.silent) log.success('request result:\n');
 
         const out = handleCloseInterface(data, options);
         if (out) console.log(out);
