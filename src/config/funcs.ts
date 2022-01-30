@@ -1,64 +1,119 @@
 import yaml from 'yaml';
 import { join } from 'path';
-import { error, fromError } from '../log';
+import { exec, ExecException } from 'child_process';
+import * as log from '../log';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { parseStruct, Config, jsonStruct } from '../structs';
+import { parseStruct, Config } from '../structs';
 
-export function getConfig() {
+// CLEAN!
+
+function run(cmd: string): Promise<[string, string | ExecException]> {
+    let _res: [string, string | ExecException];
+
+    return new Promise<[string, string | ExecException]>(
+        res => {
+            exec(cmd, (err: ExecException, out: string) => {
+                if (err) _res = [null, err];
+                else _res = [out, null];
+            }).on('close', () => res(_res));
+        }
+    );
+}
+
+export function getConfig(local: boolean = false) {
     let fp: string;
-    if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
-        fp = join(process.cwd(), '.soar-local.yml');
+
+    if (local) {
+        if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
+            fp = join(process.cwd(), '.soar-local.yml');
+        } else {
+            return null;
+        }
     } else {
-        if (!process.env.SOAR_PATH) error('MISSING_CONFIG', null, true);
+        if (!process.env.SOAR_PATH) log.error('MISSING_CONFIG', null, true);
         fp = join(process.env.SOAR_PATH, 'config.yml');
-        if (!existsSync(fp)) error('INVALID_ENV', null, true);
+        if (!existsSync(fp)) log.error('INVALID_ENV', null, true);
     }
 
     try {
         const config = yaml.parse(readFileSync(fp, 'utf-8'));
         return parseStruct<Config>(config);
     } catch {
-        error('CANNOT_READ_ENV', null, true);
+        log.error('CANNOT_READ_ENV', null, true);
     }
 }
 
-export function createConfig(options?: Config): void {
-    if (!process.env.SOAR_PATH) error('MISSING_ENV', null, true);
-    let config: Config;
+export async function createConfig(path: string, link?: string) {
+    if (!process.env.SOAR_PATH) {
+        log.info('soar library not found, attempting to fetch directly...');
+        let [res, err] = await run('git --version');
+        if (err) {
+            err = err as ExecException;
+            log.error(
+                'Exec Error',
+                err.message.includes('not found') || err.message.includes('not recognised')
+                    ? 'git CLI is required to continue'
+                    : (err as ExecException).message,
+                true
+            );
+        }
 
+        const lib = process.platform === 'win32'
+            ? 'C:\\soar\\'
+            : '/soar/';
+
+        if (existsSync(`${lib}bin`)) {
+            log.info('existing soar library found, attempting clean...');
+            [res, err] = await run(
+                lib.includes('C:')
+                    ? 'rmdir /S /Q C:\\soar\\bin'
+                    : 'rm -rf /soar/bin'
+            );
+            if (err) {
+                err = err as ExecException;
+                log.error(
+                    'Internal Error',
+                    `could not remove existing Soar library files at: '${lib}bin'`,
+                    true
+                );
+            }
+        }
+
+        [res, err] = await run(`git clone https://github.com/PteroPackages/soar-ts.git ${lib}bin`);
+        if (err) {
+            err = err as ExecException;
+            log.error(
+                'Internal Error',
+                [
+                    ...err.message.split('\n'),
+                    `source: ${err.cmd}`,
+                    `code: ${err.code}`
+                ],
+                true
+            );
+        }
+
+        log.success(`cloned Soar library into ${lib}bin`);
+        log.warn([
+            `please set the environment variable 'SOAR_PATH' to ${lib.slice(0, -1)}`,
+            `command: 'set SOAR_PATH=${lib.slice(0, -1)}'`
+        ]);
+        process.env.SOAR_PATH = lib.slice(0, -1);
+    }
+
+    const tmpl = readFileSync(
+        link || join(process.env.SOAR_PATH, 'bin/config.ex.yml'),
+        'utf-8'
+    );
     try {
-        const temp = yaml.parse(readFileSync('../../config.ex.yml', 'utf-8'));
-        config = parseStruct(temp);
+        writeFileSync(path, tmpl, { encoding: 'utf-8' });
     } catch (err) {
-        fromError(err, true);
-    }
-
-    let data: object;
-    if (options) {
-        data = jsonStruct<Config>(compareConfigs(config, options));
-    } else {
-        data = jsonStruct(config);
-    }
-
-    try {
-        writeFileSync(
-            process.env.SOAR_PATH,
-            yaml.stringify(data),
-            { encoding: 'utf-8' }
+        log.error(
+            'Internal Error',
+            err.message.includes('permission') || err.message.includes('denied')
+            ? 'missing the required read/write permissions to continue'
+            : err.message,
+            true
         );
-    } catch {
-        error('MISSING_PERMISSIONS', null, true);
     }
-}
-
-export function updateConfig(newConfig: Config): void {}
-
-function compareConfigs(_old: Config, _new: Config): Config {
-    for (const [k, v] of Object.entries(_new)) {
-        if (
-            _old[k] === undefined ||
-            _old[k] === ''
-        ) _old[k] = v;
-    }
-    return _old;
 }
