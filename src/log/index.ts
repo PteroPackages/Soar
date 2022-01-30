@@ -48,26 +48,33 @@ export function print(message: string): void {
     console.log(BASE +' '+ parse(message));
 }
 
-export function info(message: string): void {
-    console.log(`${BASE} ${COLOURS.BLUE}info${COLOURS.RESET}: ${message}`);
+export function info(message: string | string[]): void {
+    const border = `${BASE} ${COLOURS.BLUE}info${COLOURS.RESET}: `;
+    const fmt = Array.isArray(message) ? message : [message];
+    console.log(fmt.map(m => border + m).join('\n'));
 }
 
-export function notice(message: string): void {
-    console.log(`${BASE} ${COLOURS.CYAN}notice${COLOURS.RESET}: ${message}`);
+export function notice(message: string | string[]): void {
+    const border = `${BASE} ${COLOURS.CYAN}notice${COLOURS.RESET}: `;
+    const fmt = Array.isArray(message) ? message : [message];
+    console.log(fmt.map(m => border + m).join('\n'));
 }
 
-export function debug(message: string): void {
-    console.log(`${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET}: ${message}`);
+export function debug(message: string | string[]): void {
+    const border = `${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET}: `;
+    const fmt = Array.isArray(message) ? message : [message];
+    console.log(fmt.map(m => border + m).join('\n'));
 }
 
-export function success(message: string): void {
-    console.log(`${BASE} ${COLOURS.GREEN}success${COLOURS.RESET}: ${message}`);
+export function success(message: string | string[]): void {
+    const border = `${BASE} ${COLOURS.GREEN}success${COLOURS.RESET}: `;
+    const fmt = Array.isArray(message) ? message : [message];
+    console.log(fmt.map(m => border + m).join('\n'));
 }
 
 export function warn(message: string | string[]): void {
-    const border = parse(`${BASE} %ywarning%R: `);
+    const border = `${BASE} ${COLOURS.YELLOW}warning${COLOURS.RESET}: `;
     const fmt = Array.isArray(message) ? message : [message];
-
     console.log(fmt.map(m => border + m).join('\n'));
 }
 
