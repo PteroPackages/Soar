@@ -126,9 +126,8 @@ const updateUserCmd = new Command('update-user')
         const out = res.handleCloseInterface(data, options);
         if (out && args['diff']) {
             const view = parseDiffView(options.responseType, user, data);
-            log.info(log.parse(
-                `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`,
-                'success'
+            log.success(log.parse(
+                `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`
             ));
             console.log('\n'+ highlight(view.output));
         } else {
