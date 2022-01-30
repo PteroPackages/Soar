@@ -28,11 +28,14 @@ export default class Session {
             this.showDebugLog = false;
             this.showHttpLog = false;
         } else {
-            this.spinner = new Spinner()
-                .setMessage(log.parse('%yfetching%R /application/users', 'info'))
-                .onEnd(t => log.parse(`%gfetched%R /application/users (${t}ms taken)`, 'info'))
-                .onError(t => log.parse(`%rfetch failed%R /application/users (${t}ms timeout)`, 'info'));
+            this.spinner = new Spinner();
         }
+    }
+
+    private setLogs(message: string, success: string, error: string): void {
+        this.spinner?.setMessage(message)
+            .onEnd(t => success.replace('$', t.toString()))
+            .onError(t => error.replace('$', t.toString()));
     }
 
     private log(type: string, message: string): void {
@@ -49,6 +52,13 @@ export default class Session {
     public async handleRequest(method: string, path: string, data?: object) {
         this.log('debug', 'Starting HTTP request');
         this.log('http', `Sending a request to '${this.auth.url + path}'`);
+
+        const base = path.slice(4).split('?')[0];
+        this.setLogs(
+            log.parse(`%yfetching%R ${base}`, 'info'),
+            log.parse(`%gfetched%R ${base} ($ms taken)`, 'info'),
+            log.parse(`%rfetch failed%R ${base} ($ms timeout)`, 'info')
+        );
         this.spinner?.start();
 
         const res = await fetch(this.auth.url + path, {
