@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/PteroPackages/soar-ts#readme",
   "dependencies": {
+    "ascii-table": "^0.0.9",
     "commander": "^8.3.0",
     "node-fetch": "^2.6.6",
     "yaml": "^1.10.2"
