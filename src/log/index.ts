@@ -97,7 +97,7 @@ export function error(name: string, message?: string | string[], exit?: boolean)
 }
 
 export function fromError(_error: Error, exit?: boolean): void | never {
-    return error('Internal Errror', _error.stack.split('\n'), exit);
+    return error('Internal Error', _error.stack.split('\n'), exit);
 }
 
 interface pteroError {
