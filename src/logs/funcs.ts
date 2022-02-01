@@ -13,7 +13,7 @@ export function fetchLogs() {
     if (!process.env.SOAR_PATH) log.error('MISSING_ENV', null, true);
 
     const fp = join(process.env.SOAR_PATH, 'logs/requests.log');
-    if (!existsSync(fp)) create(fp);
+    if (!existsSync(fp)) make(fp);
 
     return parseLogs(readFileSync(fp, { encoding: 'utf-8' }));
 }
@@ -34,14 +34,15 @@ function getLastRef() {
     }
 }
 
-export function createLog(_log: ReqLog): void {
+export function createRequestLog(_log: ReqLog): void {
     if (!process.env.SOAR_PATH) log.error('MISSING_ENV', null, true);
 
     const fp = join(process.env.SOAR_PATH, 'logs/requests.log');
-    if (!existsSync(fp)) create(fp);
+    if (!existsSync(fp)) make(fp);
 
-    const fmt = `${_log.date}:${_log.method}:${_log.response}`+
-        `:${_log.type}:${_log.path}:${getLastRef()}\n`;
+    const fmt = `${_log.date}|${_log.method}|${_log.response}`+
+        `|${_log.type}|${_log.domain.replace(/https?:\/\//g, '')}`+
+        `|${_log.path}|${getLastRef()}\n`;
 
     try {
         appendFileSync(fp, fmt, { encoding: 'utf-8' });
@@ -50,7 +51,7 @@ export function createLog(_log: ReqLog): void {
     }
 }
 
-function create(path: string) {
+function make(path: string) {
     try {
         writeFileSync(path, `#${version}\n`, { encoding: 'utf-8' });
     } catch (err) {
@@ -65,12 +66,13 @@ function parseLogs(data: string): ReqLog[] {
         if (!line.length) continue;
         if (line.startsWith('#')) continue;
         const log = {} as ReqLog;
-        const [d, m, s, t, p, r] = line.split(':');
+        const [d, m, s, t, b, p, r] = line.split('|');
 
         log.date = Number(d);
         log.method = m;
         log.response = Number(s);
         log.type = t;
+        log.domain = b;
         log.path = p;
         log.ref = r;
 

@@ -3,7 +3,7 @@ import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
 import log from '../log';
 import Spinner from '../log/spinner';
-import { createLog } from '../logs/funcs';
+import { createRequestLog } from '../logs/funcs';
 
 export default class Session {
     public config:       Config;
@@ -75,11 +75,12 @@ export default class Session {
 
         this.log('http', `Received status: ${res.status}`);
 
-        if (this.config.logs.logHttpRequests) createLog({
+        if (this.config.logs.logHttpRequests) createRequestLog({
             date: Date.now(),
             method,
             response: res.status,
             type: 'D',
+            domain: this.auth.url,
             path
         });
 
