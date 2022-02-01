@@ -3,6 +3,7 @@ import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
 import log from '../log';
 import Spinner from '../log/spinner';
+import { createLog } from '../logs/funcs';
 
 export default class Session {
     public config:       Config;
@@ -73,6 +74,14 @@ export default class Session {
         });
 
         this.log('http', `Received status: ${res.status}`);
+
+        if (this.config.logs.logHttpRequests) createLog({
+            date: Date.now(),
+            method,
+            response: res.status,
+            type: 'D',
+            path
+        });
 
         if (res.status === 204) {
             this.log('debug', 'Request ended with no response body');

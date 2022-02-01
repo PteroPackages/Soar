@@ -13,4 +13,5 @@ logs:
   show_debug: false
   show_http_log: false
   show_ws_log: false
+  log_http_requests: false
   error_out_dir: ""

@@ -33,6 +33,7 @@ use strict mode:            ${config.logs.strictMode}
 output debug messages:      ${config.logs.showDebug}
 output http responses:      ${config.logs.showHttpLog}
 output websocket responses: ${config.logs.showWsLog}
+log http requests:          ${config.logs.logHttpRequests}
 
 Error Directory: ${config.logs.errorOutDir || 'Not Set'}`
         );

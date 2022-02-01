@@ -1,9 +1,10 @@
 export interface LogConfig {
-    strictMode:  boolean;
-    showDebug:   boolean;
-    showHttpLog: boolean;
-    showWsLog:   boolean;
-    errorOutDir: string;
+    strictMode:      boolean;
+    showDebug:       boolean;
+    showHttpLog:     boolean;
+    showWsLog:       boolean;
+    logHttpRequests: boolean;
+    errorOutDir:     string;
 }
 
 export interface Auth {
@@ -16,6 +17,15 @@ export interface Config {
     application: Auth;
     client:      Auth;
     logs:        LogConfig;
+}
+
+export interface ReqLog {
+    date:     number;
+    method:   string;
+    response: number;
+    type:     string;
+    path:     string;
+    ref?:     string;
 }
 
 export interface FlagOptions {
