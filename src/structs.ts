@@ -24,6 +24,7 @@ export interface ReqLog {
     method:   string;
     response: number;
     type:     string;
+    domain:   string;
     path:     string;
     ref?:     string;
 }

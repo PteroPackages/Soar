@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import ascii from 'ascii-table';
 import { fetchLogs } from './funcs';
 import log from '../log';
 
@@ -67,12 +68,20 @@ const logsGetCmd = new Command('fetch')
             return log.parse(`%g${c}%R`);
         }
 
-        console.log(
-            logs.map(l =>
-                `${new Date(l.date).toLocaleString()} |`+
-                ` ${l.method + ' '.repeat(6 - l.method.length)}: ${sortCode(l.response)} | ${l.path}`
-            ).join('\n') || 'no logs found'
-        );
+        const table = new ascii('Request Logs')
+            .setHeading('Date')
+            .setHeading('Method-Status')
+            .setHeading('Domain')
+            .setHeading('Path');
+
+        logs.forEach(l => table.addRow(
+            new Date(l.date).toLocaleString(),
+            l.method +' '+ sortCode(l.response),
+            l.domain,
+            l.path
+        ));
+
+        console.log(table.render());
     });
 
 export default [
