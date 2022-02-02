@@ -69,10 +69,7 @@ const logsGetCmd = new Command('fetch')
         }
 
         const table = new ascii('Request Logs')
-            .setHeading('Date')
-            .setHeading('Method-Status')
-            .setHeading('Domain')
-            .setHeading('Path');
+            .setHeading('Date', 'Method-Status', 'Domain', 'Path');
 
         logs.forEach(l => table.addRow(
             new Date(l.date).toLocaleString(),
