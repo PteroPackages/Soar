@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import fetch, { Response } from 'node-fetch';
 import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
 import log from '../log';
@@ -8,20 +8,26 @@ import { createRequestLog } from '../logs/funcs';
 export default class Session {
     public config:       Config;
     public auth:         Auth;
+    public type:         string;
     public spinner:      Spinner | null;
     public showDebugLog: boolean;
     public showHttpLog:  boolean;
 
     constructor(type: 'application' | 'client', options: FlagOptions) {
-        this.config = getConfig(true);
-        this.auth = this.config[type];
-        if (!this.auth?.url || !this.auth?.key) log.error('MISSING_AUTH_APPLICATION', null, true);
-
+        this.type = type;
         this.spinner = null;
-        this.showDebugLog = this.config.logs.showDebug;
-        this.showHttpLog = this.config.logs.showHttpLog;
 
         this.setOptions(options);
+    }
+
+    private async getConfig() {
+        this.config = await getConfig(true);
+        this.auth = this.config[this.type];
+        if (!this.auth?.url || !this.auth?.key)
+            log.error('MISSING_AUTH_APPLICATION', null, true);
+
+        this.showDebugLog = this.config.logs.showDebug;
+        this.showHttpLog = this.config.logs.showHttpLog;
     }
 
     private setOptions(options: FlagOptions) {
@@ -50,7 +56,19 @@ export default class Session {
         }
     }
 
+    private logHttp(method: string, path: string, res: Response): void {
+        if (this.config.logs.logHttpRequests) createRequestLog({
+            date: Date.now(),
+            method,
+            response: res.status,
+            type: 'D',
+            domain: this.auth.url,
+            path
+        });
+    }
+
     public async handleRequest(method: string, path: string, data?: object) {
+        await this.getConfig();
         this.log('debug', 'Starting HTTP request');
         this.log('http', `Sending a request to '${this.auth.url + path}'`);
 
@@ -75,22 +93,15 @@ export default class Session {
 
         this.log('http', `Received status: ${res.status}`);
 
-        if (this.config.logs.logHttpRequests) createRequestLog({
-            date: Date.now(),
-            method,
-            response: res.status,
-            type: 'D',
-            domain: this.auth.url,
-            path
-        });
-
         if (res.status === 204) {
             this.log('debug', 'Request ended with no response body');
             this.spinner?.stop(false);
+            this.logHttp(method, path, res);
             return Promise.resolve<void>(null);
         }
         if ([200, 201].includes(res.status)) {
             this.spinner?.stop(false);
+            this.logHttp(method, path, res);
             if (res.headers.get('content-type') === 'application/json')
                 return await res.json();
 
@@ -99,7 +110,9 @@ export default class Session {
         }
 
         this.spinner?.stop(true);
-        if (res.status >= 400 && res.status < 500) return log.fromPtero(await res.json(), true);
+        this.logHttp(method, path, res);
+        if (res.status >= 400 && res.status < 500)
+            return log.fromPtero(await res.json(), true);
 
         log.error(
             'API Error',
