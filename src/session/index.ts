@@ -15,7 +15,7 @@ export default class Session {
     constructor(type: 'application' | 'client', options: FlagOptions) {
         this.config = getConfig(true);
         this.auth = this.config[type];
-        if (!this.auth.url || !this.auth.key) log.error('MISSING_AUTH_A', null, true);
+        if (!this.auth?.url || !this.auth?.key) log.error('MISSING_AUTH_APPLICATION', null, true);
 
         this.spinner = null;
         this.showDebugLog = this.config.logs.showDebug;

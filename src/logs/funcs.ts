@@ -35,7 +35,7 @@ function getLastRef() {
 }
 
 export function createRequestLog(_log: ReqLog): void {
-    if (!process.env.SOAR_PATH) log.error('MISSING_ENV', null, true);
+    if (!process.env.SOAR_PATH) return log.warn('could not find soar library path; log skipped');
 
     const fp = join(process.env.SOAR_PATH, 'logs/requests.log');
     if (!existsSync(fp)) make(fp);
