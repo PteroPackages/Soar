@@ -20,7 +20,7 @@ function run(cmd: string): Promise<[string, string | ExecException]> {
     );
 }
 
-export function getConfig(checkLocal: boolean = false): Config {
+export async function getConfig(checkLocal: boolean = false): Promise<Config> {
     let fp: string;
 
     if (
@@ -36,7 +36,7 @@ export function getConfig(checkLocal: boolean = false): Config {
 
     try {
         const config = yaml.parse(readFileSync(fp, 'utf-8'));
-        return parseStruct<Config>(config);
+        return new Promise<Config>(res => res(parseStruct<Config>(config)));
     } catch {
         log.error('CANNOT_READ_ENV', null, true);
     }

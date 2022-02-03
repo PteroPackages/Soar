@@ -8,8 +8,8 @@ import { getConfig, createConfig } from './funcs';
 const infoCmd = new Command('info')
     .option('--local', 'Gets the local configuration for the workspace.', false)
     .option('-h, --hide', 'Hides the API keys from the command output.', false)
-    .action((args: object) => {
-        const config = getConfig(args['local']);
+    .action(async (args: object) => {
+        const config = await getConfig(args['local']);
         const appKey = args['hide']
             ? '•'.repeat(config.application.key.length)
             : config.application.key;
