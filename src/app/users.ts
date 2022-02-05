@@ -1,7 +1,6 @@
 import { Command } from 'commander';
 import Session from '../session';
-import * as res from '../response';
-import parseDiffView, { highlight } from '../response/view';
+import parseDiffView, { highlight } from '../session/view';
 import { buildUser, parseUserGroup } from '../validate';
 import log from '../log';
 
@@ -25,7 +24,7 @@ const getUsersCmd = new Command('get-users')
         const data = await session.handleRequest('GET', buildUser(args));
         if (!options.silent) log.success('request result:\n');
 
-        const out = res.handleCloseInterface(data, options);
+        const out = await session.handleClose(data, options);
         if (out) console.log(out);
     });
 
@@ -74,7 +73,7 @@ const createUserCmd = new Command('create-user')
         const data = await session.handleRequest('GET', buildUser({ email: json['email'] }));
         if (!options.silent) log.success('account created! request result:\n');
 
-        const out = res.handleCloseInterface(data, options);
+        const out = await session.handleClose(data, options);
         if (out) console.log(out);
     });
 
@@ -123,7 +122,8 @@ const updateUserCmd = new Command('update-user')
         json['password'] ||= null;
 
         const data = await session.handleRequest('PATCH', buildUser({ id }), json);
-        const out = res.handleCloseInterface(data, options);
+        const out = await session.handleClose(data, options);
+
         if (out && args['diff']) {
             const view = parseDiffView(options.responseType, user, data);
             log.success(log.parse(

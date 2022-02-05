@@ -1,5 +1,5 @@
 import yaml from 'yaml';
-import { formatString } from '.';
+import { formatString } from './response';
 import { COLOURS } from '../log';
 
 export function viewAs(type: string, _old: object, _new: object): [string, string] {

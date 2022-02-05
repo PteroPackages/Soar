@@ -1,14 +1,18 @@
 import fetch, { Response } from 'node-fetch';
+import { createInterface, Interface } from 'readline';
+import yaml from 'yaml';
 import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
 import log from '../log';
 import Spinner from '../log/spinner';
 import { createRequestLog } from '../logs/funcs';
+import * as response from './response';
 
 export default class Session {
     public config:       Config;
     public auth:         Auth;
     public type:         string;
+    public reader:       Interface;
     public spinner:      Spinner | null;
     public showDebugLog: boolean;
     public showHttpLog:  boolean;
@@ -122,5 +126,45 @@ export default class Session {
                 'Please contact a system administrator to resolve.'
             ]
         );
+    }
+
+    public async handleClose(data: object, options: FlagOptions) {
+        let parsed: string;
+
+        switch (options.responseType) {
+            case 'text': parsed = response.formatString(data); break;
+            case 'yaml': parsed = yaml.stringify(data); break;
+            default: parsed = JSON.stringify(data); break;
+        }
+
+        if (options.writeFile.length) {
+            response.writeFileResponse(options.writeFile, parsed, !options.silent);
+        } else if (options.prompt && !options.silent) {
+            this.reader ??= createInterface(
+                process.stdin,
+                process.stdout
+            );
+
+            const res = await response.getBoolInput(
+                this.reader, 'should this request be saved? (y/n)'
+            );
+
+            if (res) {
+                const fp = await response.getStringInput(
+                    this.reader,
+                    'Enter the file path to save to, leave empty for default path',
+                    true
+                );
+
+                if (fp) await response.writeFileResponse(
+                    `soar_log_${Date.now()}.${options.responseType}`,
+                    parsed,
+                    !options.silent
+                );
+            }
+            this.reader.close();
+        }
+
+        return parsed;
     }
 }

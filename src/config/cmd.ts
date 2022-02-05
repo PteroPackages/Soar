@@ -1,8 +1,9 @@
 import { Command } from 'commander';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { createInterface } from 'readline';
 import log from '../log';
-import { getBoolInput } from '../response';
+import { getBoolInput } from '../session/response';
 import { getConfig, createConfig } from './funcs';
 
 const infoCmd = new Command('info')
@@ -54,7 +55,12 @@ const setupCmd = new Command('setup')
             if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
                 log.notice('existing local config file found');
                 if (!force) {
-                    const res = getBoolInput('Do you want to overwrite this file? (y/n)');
+                    const reader = createInterface(
+                        process.stdin,
+                        process.stdout
+                    );
+
+                    const res = await getBoolInput(reader, 'do you want to overwrite this file? (y/n)');
                     if (!res) return;
                 } else {
                     log.notice('overwrite mode forced for local config');

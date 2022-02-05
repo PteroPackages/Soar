@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import Session from '../session';
-import { handleCloseInterface } from '../response';
 import { buildServer, parseServerGroup } from '../validate';
 import log from '../log';
 
@@ -24,7 +23,7 @@ const getServersCmd = new Command('get-servers')
         const data = await session.handleRequest('GET', buildServer(args));
         if (!options.silent) log.success('request result:\n');
 
-        const out = handleCloseInterface(data, options);
+        const out = session.handleClose(data, options);
         if (out) console.log(out);
     });
 
