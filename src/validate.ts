@@ -50,3 +50,25 @@ export function buildNode(args: object): string {
     if (args['config']) return base +'/configuration';
     return base;
 }
+
+function assert(key: string, value: any, expected: any): void {
+    if (typeof value !== typeof expected)
+        throw `expected type ${typeof value} for '${key}'; got ${typeof expected}`;
+}
+
+export function parseConfig(config: any): string {
+    try {
+        assert('version', config.version, '');
+        assert('application.url', config.application[0].url, '');
+        assert('application.key', config.application[0].key, '');
+        assert('client.url', config.client[0].url, '');
+        assert('client.key', config.client[0].key, '');
+        assert('logs.strictMode', config.logs.strict_mode, true);
+        assert('logs.showDebug', config.logs.show_debug, true);
+        assert('logs.showHttpLog', config.logs.show_http_log, true);
+        assert('logs.showWsLog', config.logs.show_ws_log, true);
+        assert('logs.logHttpRequests', config.logs.log_http_requests, true);
+    } catch (err) {
+        return err;
+    }
+}

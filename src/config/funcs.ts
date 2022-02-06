@@ -1,9 +1,10 @@
 import yaml from 'yaml';
 import { join } from 'path';
 import { exec, ExecException } from 'child_process';
-import log from '../log';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { parseStruct, Config } from '../structs';
+import { parseConfig } from '../validate';
+import log from '../log';
 
 function run(cmd: string): Promise<[string, string | ExecException]> {
     let _res: [string, string | ExecException];
@@ -34,6 +35,16 @@ export async function getConfig(checkLocal: boolean = false): Promise<Config> {
 
     try {
         const config = yaml.parse(readFileSync(fp, 'utf-8'));
+        const err = parseConfig(config);
+        if (err) log.error(
+            'Config Error',
+            [
+                err,
+                'make sure to update the necessary config option at:',
+                fp
+            ],
+            true
+        );
         return new Promise<Config>(res => res(parseStruct<Config>(config)));
     } catch {
         log.error('CANNOT_READ_ENV', null, true);
