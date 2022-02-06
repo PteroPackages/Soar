@@ -20,16 +20,18 @@ const getNodesCmd = new Command('get-nodes')
             'a node id is necessary to fetch its configuration setup',
             true
         );
-        const session = new Session('application', options);
 
+        const session = new Session('application', options);
         const data = await session.handleRequest(
             'GET',
             buildNode({ config: args['config'], ...args })
         );
-        if (!options.silent) log.success('request result:\n');
 
         const out = await session.handleClose(data, options);
-        if (out) console.log(out);
+        if (out) {
+            if (!options.silent) log.success('request result:\n');
+            console.log(out);
+        }
     });
 
 export default [

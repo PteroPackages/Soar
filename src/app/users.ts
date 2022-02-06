@@ -22,10 +22,11 @@ const getUsersCmd = new Command('get-users')
         const session = new Session('application', options);
 
         const data = await session.handleRequest('GET', buildUser(args));
-        if (!options.silent) log.success('request result:\n');
-
         const out = await session.handleClose(data, options);
-        if (out) console.log(out);
+        if (out) {
+            if (!options.silent) log.success('request result:\n');
+            console.log(out);
+        }
     });
 
 const createUserCmd = new Command('create-user')
@@ -71,10 +72,11 @@ const createUserCmd = new Command('create-user')
         const session = new Session('application', options);
         await session.handleRequest('POST', buildUser({}), json);
         const data = await session.handleRequest('GET', buildUser({ email: json['email'] }));
-        if (!options.silent) log.success('account created! request result:\n');
-
         const out = await session.handleClose(data, options);
-        if (out) console.log(out);
+        if (out) {
+            if (!options.silent) log.success('account created! request result:\n');
+            console.log(out);
+        }
     });
 
 const updateUserCmd = new Command('update-user')
@@ -127,7 +129,8 @@ const updateUserCmd = new Command('update-user')
         if (out && args['diff']) {
             const view = parseDiffView(options.responseType, user, data);
             log.success(log.parse(
-                `made %c${view.totalChanges}%R changes (%g+${view.additions}%R | %r-${view.subtractions}%R)`
+                `made %c${view.totalChanges}%R changes`+
+                ` (%g+${view.additions}%R | %r-${view.subtractions}%R)`
             ));
             console.log('\n'+ highlight(view.output));
         } else {

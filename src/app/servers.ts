@@ -21,10 +21,11 @@ const getServersCmd = new Command('get-servers')
         const session = new Session('application', options);
 
         const data = await session.handleRequest('GET', buildServer(args));
-        if (!options.silent) log.success('request result:\n');
-
         const out = await session.handleClose(data, options);
-        if (out) console.log(out);
+        if (out) {
+            if (!options.silent) log.success('request result:\n');
+            console.log(out);
+        }
     });
 
 const suspendServerCmd = new Command('suspend')
