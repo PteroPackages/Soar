@@ -32,7 +32,7 @@ export async function writeFileResponse(name: string, data: string, writeLog: bo
 }
 
 async function prompt(reader: Interface, message: string): Promise<string> {
-    reader.write(message);
+    reader.write(`[soar] ${message}\n[soar] >`);
 
     let out: string;
     await new Promise<void>(
@@ -48,13 +48,13 @@ async function prompt(reader: Interface, message: string): Promise<string> {
 }
 
 export async function getBoolInput(reader: Interface, message: string): Promise<boolean> {
-    const out = await prompt(reader, `${message}\n[soar] >`);
+    const out = await prompt(reader, message);
     if ('yes'.includes(out.slice(8))) return true;
     return false;
 }
 
 export async function getStringInput(reader: Interface, message: string, allowEmpty: boolean) {
-    const out = await prompt(reader, `${message}\n[soar] >`);
+    const out = await prompt(reader, message);
     if (!out.length && !allowEmpty) return getStringInput(reader, message, allowEmpty);
     return out;
 }
