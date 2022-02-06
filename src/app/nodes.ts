@@ -15,6 +15,11 @@ const getNodesCmd = new Command('get-nodes')
     .option('--config', 'Fetch the node configuration setup.', false)
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
+        if (args['config'] && !args['id']) log.error(
+            'Invalid Arguments',
+            'a node id is necessary to fetch its configuration setup',
+            true
+        );
         const session = new Session('application', options);
 
         const data = await session.handleRequest(
