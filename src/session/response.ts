@@ -38,7 +38,7 @@ async function prompt(reader: Interface, message: string): Promise<string> {
     await new Promise<void>(
         res => {
             reader.once('line', line => {
-                out = line;
+                out = line.slice(8);
                 res();
             });
         }
@@ -49,7 +49,8 @@ async function prompt(reader: Interface, message: string): Promise<string> {
 
 export async function getBoolInput(reader: Interface, message: string): Promise<boolean> {
     const out = await prompt(reader, message);
-    if ('yes'.includes(out.slice(8))) return true;
+    if (!out.length) return false;
+    if ('yes'.includes(out)) return true;
     return false;
 }
 
