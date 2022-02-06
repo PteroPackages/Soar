@@ -43,3 +43,10 @@ export function buildServer(args: object): string {
     if (args['image']) return `${base}?filter[image]=${args['image']}`;
     return base;
 }
+
+export function buildNode(args: object): string {
+    let base = '/api/application/nodes';
+    if (args['id']) base += `/${args['id']}`;
+    if (args['config']) return base +'/configuration';
+    return base;
+}
