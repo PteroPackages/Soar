@@ -118,7 +118,7 @@ interface pteroError {
 export function fromPtero(data: pteroError, exit?: boolean): void | never {
     error(
         'API Request Error',
-        `Pterodactyl panel returned ${data.errors.length} error${data.errors.length > 1 ? 's' : ''}.`
+        `pterodactyl panel returned ${data.errors.length} error${data.errors.length > 1 ? 's' : ''}.`
     );
 
     for (const err of data.errors) {
@@ -128,7 +128,7 @@ export function fromPtero(data: pteroError, exit?: boolean): void | never {
 
     if (data.errors.some(e => e.status === '403')) {
         notice(
-            'Please ensure that your API key has the necessary'+
+            'please ensure that your api key has the necessary'+
             ' read/write permissions before making requests.'
         );
     }

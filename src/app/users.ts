@@ -48,7 +48,7 @@ const createUserCmd = new Command('create-user')
             log.error(
                 'Argument Error',
                 [
-                    'Couldn\'t parse JSON data argument:',
+                    'couldn\'t parse json data argument:',
                     err.message
                 ],
                 true
@@ -63,7 +63,7 @@ const createUserCmd = new Command('create-user')
         if (missing.length) log.error(
             'Argument Error',
             [
-                `Missing required key${missing.length > 1 ? 's' : ''}:`,
+                `missing required key${missing.length > 1 ? 's' : ''}:`,
                 missing.join(', ')
             ],
             true
@@ -100,7 +100,7 @@ const updateUserCmd = new Command('update-user')
             log.error(
                 'Argument Error',
                 [
-                    'Couldn\'t parse JSON data argument:',
+                    'couldn\'t parse json data argument:',
                     err.message
                 ],
                 true
@@ -108,7 +108,7 @@ const updateUserCmd = new Command('update-user')
         }
         if (!Object.entries(json).length) log.error(
             'Argument Error',
-            'No JSON was provided to update.',
+            'no json was provided to update.',
             true
         );
 

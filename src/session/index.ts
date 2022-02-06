@@ -121,9 +121,9 @@ export default class Session {
         log.error(
             'API Error',
             [
-                `Status code ${res.status} receieved;`,
-                'The API could not be contacted securely',
-                'Please contact a system administrator to resolve.'
+                `status code ${res.status} receieved`,
+                'the api could not be contacted securely',
+                'please contact a system administrator to resolve'
             ]
         );
     }
@@ -152,7 +152,7 @@ export default class Session {
             if (res) {
                 const fp = await response.getStringInput(
                     this.reader,
-                    'Enter the file path to save to, leave empty for default path',
+                    'enter the file path to save to, leave empty for default path',
                     true
                 );
 

@@ -72,7 +72,7 @@ const setupCmd = new Command('setup')
             if (typeof link === 'string') {
                 if (!existsSync(link)) log.error(
                     'Not Found Error',
-                    'The local config file path could not be resolved',
+                    'the local config file path could not be resolved',
                     true
                 );
                 linkfp = link;

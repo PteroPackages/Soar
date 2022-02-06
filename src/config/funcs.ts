@@ -5,8 +5,6 @@ import log from '../log';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { parseStruct, Config } from '../structs';
 
-// CLEAN!
-
 function run(cmd: string): Promise<[string, string | ExecException]> {
     let _res: [string, string | ExecException];
 
@@ -51,7 +49,7 @@ export async function createConfig(path: string, link?: string) {
             log.error(
                 'Exec Error',
                 err.message.includes('not found') || err.message.includes('not recognised')
-                    ? 'git CLI is required to continue'
+                    ? 'git cli is required to continue'
                     : (err as ExecException).message,
                 true
             );
@@ -72,7 +70,7 @@ export async function createConfig(path: string, link?: string) {
                 err = err as ExecException;
                 log.error(
                     'Internal Error',
-                    `could not remove existing Soar library files at: '${lib}bin'`,
+                    `could not remove existing soar library files at: '${lib}bin'`,
                     true
                 );
             }
@@ -92,7 +90,7 @@ export async function createConfig(path: string, link?: string) {
             );
         }
 
-        log.success(`cloned Soar library into ${lib}bin`);
+        log.success(`cloned soar library into ${lib}bin`);
         log.warn([
             `please set the environment variable 'SOAR_PATH' to ${lib.slice(0, -1)}`,
             `command: 'set SOAR_PATH=${lib.slice(0, -1)}'`

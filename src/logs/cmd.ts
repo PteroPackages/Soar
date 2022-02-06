@@ -40,7 +40,7 @@ const logsGetCmd = new Command('fetch')
             ) log.error(
                 'Argument Error',
                 [
-                    'invalid HTTP method specified.',
+                    'invalid http method specified',
                     'methods: GET, POST, PATCH, PUT, DELETE'
                 ],
                 true
