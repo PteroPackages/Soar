@@ -27,6 +27,32 @@ const getServersCmd = new Command('get-servers')
         if (out) console.log(out);
     });
 
+const suspendServerCmd = new Command('suspend')
+    .addHelpText('before', 'Suspends a specified server.')
+    .argument('<id>', 'The ID of the server.')
+    .option('-s, --silent', 'Don\'t log request messages.', false)
+    .action(async (id: string, args: object) => {
+        const options = parseFlagOptions(args);
+        const session = new Session('application', options);
+
+        await session.handleRequest('POST', buildServer({ id, suspend: true }));
+        if (!options.silent) log.success(`suspended server: ${id}`);
+    });
+
+    const unsuspendServerCmd = new Command('unsuspend')
+    .addHelpText('before', 'Unsuspends a suspended server.')
+    .argument('<id>', 'The ID of the server.')
+    .option('-s, --silent', 'Don\'t log request messages.', false)
+    .action(async (id: string, args: object) => {
+        const options = parseFlagOptions(args);
+        const session = new Session('application', options);
+
+        await session.handleRequest('POST', buildServer({ id, suspend: true }));
+        if (!options.silent) log.success(`unsuspended server: ${id}`);
+    });
+
 export default [
-    getServersCmd
+    getServersCmd,
+    suspendServerCmd,
+    unsuspendServerCmd
 ]
