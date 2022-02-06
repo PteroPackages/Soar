@@ -31,9 +31,14 @@ export function buildUser(args: object): string {
 
 export function buildServer(args: object): string {
     let base = '/api/application/servers';
-    if (args['id']) return `${base}/${args['id']}`;
+    if (args['id']) {
+        base = `/api/application/servers/${args['id']}`;
+        if (args['suspend']) return base +'/suspend';
+        if (args['unsuspend']) return base +'/unsuspend';
+        if (args['reinstall']) return base +'/reinstall';
+    }
     if (args['uuid']) return `${base}?filter[uuid]=${args['uuid']}`;
-    if (args['name']) return `${base}?filter[uuid]=${args['name']}`;
+    if (args['name']) return `${base}?filter[name]=${args['name']}`;
     if (args['external']) return `${base}?filter[external_id]=${args['external']}`;
     if (args['image']) return `${base}?filter[image]=${args['image']}`;
     return base;
