@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import Session from '../session';
-import { buildServer, parseServerGroup } from '../validate';
+import { buildServer, parseFlagOptions } from '../validate';
 import log from '../log';
 
 const getServersCmd = new Command('get-servers')
@@ -17,13 +17,13 @@ const getServersCmd = new Command('get-servers')
     .option('--external <id>', 'The external server ID to query.')
     .option('--image <url>', 'The docker image URL to query.')
     .action(async (args: object) => {
-        const options = parseServerGroup(args);
+        const options = parseFlagOptions(args);
         const session = new Session('application', options);
 
         const data = await session.handleRequest('GET', buildServer(args));
         if (!options.silent) log.success('request result:\n');
 
-        const out = session.handleClose(data, options);
+        const out = await session.handleClose(data, options);
         if (out) console.log(out);
     });
 

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import Session from '../session';
 import parseDiffView, { highlight } from '../session/view';
-import { buildUser, parseUserGroup } from '../validate';
+import { buildUser, parseFlagOptions } from '../validate';
 import log from '../log';
 
 const getUsersCmd = new Command('get-users')
@@ -18,7 +18,7 @@ const getUsersCmd = new Command('get-users')
     .option('--uuid <uuid>', 'The UUID to query.')
     .option('--external <id>', 'The external user ID to query.')
     .action(async (args: object) => {
-        const options = parseUserGroup(args);
+        const options = parseFlagOptions(args);
         const session = new Session('application', options);
 
         const data = await session.handleRequest('GET', buildUser(args));
@@ -38,7 +38,7 @@ const createUserCmd = new Command('create-user')
     .option('-o, --output [file]', 'Writes the output to a file.')
     .option('-d, --data <json>', 'The json data to create the user with.')
     .action(async (args: object) => {
-        const options = parseUserGroup(args);
+        const options = parseFlagOptions(args);
 
         let json: object;
         try {
@@ -89,7 +89,7 @@ const updateUserCmd = new Command('update-user')
     .option('-d, --data <json>', 'The json data to update the user with.')
     .option('--no-diff', 'Don\'t show the properties changed in the request.', false)
     .action(async (id: string, args: object) => {
-        const options = parseUserGroup(args);
+        const options = parseFlagOptions(args);
 
         let json: object;
         try {
@@ -140,7 +140,7 @@ const deleteUserCmd = new Command('delete-user')
     .argument('<id>', 'The ID of the user account to delete.')
     .option('-s, --silent', 'Don\'t log request messages.', false)
     .action(async (id: string, args: object) => {
-        const options = parseUserGroup(args);
+        const options = parseFlagOptions(args);
         const session = new Session('application', options);
 
         await session.handleRequest('DELETE', buildUser({ id }));
