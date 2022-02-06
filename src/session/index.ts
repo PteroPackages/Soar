@@ -78,9 +78,9 @@ export default class Session {
 
         const base = path.slice(4).split('?')[0];
         this.setLogs(
-            log.parse(`%yfetching%R ${base}`, 'info'),
-            log.parse(`%gfetched%R ${base} ($ms taken)`, 'info'),
-            log.parse(`%rfetch failed%R ${base} ($ms timeout)`, 'info')
+            log.parse(`%y${method}%R ${base}`, 'http'),
+            log.parse(`%g${method}%R ${base} ($ms taken)`, 'http'),
+            log.parse(`%r${method}%R ${base} ($ms timeout)`, 'http')
         );
         this.spinner?.start();
 

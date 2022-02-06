@@ -22,11 +22,11 @@ export const CODE_MAP = {
     '%m': COLOURS.MAGENTA
 }
 
-const BASE = `[${COLOURS.CYAN}soar${COLOURS.RESET}]`;
+const BASE = `${COLOURS.RESET}[soar]${COLOURS.RESET}`;
 
 export function parse(
         message: string,
-        type?: 'info' | 'success' | 'notice' | 'debug' | 'warn' | 'error'
+        type?: 'info' | 'success' | 'notice' | 'debug' | 'http' | 'warn' | 'error'
     ): string {
     for (const [k, c] of Object.entries<string>(CODE_MAP)) message = message.replaceAll(k, c);
 
@@ -35,7 +35,8 @@ export function parse(
             case 'info': message = `${BASE} ${COLOURS.BLUE}info${COLOURS.RESET}: ${message}`; break;
             case 'success': message = `${BASE} ${COLOURS.GREEN}success${COLOURS.RESET}: ${message}`; break;
             case 'notice': message = `${BASE} ${COLOURS.BLUE}notice${COLOURS.RESET}: ${message}`; break;
-            case 'debug': message = `${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET} ${message}`; break;
+            case 'debug': message = `${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET}: ${message}`; break;
+            case 'http': message = `${BASE} ${COLOURS.MAGENTA}http${COLOURS.RESET}: ${message}`; break;
             case 'warn': message = `${BASE} ${COLOURS.YELLOW}warning${COLOURS.RESET}: ${message}`; break;
             case 'error': message = `${BASE} ${COLOURS.RED}error${COLOURS.RESET}: ${message}`; break;
         }
@@ -62,6 +63,12 @@ export function notice(message: string | string[]): void {
 
 export function debug(message: string | string[]): void {
     const border = `${BASE} ${COLOURS.BOLD}debug${COLOURS.RESET}: `;
+    const fmt = Array.isArray(message) ? message : [message];
+    console.log(fmt.map(m => border + m).join('\n'));
+}
+
+export function http(message: string | string[]): void {
+    const border = `${BASE} ${COLOURS.MAGENTA}http${COLOURS.RESET}: `;
     const fmt = Array.isArray(message) ? message : [message];
     console.log(fmt.map(m => border + m).join('\n'));
 }
@@ -135,6 +142,7 @@ export default {
     info,
     notice,
     debug,
+    http,
     success,
     warn,
     error,
