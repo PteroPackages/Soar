@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { createInterface } from 'readline';
 import log from '../log';
@@ -49,11 +49,24 @@ const setupCmd = new Command('setup')
         const local: boolean = args['local'];
         const force: boolean = args['force'];
         let link: string | boolean = args['link'];
-        let linkfp: string;
+        let mainfp = join(process.env.SOAR_PATH || '', 'config.yml');
+
+        if (link) {
+            if (typeof link === 'string') {
+                if (!existsSync(link)) log.error(
+                    'Not Found Error',
+                    'the local config file path could not be resolved',
+                    true
+                );
+                mainfp = link;
+            } else {
+                if (!existsSync(process.env.SOAR_PATH)) log.error('MISSING_CONFIG', null, true);
+            }
+        }
 
         if (local) {
             if (existsSync(join(process.cwd(), '.soar-local.yml'))) {
-                log.notice('existing local config file found');
+                log.info('existing local config file found');
                 if (!force) {
                     const reader = createInterface(
                         process.stdin,
@@ -63,32 +76,27 @@ const setupCmd = new Command('setup')
                     const res = await getBoolInput(reader, 'do you want to overwrite this file? (y/n)');
                     if (!res) return;
                 } else {
-                    log.notice('overwrite mode forced for local config');
+                    log.info('overwrite mode forced for local config');
                 }
             }
-        }
 
-        if (link) {
-            if (typeof link === 'string') {
-                if (!existsSync(link)) log.error(
-                    'Not Found Error',
-                    'the local config file path could not be resolved',
-                    true
+            try {
+                const linkData = readFileSync(mainfp, { encoding: 'utf-8' });
+                writeFileSync(
+                    join(process.cwd(), '.soar-local.yml'),
+                    linkData, { encoding: 'utf-8' }
                 );
-                linkfp = link;
-            } else {
-                if (!existsSync(process.env.SOAR_PATH)) log.error('MISSING_CONFIG', null, true);
-                linkfp = process.env.SOAR_PATH;
+
+                log.success([
+                    'setup a new local config at:',
+                    join(process.cwd(), '.soar-local.yml')
+                ]);
+            } catch (err) {
+                log.fromError(err, true);
             }
+        } else {
+            await createConfig(link ? mainfp : null);
         }
-
-        const fp = local ?
-            join(process.cwd(), '.soar-local.yml')
-            : join(process.env.SOAR_PATH, 'config.yml');
-
-        await createConfig(fp, linkfp);
-
-        log.success([`setup a new ${local ? 'local' : 'global'} config at:`, fp]);
     });
 
 export default [

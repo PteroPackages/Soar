@@ -40,7 +40,11 @@ export async function getConfig(checkLocal: boolean = false): Promise<Config> {
     }
 }
 
-export async function createConfig(path: string, link?: string) {
+export async function createConfig(link?: string) {
+    const lib = process.platform === 'win32'
+            ? 'C:\\soar\\'
+            : '/soar/';
+
     if (!process.env.SOAR_PATH) {
         log.info('soar library not found, attempting to fetch directly...');
         let [res, err] = await run('git --version');
@@ -54,10 +58,6 @@ export async function createConfig(path: string, link?: string) {
                 true
             );
         }
-
-        const lib = process.platform === 'win32'
-            ? 'C:\\soar\\'
-            : '/soar/';
 
         if (existsSync(`${lib}bin`)) {
             log.info('existing soar library found, attempting clean...');
@@ -103,7 +103,7 @@ export async function createConfig(path: string, link?: string) {
         'utf-8'
     );
     try {
-        writeFileSync(path, tmpl, { encoding: 'utf-8' });
+        writeFileSync(`${lib}config.yml`, tmpl, { encoding: 'utf-8' });
     } catch (err) {
         log.error(
             'Internal Error',
