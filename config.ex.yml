@@ -1,17 +1,18 @@
 version: 0.0.2
 
 application:
-  - url: ""
-    key: ""
+  url: ""
+  key: ""
 
 client:
-  - url: ""
-    key: ""
+  url: ""
+  key: ""
 
 logs:
-  strict_mode: false
   show_debug: false
   show_http_log: false
   show_ws_log: false
   log_http_requests: false
-  error_out_dir: ""
+  ignore_warnings: false
+  cache_metadata: true
+  send_full_body: false

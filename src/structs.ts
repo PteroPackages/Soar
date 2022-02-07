@@ -1,10 +1,11 @@
 export interface LogConfig {
-    strictMode:      boolean;
     showDebug:       boolean;
     showHttpLog:     boolean;
     showWsLog:       boolean;
     logHttpRequests: boolean;
-    errorOutDir:     string;
+    ignoreWarnings:  boolean;
+    cacheMetadata:   boolean;
+    sendFullBody:    boolean;
 }
 
 export interface Auth {
