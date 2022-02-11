@@ -51,23 +51,45 @@ export function buildNode(args: object): string {
     return base;
 }
 
-function assert(key: string, value: any, expected: any): void {
+function assertType(key: string, value: any, expected: any): void {
     if (typeof value !== typeof expected)
-        throw `expected type ${typeof value} for '${key}'; got ${typeof expected}`;
+        throw `expected type ${typeof expected} for '${key}'; got ${typeof value}`;
+}
+
+function assertValue(key: string, value: any, expected: string): void {
+    if (!value) throw `expected ${expected} for '${key}'`;
 }
 
 export function parseConfig(config: any): string {
     try {
-        assert('version', config.version, '');
-        assert('application.url', config.application[0].url, '');
-        assert('application.key', config.application[0].key, '');
-        assert('client.url', config.client[0].url, '');
-        assert('client.key', config.client[0].key, '');
-        assert('logs.strictMode', config.logs.strict_mode, true);
-        assert('logs.showDebug', config.logs.show_debug, true);
-        assert('logs.showHttpLog', config.logs.show_http_log, true);
-        assert('logs.showWsLog', config.logs.show_ws_log, true);
-        assert('logs.logHttpRequests', config.logs.log_http_requests, true);
+        assertType('version', config.version, '');
+        assertType('application.url', config.application.url, '');
+        assertType('application.key', config.application.key, '');
+        assertType('client.url', config.client.url, '');
+        assertType('client.key', config.client.key, '');
+        assertType('logs.showDebug', config.logs.show_debug, true);
+        assertType('logs.showHttpLog', config.logs.show_http_log, true);
+        assertType('logs.showWsLog', config.logs.show_ws_log, true);
+        assertType('logs.logHttpRequests', config.logs.log_http_requests, true);
+        assertType('logs.ignoreWarnings', config.logs.ignore_warnings, true);
+        assertType('logs.cacheMetadata', config.logs.cache_metadata, true);
+        assertType('logs.sendFullBody', config.logs.send_full_body, true);
+
+        assertValue(
+            'version',
+            /\d\.\d\.\d/g.test(config.version),
+            'version to match semver spec'
+        );
+        assertValue(
+            'application.url',
+            /https?\:\/\//g.test(config.application.url),
+            "url to start with 'http://' or 'https://'"
+        );
+        assertValue(
+            'client.url',
+            /https?\:\/\//g.test(config.application.url),
+            "url to start with 'http://' or 'https://'"
+        );
     } catch (err) {
         return err;
     }
