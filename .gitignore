@@ -2,6 +2,7 @@
 /build
 /scripts
 
+package-lock.json
 soar_log_*
 *.test.*
 *.exe
