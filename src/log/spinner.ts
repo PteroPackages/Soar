@@ -27,7 +27,7 @@ export default class Spinner {
     }
 
     public setMessage(message: string): this {
-        this.message = message.trim() + ' ⠇    ';
+        this.message = message.trim() + ' ⠇';
         return this;
     }
 
@@ -45,6 +45,7 @@ export default class Spinner {
         if (this.running) return this;
         this.startedAt = Date.now();
         this.running = true;
+        process.stdout.write('\u001B[?25l');
         this.interval = setInterval(() => this.handle(), 100).unref();
         return this;
     }
@@ -54,6 +55,7 @@ export default class Spinner {
         this.running = false;
         clearInterval(this.interval);
         this.clear();
+        process.stdout.write('\u001B[?25h');
         let res: string;
         if (error) {
             res = this.errFunc?.(Date.now() - this.startedAt);
@@ -64,8 +66,8 @@ export default class Spinner {
     }
 
     private handle() {
-        const char = this.message.slice(-5).slice(0, -4);
-        this.message = this.message.slice(0, -5) + this.CHAR_REF[char] + '    ';
+        const char = this.message.slice(-1);
+        this.message = this.message.slice(0, -1) + this.CHAR_REF[char];
         this.clear();
         process.stdout.write(this.message);
     }
