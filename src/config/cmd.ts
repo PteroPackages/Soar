@@ -79,6 +79,7 @@ const setupCmd = new Command('setup')
                 }
             }
 
+            if (!existsSync(mainfp)) log.error('MISSING_ENV', null, true);
             try {
                 const linkData = readFileSync(mainfp, { encoding: 'utf-8' });
                 writeFileSync(
