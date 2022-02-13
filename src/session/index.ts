@@ -56,7 +56,7 @@ export default class Session {
             log.debug(message);
         } else {
             if (!this.showHttpLog) return;
-            log.print(`%B${type}%R: ${message}`);
+            // log.print(`%B${type}%R: ${message}`);
         }
     }
 
