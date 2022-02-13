@@ -28,7 +28,7 @@ export async function getConfig(checkLocal: boolean = false): Promise<Config> {
     ) fp = join(process.cwd(), '.soar-local.yml');
 
     if (!fp) {
-        if (!process.env.SOAR_PATH) log.error('MISSING_CONFIG', null, true);
+        if (!process.env.SOAR_PATH) log.error('MISSING_ENV', null, true);
         fp = join(process.env.SOAR_PATH, 'config.yml');
         if (!existsSync(fp)) log.error('INVALID_ENV', null, true);
     }

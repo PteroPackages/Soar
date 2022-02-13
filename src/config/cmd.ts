@@ -18,8 +18,8 @@ const infoCmd = new Command('info')
             ? '•'.repeat(config.client.key.length)
             : config.client.key;
 
-        console.log(
-`Soar ${args['local'] ? 'Local' : 'Global'} Config
+        console.log(`
+Soar ${args['local'] ? 'Local' : 'Global'} Config
 ====================
 \x1b[4mApplication Details\x1b[0m
 url: ${config.application.url || 'Not Set'}
@@ -43,8 +43,8 @@ send full response body: ${config.http.sendFullBody}
 \x1b[4mCore\x1b[0m
 ignore warnings:       ${config.core.ignoreWarnings}
 save error logs:       ${config.core.saveErrorLogs}
-stop at system errors: ${config.core.stopAtSysError}`
-        );
+stop at system errors: ${config.core.stopAtSysError}
+`);
     });
 
 const setupCmd = new Command('setup')
