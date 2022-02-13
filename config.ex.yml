@@ -10,9 +10,16 @@ client:
 
 logs:
   show_debug: false
-  show_http_log: false
-  show_ws_log: false
-  log_http_requests: false
-  ignore_warnings: false
-  cache_metadata: true
+  show_http: false
+  show_websocket: false
+  use_colour: true
+
+http:
+  save_requests: true
   send_full_body: false
+  retry_ratelimit: false
+
+core:
+  ignore_warnings: false
+  stop_at_sys_error: false
+  save_error_logs: true

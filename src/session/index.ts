@@ -31,7 +31,8 @@ export default class Session {
             log.error('MISSING_AUTH_APPLICATION', null, true);
 
         this.showDebugLog = this.config.logs.showDebug;
-        this.showHttpLog = this.config.logs.showHttpLog;
+        this.showHttpLog = this.config.logs.showHttp;
+        if (!this.config.logs.useColour) log.disableColour();
     }
 
     private setOptions(options: FlagOptions) {
@@ -61,7 +62,7 @@ export default class Session {
     }
 
     private logHttp(method: string, path: string, res: Response): void {
-        if (this.config.logs.logHttpRequests) createRequestLog({
+        if (this.config.http.saveRequests) createRequestLog({
             date: Date.now(),
             method,
             response: res.status,

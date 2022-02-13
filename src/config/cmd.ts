@@ -29,13 +29,21 @@ key: ${appKey || 'Not Set'}
 url: ${config.client.url || 'Not Set'}
 key: ${clientKey || 'Not Set'}
 
-\x1b[4mGeneral\x1b[0m
-output debug messages:      ${config.logs.showDebug}
-output http responses:      ${config.logs.showHttpLog}
-output websocket responses: ${config.logs.showWsLog}
-log http requests:          ${config.logs.logHttpRequests}
-ignore warnings:            ${config.logs.ignoreWarnings}
-output full response body:  ${config.logs.sendFullBody}`
+\x1b[4mLogging\x1b[0m
+show debug logs:     ${config.logs.showDebug}
+show http logs:      ${config.logs.showHttp}
+show websocket logs: ${config.logs.showWebsocket}
+use colour:          ${config.logs.useColour}
+
+\x1b[4mHTTP\x1b[0m
+retry on ratelimit:      ${config.http.retryRatelimit}
+save http requests:      ${config.http.saveRequests}
+send full response body: ${config.http.sendFullBody}
+
+\x1b[4mCore\x1b[0m
+ignore warnings:       ${config.core.ignoreWarnings}
+save error logs:       ${config.core.saveErrorLogs}
+stop at system errors: ${config.core.stopAtSysError}`
         );
     });
 

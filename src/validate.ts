@@ -68,12 +68,15 @@ export function parseConfig(config: any): string {
         assertType('client.url', config.client.url, '');
         assertType('client.key', config.client.key, '');
         assertType('logs.showDebug', config.logs.show_debug, true);
-        assertType('logs.showHttpLog', config.logs.show_http_log, true);
-        assertType('logs.showWsLog', config.logs.show_ws_log, true);
-        assertType('logs.logHttpRequests', config.logs.log_http_requests, true);
-        assertType('logs.ignoreWarnings', config.logs.ignore_warnings, true);
-        assertType('logs.cacheMetadata', config.logs.cache_metadata, true);
-        assertType('logs.sendFullBody', config.logs.send_full_body, true);
+        assertType('logs.showHttp', config.logs.show_http, true);
+        assertType('logs.showWebsocket', config.logs.show_websocket, true);
+        assertType('logs.useColour', config.logs.use_colour, true);
+        assertType('http.saveRequests', config.http.save_requests, true);
+        assertType('http.sendFullBody', config.http.send_full_body, true);
+        assertType('http.retryRatelimit', config.http.retry_ratelimit, true);
+        assertType('core.ignoreWarnings', config.core.ignore_warnings, true);
+        assertType('core.stopAtSysError', config.core.stop_at_sys_error, true);
+        assertType('core.saveErrorLogs', config.core.save_error_logs, true);
 
         assertValue(
             'version',
