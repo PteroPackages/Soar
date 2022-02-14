@@ -4,13 +4,14 @@ import { fetchLogs } from './funcs';
 import log from '../log';
 
 const logsGetCmd = new Command('fetch')
-    .addHelpText('before', 'Fetches Soar requests logs with additional filters.')
-    .option('-s, --silent', 'Doesn\'t log response messages.', false)
-    .option('--from <date>', 'Gets logs from a specific date.')
-    .option('--method <method>', 'Gets logs using a specific HTTP method.')
-    .option('--app', 'Gets logs that used the application API.', false)
-    .option('--client', 'Gets logs that used the client API.', false)
-    .option('--raw', 'Gets logs that used the raw request method.', false)
+    .description('Fetches Soar HTTP logs')
+    .addHelpText('before', 'Fetches Soar HTTP logs with additional filters')
+    .option('-s, --silent', 'Doesn\'t log response messages', false)
+    .option('--from <date>', 'Gets logs from a specific date')
+    .option('--method <method>', 'Gets logs using a specific HTTP method')
+    .option('--app', 'Gets logs that used the application API', false)
+    .option('--client', 'Gets logs that used the client API', false)
+    .option('--raw', 'Gets logs that used the raw request method', false)
     .action((args: object) => {
         let date: Date;
         let method: string;

@@ -7,8 +7,10 @@ import { getBoolInput } from '../session/response';
 import { getConfig, createConfig } from './funcs';
 
 const infoCmd = new Command('info')
-    .option('--local', 'Gets the local configuration for the workspace.', false)
-    .option('-h, --hide', 'Hides the API keys from the command output.', false)
+    .description('Gets the Soar configuration setup')
+    .addHelpText('before', 'Gets the global Soar configuration setup (or local if specified)')
+    .option('--local', 'Gets the local configuration for the workspace', false)
+    .option('-h, --hide', 'Hides the API keys from the command output', false)
     .action(async (args: object) => {
         const config = await getConfig(args['local']);
         const appKey = args['hide']
@@ -48,10 +50,11 @@ stop at system errors: ${config.core.stopAtSysError}
     });
 
 const setupCmd = new Command('setup')
-    .addHelpText('before', 'Setup a new Soar configuration.')
-    .option('--local', 'Setup a local configuration for the workspace (default is global).', false)
-    .option('--link [file]', 'Links the new config with another local config or the global config if not provided.')
-    .option('-f, --force', 'Skips all confirmation prompts.', false)
+    .description('Setup a new Soar configuration')
+    .addHelpText('before', 'Setup a new global or local Soar configuration')
+    .option('--local', 'Setup a local configuration for the workspace (default: global)', false)
+    .option('--link [file]', 'Links the new config with another local config or the global config if not provided')
+    .option('-f, --force', 'Skips all confirmation prompts', false)
     .action(async (args: object) => {
         const local: boolean = args['local'];
         const force: boolean = args['force'];

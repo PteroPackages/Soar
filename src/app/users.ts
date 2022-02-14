@@ -5,18 +5,19 @@ import { buildUser, parseFlagOptions } from '../validate';
 import log from '../log';
 
 const getUsersCmd = new Command('get-users')
-    .addHelpText('before', 'Fetches all accounts from the panel (can specify or query with flags).')
-    .option('--json', 'Send the response output as JSON.', true)
-    .option('--yaml', 'Send the response output as YAML.', false)
-    .option('--text', 'Send the response output as formatted text.', false)
-    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request.', false)
-    .option('-s, --silent', 'Don\'t log request messages.', false)
-    .option('-o, --output [file]', 'Writes the output to a file.')
-    .option('--id <userID>', 'The user ID to fetch.')
-    .option('--email <email>', 'The email to query.')
-    .option('--username <name>', 'The user name to query.')
-    .option('--uuid <uuid>', 'The UUID to query.')
-    .option('--external <id>', 'The external user ID to query.')
+    .description('Fetches accounts from the panel')
+    .addHelpText('before', 'Fetches all accounts from the panel (can specify or query with flags)')
+    .option('--json', 'Send the response output as JSON', true)
+    .option('--yaml', 'Send the response output as YAML', false)
+    .option('--text', 'Send the response output as formatted text', false)
+    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request', false)
+    .option('-s, --silent', 'Don\'t log request messages', false)
+    .option('-o, --output [file]', 'Writes the output to a file')
+    .option('--id <id>', 'The user ID to fetch')
+    .option('--email <email>', 'The email to query')
+    .option('--username <name>', 'The user name to query')
+    .option('--uuid <uuid>', 'The UUID to query')
+    .option('--external <id>', 'The external user ID to query')
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
         const session = new Session('application', options);
@@ -30,14 +31,15 @@ const getUsersCmd = new Command('get-users')
     });
 
 const createUserCmd = new Command('create-user')
-    .addHelpText('before', 'Creates a new user account on the panel.')
-    .option('--json', 'Send the response output as JSON.', true)
-    .option('--yaml', 'Send the response output as YAML.', false)
-    .option('--text', 'Send the response output as formatted text.', false)
-    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request.', false)
-    .option('-s, --silent', 'Don\'t log request messages.', false)
-    .option('-o, --output [file]', 'Writes the output to a file.')
-    .option('-d, --data <json>', 'The json data to create the user with.')
+    .description('Creates a new account on the panel')
+    .addHelpText('before', 'Creates a new user account on the panel')
+    .option('--json', 'Send the response output as JSON', true)
+    .option('--yaml', 'Send the response output as YAML', false)
+    .option('--text', 'Send the response output as formatted text', false)
+    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request', false)
+    .option('-s, --silent', 'Don\'t log request messages', false)
+    .option('-o, --output [file]', 'Writes the output to a file')
+    .requiredOption('-d, --data <json>', 'The json data to create the user with')
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
 
@@ -80,16 +82,17 @@ const createUserCmd = new Command('create-user')
     });
 
 const updateUserCmd = new Command('update-user')
-    .addHelpText('before', 'Updates a specified user account.')
-    .argument('<id>', 'The ID of the user account to update.')
-    .option('--json', 'Send the response output as JSON.', false)
-    .option('--yaml', 'Send the response output as YAML.', true)
-    .option('--text', 'Send the response output as formatted text.', false)
-    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request.', false)
-    .option('-s, --silent', 'Don\'t log request messages.', false)
-    .option('-o, --output [file]', 'Writes the output to a file.')
-    .option('-d, --data <json>', 'The json data to update the user with.')
-    .option('--no-diff', 'Don\'t show the properties changed in the request.', false)
+    .description('Updates an account on the panel')
+    .addHelpText('before', 'Updates a specified user account')
+    .argument('<id>', 'The ID of the user account to update')
+    .option('--json', 'Send the response output as JSON', false)
+    .option('--yaml', 'Send the response output as YAML', true)
+    .option('--text', 'Send the response output as formatted text', false)
+    .option('-n, --no-prompt', 'Don\'t prompt for user response after the request', false)
+    .option('-s, --silent', 'Don\'t log request messages', false)
+    .option('-o, --output [file]', 'Writes the output to a file')
+    .requiredOption('-d, --data <json>', 'The json data to update the user with')
+    .option('--no-diff', 'Don\'t show the properties changed in the request', false)
     .action(async (id: string, args: object) => {
         const options = parseFlagOptions(args);
 
@@ -139,8 +142,9 @@ const updateUserCmd = new Command('update-user')
     });
 
 const deleteUserCmd = new Command('delete-user')
-    .addHelpText('before', 'Deletes a specified user account.')
-    .argument('<id>', 'The ID of the user account to delete.')
+    .description('Deletes an account on the panel')
+    .addHelpText('before', 'Deletes a specified user account')
+    .argument('<id>', 'The ID of the user account to delete')
     .option('-s, --silent', 'Don\'t log request messages.', false)
     .action(async (id: string, args: object) => {
         const options = parseFlagOptions(args);
