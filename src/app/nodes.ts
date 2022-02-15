@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import Session from '../session';
 import { buildNode, parseFlagOptions } from '../validate';
 import log from '../log';
@@ -14,6 +14,7 @@ const getNodesCmd = new Command('get-nodes')
     .option('-o, --output [file]', 'Writes the output to a file')
     .option('--id <id>', 'The node ID to fetch')
     .option('--config', 'Fetch the node configuration setup', false)
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
         if (args['config'] && !args['id']) log.error(

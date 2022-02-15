@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import Session from '../session';
 import parseDiffView, { highlight } from '../session/view';
 import { buildUser, parseFlagOptions } from '../validate';
@@ -18,6 +18,7 @@ const getUsersCmd = new Command('get-users')
     .option('--username <name>', 'The user name to query')
     .option('--uuid <uuid>', 'The UUID to query')
     .option('--external <id>', 'The external user ID to query')
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
         const session = new Session('application', options);
@@ -40,6 +41,7 @@ const createUserCmd = new Command('create-user')
     .option('-s, --silent', 'Don\'t log request messages', false)
     .option('-o, --output [file]', 'Writes the output to a file')
     .requiredOption('-d, --data <json>', 'The json data to create the user with')
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
 
@@ -93,6 +95,7 @@ const updateUserCmd = new Command('update-user')
     .option('-o, --output [file]', 'Writes the output to a file')
     .requiredOption('-d, --data <json>', 'The json data to update the user with')
     .option('--no-diff', 'Don\'t show the properties changed in the request', false)
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (id: string, args: object) => {
         const options = parseFlagOptions(args);
 
@@ -146,6 +149,7 @@ const deleteUserCmd = new Command('delete-user')
     .addHelpText('before', 'Deletes a specified user account')
     .argument('<id>', 'The ID of the user account to delete')
     .option('-s, --silent', 'Don\'t log request messages.', false)
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (id: string, args: object) => {
         const options = parseFlagOptions(args);
         const session = new Session('application', options);

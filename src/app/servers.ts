@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import Session from '../session';
 import { buildServer, parseFlagOptions } from '../validate';
 import log from '../log';
@@ -17,6 +17,7 @@ const getServersCmd = new Command('get-servers')
     .option('--name <name>', 'The server name to query')
     .option('--external <id>', 'The external server ID to query')
     .option('--image <url>', 'The docker image URL to query')
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (args: object) => {
         const options = parseFlagOptions(args);
         const session = new Session('application', options);
@@ -34,6 +35,7 @@ const suspendServerCmd = new Command('suspend')
     .addHelpText('before', 'Suspends a specified server')
     .argument('<id>', 'The ID of the server')
     .option('-s, --silent', 'Don\'t log request messages', false)
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (id: string, args: object) => {
         const options = parseFlagOptions(args);
         const session = new Session('application', options);
@@ -47,6 +49,7 @@ const unsuspendServerCmd = new Command('unsuspend')
     .addHelpText('before', 'Unsuspends a suspended server')
     .argument('<id>', 'The ID of the server')
     .option('-s, --silent', 'Don\'t log request messages', false)
+    .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (id: string, args: object) => {
         const options = parseFlagOptions(args);
         const session = new Session('application', options);
