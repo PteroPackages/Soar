@@ -52,6 +52,22 @@ export function buildNode(args: object): string {
     return base;
 }
 
+export function buildLocation(args: object): string {
+    let base = '/api/application/locations';
+    if (args['id']) base += '/'+ args['id'];
+    if (args['nodes']) base += '?include=nodes';
+    if (args['servers']) base += `${args['nodes'] ? ',' : '?include='}servers`;
+    return base;
+}
+
+export function buildNest(args: object): string {
+    let base = '/api/application/nests';
+    if (args['id']) base += '/'+ args['id'];
+    if (args['eggs']) base += '?include=eggs';
+    if (args['servers']) base += `${args['eggs'] ? ',' : '?include='}servers`;
+    return base;
+}
+
 function assertType(key: string, value: any, expected: any): void {
     if (typeof value !== typeof expected)
         throw `expected type ${typeof expected} for '${key}'; got ${typeof value}`;
@@ -59,14 +75,6 @@ function assertType(key: string, value: any, expected: any): void {
 
 function assertValue(key: string, value: any, expected: string): void {
     if (!value) throw `expected ${expected} for '${key}'`;
-}
-
-export function buildLocation(args: object): string {
-    let base = '/api/application/locations';
-    if (args['id']) base += '/'+ args['id'];
-    if (args['nodes']) base += '?include=nodes';
-    if (args['servers']) base += `${args['nodes'] ? ',' : '?include='}servers`;
-    return base;
 }
 
 export function parseConfig(config: any): string {
