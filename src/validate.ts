@@ -68,6 +68,19 @@ export function buildNest(args: object): string {
     return base;
 }
 
+export function buildNestEgg(id: string, args: object): string {
+    let base = `/api/application/nests/${id}/eggs`;
+    const include = [];
+    if (args['id']) base += '/'+ args['id'];
+    if (args['nest']) include.push('nest');
+    if (args['servers']) include.push('servers');
+    if (args['config']) include.push('config');
+    if (args['script']) include.push('script');
+    if (args['variables']) include.push('variables');
+    if (include.length) base += '?include='+ include.join(',');
+    return base;
+}
+
 function assertType(key: string, value: any, expected: any): void {
     if (typeof value !== typeof expected)
         throw `expected type ${typeof expected} for '${key}'; got ${typeof value}`;
