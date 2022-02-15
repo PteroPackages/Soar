@@ -9,13 +9,12 @@ import { createRequestLog } from '../logs/funcs';
 import * as response from './response';
 
 export default class Session {
-    public config:       Config;
-    public auth:         Auth;
-    public type:         string;
-    public reader:       Interface;
-    public spinner:      Spinner | null;
-    public showDebugLog: boolean;
-    public showHttpLog:  boolean;
+    public config:    Config;
+    public auth:      Auth;
+    public type:      string;
+    public reader:    Interface;
+    public spinner:   Spinner | null;
+    public showDebug: boolean;
 
     constructor(type: 'application' | 'client', options: FlagOptions) {
         this.type = type;
@@ -30,17 +29,16 @@ export default class Session {
         if (!this.auth?.url || !this.auth?.key)
             log.error('MISSING_AUTH_APPLICATION', null, true);
 
-        this.showDebugLog = this.config.logs.showDebug;
-        this.showHttpLog = this.config.logs.showHttp;
+        this.showDebug ||= this.config.logs.showDebug;
         if (!this.config.logs.useColour) log.disableColour();
     }
 
     private setOptions(options: FlagOptions) {
         if (options.silent) {
-            this.showDebugLog = false;
-            this.showHttpLog = false;
+            this.showDebug = false;
         } else {
             this.spinner = new Spinner();
+            this.showDebug = options.debugMode;
         }
     }
 
@@ -50,32 +48,35 @@ export default class Session {
             .onError(t => error.replace('$', t.toString()));
     }
 
-    private log(type: string, message: string): void {
-        if (this.spinner?.running) return;
-        if (type === 'debug') {
-            if (!this.showDebugLog) return;
-            log.debug(message);
-        } else {
-            if (!this.showHttpLog) return;
-            // log.print(`%B${type}%R: ${message}`);
-        }
+    private log(message: string | string[]): void {
+        if (!this.showDebug) return;
+        log.debug(message);
     }
 
     private logHttp(method: string, path: string, res: Response): void {
-        if (this.config.http.saveRequests) createRequestLog({
-            date: Date.now(),
-            method,
-            response: res.status,
-            type: 'D',
-            domain: this.auth.url,
-            path
-        });
+        if (!this.config.http.saveRequests) return this.log('request not saved');
+        this.log('attempting to save request');
+        createRequestLog(
+            {
+                date: Date.now(),
+                method,
+                response: res.status,
+                type: 'D',
+                domain: this.auth.url,
+                path
+            },
+            this.config.core.ignoreWarnings
+        );
     }
 
     public async handleRequest(method: string, path: string, data?: object) {
         await this.getConfig();
-        this.log('debug', 'Starting HTTP request');
-        this.log('http', `Sending a request to '${this.auth.url + path}'`);
+        this.log([
+            'starting http request',
+            `url: '${this.auth.url + path}'`,
+            `method: ${method}`,
+            `payload: ${data ? getByteSize(data) : '0'} bytes`
+        ]);
 
         const base = path.slice(4).split('?')[0];
         this.setLogs(
@@ -96,26 +97,43 @@ export default class Session {
             body: data ? JSON.stringify(data) : null
         });
 
-        this.log('http', `Received status: ${res.status}`);
-
         if (res.status === 204) {
-            this.log('debug', 'Request ended with no response body');
             this.spinner?.stop(false);
+            this.log('received status: 204; request ended with no response body');
             this.logHttp(method, path, res);
             return Promise.resolve<void>(null);
         }
+
         if ([200, 201].includes(res.status)) {
             this.spinner?.stop(false);
+            this.log(`received status: ${res.status}`);
             this.logHttp(method, path, res);
-            if (res.headers.get('content-type') === 'application/json')
-                return await res.json();
 
-            this.log('debug', 'Buffer response body received, attempting to resolve...');
-            return await res.buffer();
+            if (res.headers.get('content-type') === 'application/json') {
+                const json = await res.json();
+                this.log([
+                    'json response received',
+                    `body: ${getByteSize(json)} bytes`
+                ]);
+                if (!this.config.http.sendFullBody) return json;
+                return json['data'];
+            }
+
+            this.log('buffer response body received, attempting to resolve...');
+            const buf = await res.buffer();
+            this.log(`buffer size: ${getByteSize(buf)} bytes`);
+            return buf;
         }
 
         this.spinner?.stop(true);
+        this.log(`received status: ${res.status}`);
         this.logHttp(method, path, res);
+        if (res.status === 429 && this.config.http.retryRatelimit) {
+            if (!this.config.core.ignoreWarnings) log.warn('ratelimit received, retrying...');
+            this.log("attempting new request from 'http.retryRatelimit'");
+            return this.handleRequest(method, path, data);
+        }
+
         if (res.status >= 400 && res.status < 500)
             return log.fromPtero(await res.json(), true);
 
@@ -131,6 +149,7 @@ export default class Session {
 
     public async handleClose(data: object, options: FlagOptions) {
         let parsed: string;
+        this.setOptions(options);
 
         switch (options.responseType) {
             case 'text': parsed = response.formatString(data); break;
@@ -139,12 +158,14 @@ export default class Session {
         }
 
         if (options.writeFile.length) {
+            this.log(`writing response to: '${options.writeFile}'`);
             response.writeFileResponse(options.writeFile, parsed, !options.silent);
         } else if (options.prompt && !options.silent) {
             this.reader ??= createInterface(
                 process.stdin,
                 process.stdout
             );
+            this.log('input reader created');
 
             const res = await response.getBoolInput(
                 this.reader, 'should this request be saved? (y/n)'
@@ -159,13 +180,33 @@ export default class Session {
 
                 if (fp) await response.writeFileResponse(
                     `soar_log_${Date.now()}.${options.responseType}`,
-                    parsed,
-                    !options.silent
+                    parsed, !options.silent
                 );
             }
             this.reader.close();
+            this.log('input reader closed');
         }
 
         return parsed;
     }
+}
+
+function getByteSize(o: any): number {
+    let size = 0;
+
+    switch (typeof o) {
+        case 'number': case 'bigint': size += 8; break;
+        case 'string': size += o.length * 2; break;
+        case 'boolean': size += 4; break;
+        case 'object':{
+            if (o === null || o === undefined) break;
+            if (Array.isArray(o)) {
+                size += o.reduce<any>((a, b) => getByteSize(b) + a, 0);
+            } else {
+                size += Object.values<any>(o).reduce((a, b) => getByteSize(b) + a, 0);
+            }
+        }
+    }
+
+    return size;
 }

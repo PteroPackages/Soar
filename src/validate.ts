@@ -15,7 +15,8 @@ export function parseFlagOptions(args: object): FlagOptions {
         silent,
         prompt: args['prompt'],
         writeFile: file,
-        responseType: type
+        responseType: type,
+        debugMode: args['debug']
     } as FlagOptions;
 }
 

@@ -46,6 +46,7 @@ export interface FlagOptions {
     responseType: string;
     prompt:       boolean;
     silent:       boolean;
+    debugMode:    boolean;
 }
 
 export function parseStruct<T>(data: any): T {

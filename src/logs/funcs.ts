@@ -34,8 +34,11 @@ function getLastRef() {
     }
 }
 
-export function createRequestLog(_log: ReqLog): void {
-    if (!process.env.SOAR_PATH) return log.warn('could not find soar library path; log skipped');
+export function createRequestLog(_log: ReqLog, ignore: boolean): void {
+    if (!process.env.SOAR_PATH) {
+        if (!ignore) log.warn('could not find soar library path; log skipped');
+        return;
+    }
 
     const fp = join(process.env.SOAR_PATH, 'logs/requests.log');
     if (!existsSync(fp)) make(fp);
@@ -47,7 +50,7 @@ export function createRequestLog(_log: ReqLog): void {
     try {
         appendFileSync(fp, fmt, { encoding: 'utf-8' });
     } catch {
-        log.warn(`could not write log for '${Date.now()}'. Please check the application permissions.`);
+        if (!ignore) log.warn(`could not write log for '${Date.now()}'. Please check the application permissions.`);
     }
 }
 
