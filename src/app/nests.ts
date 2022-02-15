@@ -28,6 +28,4 @@ const getNestsCmd = new Command('get-nests')
         }
     });
 
-export default [
-    getNestsCmd
-]
+export default getNestsCmd;
