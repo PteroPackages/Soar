@@ -1,6 +1,7 @@
 import fetch, { Response } from 'node-fetch';
 import { createInterface, Interface } from 'readline';
 import yaml from 'yaml';
+import { version } from '../../package.json';
 import { Auth, Config, FlagOptions } from '../structs';
 import { getConfig } from '../config/funcs';
 import log from '../log';
@@ -92,7 +93,7 @@ export default class Session {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'Authorization': `Bearer ${this.auth.key}`,
-                'User-Agent': `Soar Client v0.0.2`
+                'User-Agent': `Soar Client v${version}`
             },
             body: data ? JSON.stringify(data) : null
         });

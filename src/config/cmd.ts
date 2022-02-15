@@ -23,6 +23,7 @@ const infoCmd = new Command('info')
         console.log(`
 Soar ${args['local'] ? 'Local' : 'Global'} Config
 ====================
+version: ${config.version}
 \x1b[4mApplication Details\x1b[0m
 url: ${config.application.url || 'Not Set'}
 key: ${appKey || 'Not Set'}

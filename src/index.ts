@@ -7,7 +7,7 @@ import config from './config';
 import log from './logs';
 
 const root = new Command('soar')
-    .version(version, '-v, --version')
+    .version(`v${version}-beta (build: unknown)`, '-v, --version')
     .addCommand(app)
     .addCommand(config)
     .addCommand(log);
