@@ -2,7 +2,7 @@
   "name": "soar",
   "version": "0.0.3",
   "description": "A command line application for the Pterodactyl panel",
-  "main": "build/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "build": "tsc && pkg build/. && rename ptero-soar.exe soar.exe",
     "clean": "del soar.exe && del /s /q build"
