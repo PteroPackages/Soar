@@ -134,11 +134,17 @@ const updateUserCmd = new Command('update-user')
 
         if (out && args['diff']) {
             const view = parseDiffView(options.responseType, user, data);
-            log.success(log.parse(
+            log.print(
+                'success',
                 `made %c${view.totalChanges}%R changes`+
-                ` (%g+${view.additions}%R | %r-${view.subtractions}%R)`
-            ));
-            console.log('\n'+ highlight(view.output));
+                ` (%g+${view.additions}%R | %r-${view.subtractions}%R)`,
+                false
+            );
+            console.log(
+                '\n'+ (session.config.logs.useColour
+                ? highlight(view.output)
+                : view.output)
+            );
         } else {
             log.success(`updated user account: ${id}`);
         }
