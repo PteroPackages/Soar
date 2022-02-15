@@ -116,8 +116,8 @@ export default class Session {
                     'json response received',
                     `body: ${getByteSize(json)} bytes`
                 ]);
-                if (!this.config.http.sendFullBody) return json;
-                return json['data'];
+                if (this.config.http.sendFullBody) return json;
+                return json['data'] || json['attributes'];
             }
 
             this.log('buffer response body received, attempting to resolve...');
