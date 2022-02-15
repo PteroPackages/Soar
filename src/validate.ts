@@ -61,6 +61,14 @@ function assertValue(key: string, value: any, expected: string): void {
     if (!value) throw `expected ${expected} for '${key}'`;
 }
 
+export function buildLocation(args: object): string {
+    let base = '/api/application/locations';
+    if (args['id']) base += '/'+ args['id'];
+    if (args['nodes']) base += '?include=nodes';
+    if (args['servers']) base += `${args['nodes'] ? ',' : '?include='}servers`;
+    return base;
+}
+
 export function parseConfig(config: any): string {
     try {
         assertType('version', config.version, '');
