@@ -1,25 +1,20 @@
 version: 0.0.2
-
 application:
   url: ""
   key: ""
-
 client:
   url: ""
   key: ""
-
 logs:
-  show_debug: false
-  show_http: false
-  show_websocket: false
-  use_colour: true
-
+  showDebug: false
+  showHttp: false
+  showWebsocket: false
+  useColour: true
 http:
-  save_requests: true
-  send_full_body: false
-  retry_ratelimit: false
-
+  saveRequests: false
+  sendFullBody: false
+  retryRatelimit: false
 core:
-  ignore_warnings: false
-  stop_at_sys_error: false
-  save_error_logs: true
+  ignoreWarnings: false
+  stopAtSysError: false
+  saveErrorLogs: true

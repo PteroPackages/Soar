@@ -97,16 +97,16 @@ export function parseConfig(config: any): string {
         assertType('application.key', config.application.key, '');
         assertType('client.url', config.client.url, '');
         assertType('client.key', config.client.key, '');
-        assertType('logs.showDebug', config.logs.show_debug, true);
-        assertType('logs.showHttp', config.logs.show_http, true);
-        assertType('logs.showWebsocket', config.logs.show_websocket, true);
-        assertType('logs.useColour', config.logs.use_colour, true);
-        assertType('http.saveRequests', config.http.save_requests, true);
-        assertType('http.sendFullBody', config.http.send_full_body, true);
-        assertType('http.retryRatelimit', config.http.retry_ratelimit, true);
-        assertType('core.ignoreWarnings', config.core.ignore_warnings, true);
-        assertType('core.stopAtSysError', config.core.stop_at_sys_error, true);
-        assertType('core.saveErrorLogs', config.core.save_error_logs, true);
+        assertType('logs.showDebug', config.logs.showDebug, true);
+        assertType('logs.showHttp', config.logs.showHttp, true);
+        assertType('logs.showWebsocket', config.logs.showWebsocket, true);
+        assertType('logs.useColour', config.logs.useColour, true);
+        assertType('http.saveRequests', config.http.saveRequests, true);
+        assertType('http.sendFullBody', config.http.sendFullBody, true);
+        assertType('http.retryRatelimit', config.http.retryRatelimit, true);
+        assertType('core.ignoreWarnings', config.core.ignoreWarnings, true);
+        assertType('core.stopAtSysError', config.core.stopAtSysError, true);
+        assertType('core.saveErrorLogs', config.core.saveErrorLogs, true);
 
         assertValue(
             'version',
