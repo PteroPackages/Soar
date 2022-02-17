@@ -12,9 +12,10 @@ export const COLOURS = {
     RED: '\x1b[31m',
     YELLOW: '\x1b[33m',
     GREEN: '\x1b[32m',
-    CYAN: '\x1b[36m',
+    CYAN: '\x1b[96m',
     BLUE: '\x1b[34m',
-    MAGENTA: '\x1b[35m'
+    PURPLE: '\x1b[35m',
+    MAGENTA: '\x1b[95m'
 }
 
 export const CODE_MAP = {
@@ -25,6 +26,7 @@ export const CODE_MAP = {
     '%g': COLOURS.GREEN,
     '%c': COLOURS.CYAN,
     '%b': COLOURS.BLUE,
+    '%p': COLOURS.PURPLE,
     '%m': COLOURS.MAGENTA
 }
 
