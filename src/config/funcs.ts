@@ -2,7 +2,7 @@ import yaml from 'yaml';
 import { join } from 'path';
 import { exec, ExecException } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { parseStruct, Config } from '../structs';
+import { Config } from '../structs';
 import { parseConfig } from '../validate';
 import log from '../log';
 
@@ -45,10 +45,16 @@ export async function getConfig(checkLocal: boolean = false): Promise<Config> {
             ],
             true
         );
-        return new Promise<Config>(res => res(parseStruct<Config>(config)));
+        return new Promise<Config>(res => res(config));
     } catch {
         log.error('CANNOT_READ_ENV', null, true);
     }
+}
+
+export function getConfigKey(config: Config, key: string): string[] {
+    const [base, main] = key.split('.');
+    if (main in config[base]) return [base, main];
+    return [];
 }
 
 export async function createConfig(link?: string) {
@@ -104,7 +110,7 @@ export async function createConfig(link?: string) {
         log.success(`cloned soar library into ${lib}bin`);
         log.warn([
             `please set the environment variable 'SOAR_PATH' to ${lib.slice(0, -1)}`,
-            `command: 'set SOAR_PATH=${lib.slice(0, -1)}'`
+            `command: '%bset SOAR_PATH=${lib.slice(0, -1)}%R'`
         ]);
         process.env.SOAR_PATH = lib.slice(0, -1);
     }
@@ -119,9 +125,43 @@ export async function createConfig(link?: string) {
         log.error(
             'Internal Error',
             err.message.includes('permission') || err.message.includes('denied')
-            ? 'missing the required read/write permissions to continue'
-            : err.message,
+                ? 'missing the required read/write permissions to continue'
+                : err.message,
             true
         );
+    }
+}
+
+export function updateConfig(
+    config: Config,
+    key: string[],
+    value: string,
+    local: boolean
+): void {
+    if (['application', 'client'].includes(key[0])) {
+        config[key[0]][key[1]] = value;
+    } else {
+        switch (value.toLowerCase()) {
+            case 'true': config[key[0]][key[1]] = true; break;
+            case 'false': config[key[0]][key[1]] = false; break;
+            default: log.error(
+                'Argument Error',
+                `invalid config option value '${typeof value}'`,
+                true
+            );
+        }
+    }
+
+    const err = parseConfig(config);
+    if (err) log.error('Config Error', err, true);
+
+    const fp = local
+        ? join(process.cwd(), '.soar-local.yml')
+        : process.env.SOAR_PATH;
+
+    try {
+        writeFileSync(fp, yaml.stringify(config), { encoding: 'utf-8' });
+    } catch (err) {
+        log.fromError(err, true);
     }
 }

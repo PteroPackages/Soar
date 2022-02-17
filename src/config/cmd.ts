@@ -4,7 +4,7 @@ import { join } from 'path';
 import { createInterface } from 'readline';
 import log from '../log';
 import { getBoolInput } from '../session/response';
-import { getConfig, createConfig } from './funcs';
+import { getConfig, createConfig, getConfigKey, updateConfig } from './funcs';
 
 const infoCmd = new Command('info')
     .description('Gets the Soar configuration setup')
@@ -24,6 +24,7 @@ const infoCmd = new Command('info')
 Soar ${args['local'] ? 'Local' : 'Global'} Config
 ====================
 version: ${config.version}
+
 \x1b[4mApplication Details\x1b[0m
 url: ${config.application.url || 'Not Set'}
 key: ${appKey || 'Not Set'}
@@ -53,7 +54,7 @@ stop at system errors: ${config.core.stopAtSysError}
 const setupCmd = new Command('setup')
     .description('Setup a new Soar configuration')
     .addHelpText('before', 'Setup a new global or local Soar configuration')
-    .option('--local', 'Setup a local configuration for the workspace (default: global)', false)
+    .option('--local', 'Setup a local configuration for the workspace', false)
     .option('--link [file]', 'Links the new config with another local config or the global config if not provided')
     .option('-f, --force', 'Skips all confirmation prompts', false)
     .action(async (args: object) => {
@@ -111,7 +112,28 @@ const setupCmd = new Command('setup')
         }
     });
 
+const setCmd = new Command('set')
+    .description('Sets an option in the Soar configuration')
+    .addHelpText('before', 'Sets an option in the Soar configuration')
+    .argument('<key>', 'The config key to set')
+    .argument('<value>', 'The value to set the key to')
+    .option('--local', 'Updates the local Soar configuration', false)
+    .action(async (key: string, value: string, args: object) => {
+        const config = await getConfig(args['local']);
+        const option = getConfigKey(config, key);
+
+        if (!option.length) {
+            log.error('Invalid Arguments', `invalid config key '${key}'`);
+            log.notice("you can view all config keys with the '%bsoar config info%R' command");
+            return;
+        }
+
+        updateConfig(config, option, value, args['local']);
+        log.success('updated config');
+    });
+
 export default [
     infoCmd,
-    setupCmd
+    setupCmd,
+    setCmd
 ]
