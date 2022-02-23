@@ -88,6 +88,10 @@ export function buildAccount(args: object): string {
     return base;
 }
 
+export function buildApiKey(id?: string): string {
+    return `/api/client/account/api-keys${id ? '/'+ id : ''}`;
+}
+
 function assertType(key: string, value: any, expected: any): void {
     if (typeof value !== typeof expected)
         throw `expected type ${typeof expected} for '${key}'; got ${typeof value}`;
