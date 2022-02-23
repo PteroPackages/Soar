@@ -1,7 +1,7 @@
 import { Command, Option } from 'commander';
 import Session from '../session';
 import parseDiffView, { highlight } from '../session/view';
-import { parseFlagOptions } from '../validate';
+import { buildAccount, parseFlagOptions } from '../validate';
 import log from '../log';
 
 const getAccountCmd = new Command('get-account')
@@ -18,7 +18,7 @@ const getAccountCmd = new Command('get-account')
         const options = parseFlagOptions(args);
         const session = new Session('client', options);
 
-        const data = await session.handleRequest('GET', '/api/client/account');
+        const data = await session.handleRequest('GET', buildAccount({}));
         const out = await session.handleClose(data, options);
         if (out) {
             if (!options.silent) log.success('request result:\n');
@@ -41,12 +41,10 @@ const updateAccountCmd = new Command('update-account')
     .option('--no-diff', 'Don\'t show the properties changed in the request', false)
     .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (args: object) => {
-        let path = '/api/client/account/';
         let json: object;
 
         if (args['email']) {
             json = { email: args['email'], password: args['pass'] };
-            path += 'email';
         } else {
             if (!args['new']) log.error(
                 'Argument Error',
@@ -58,15 +56,14 @@ const updateAccountCmd = new Command('update-account')
                 password: args['new'],
                 password_confirmation: args['new']
             };
-            path += 'password';
         }
 
         const options = parseFlagOptions(args);
         const session = new Session('client', options);
 
-        const user = await session.handleRequest('GET', '/api/client/account');
-        await session.handleRequest('PUT', path, json);
-        const data = await session.handleRequest('GET', '/api/client/account');
+        const user = await session.handleRequest('GET', buildAccount({}));
+        await session.handleRequest('PUT', buildAccount(args), json);
+        const data = await session.handleRequest('GET', buildAccount({}));
         const out = await session.handleClose(data, options);
 
         if (out && args['diff'] && !args['new']) {

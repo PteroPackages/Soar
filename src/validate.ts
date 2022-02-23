@@ -81,6 +81,13 @@ export function buildNestEgg(id: string, args: object): string {
     return base;
 }
 
+export function buildAccount(args: object): string {
+    const base = '/api/client/account';
+    if (args['email']) return base + '/email';
+    if (args['new']) return base + '/password';
+    return base;
+}
+
 function assertType(key: string, value: any, expected: any): void {
     if (typeof value !== typeof expected)
         throw `expected type ${typeof expected} for '${key}'; got ${typeof value}`;
