@@ -36,17 +36,28 @@ const updateAccountCmd = new Command('update-account')
     .option('-s, --silent', 'Don\'t log request messages', false)
     .option('-o, --output [file]', 'Writes the output to a file')
     .option('--email <email>', 'The new email address (requires password)')
+    .option('--new <password>', 'The new password (required for updating)')
     .requiredOption('--pass <password>', 'The account password (required for updating)')
     .option('--no-diff', 'Don\'t show the properties changed in the request', false)
     .addOption(new Option('--debug').default(false).hideHelp())
     .action(async (args: object) => {
         let path = '/api/client/account/';
-        let json = { password: args['pass'] };
+        let json: object;
 
         if (args['email']) {
-            json['email'] = args['email'];
+            json = { email: args['email'], password: args['pass'] };
             path += 'email';
         } else {
+            if (!args['new']) log.error(
+                'Argument Error',
+                "'--new' and '--pass' are required to update password",
+                true
+            );
+            json = {
+                current_password: args['pass'],
+                password: args['new'],
+                password_confirmation: args['new']
+            };
             path += 'password';
         }
 
@@ -58,7 +69,7 @@ const updateAccountCmd = new Command('update-account')
         const data = await session.handleRequest('GET', '/api/client/account');
         const out = await session.handleClose(data, options);
 
-        if (out && args['diff']) {
+        if (out && args['diff'] && !args['new']) {
             const view = parseDiffView(options.responseType, user, data);
             log.print(
                 'success',
