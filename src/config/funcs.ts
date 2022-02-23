@@ -59,7 +59,7 @@ export function getConfigKey(config: Config, key: string): string[] {
 
 export async function createConfig(link?: string) {
     const lib = process.platform === 'win32'
-            ? 'C:\\soar\\'
+            ? 'C:\\Program Files\\Soar\\'
             : '/soar/';
 
     if (!process.env.SOAR_PATH) {
@@ -76,24 +76,24 @@ export async function createConfig(link?: string) {
             );
         }
 
-        if (existsSync(`${lib}bin`)) {
+        if (existsSync(`${lib}lib`)) {
             log.info('existing soar library found, attempting clean...');
             [res, err] = await run(
                 lib.includes('C:')
-                    ? 'rmdir /S /Q C:\\soar\\bin'
-                    : 'rm -rf /soar/bin'
+                    ? 'rmdir /S /Q C:\\Program Files\\Soar\\lib'
+                    : 'rm -rf /soar/lib'
             );
             if (err) {
                 err = err as ExecException;
                 log.error(
                     'Internal Error',
-                    `could not remove existing soar library files at: '${lib}bin'`,
+                    `could not remove existing soar library files at: '${lib}lib'`,
                     true
                 );
             }
         }
 
-        [res, err] = await run(`git clone https://github.com/PteroPackages/soar-ts.git ${lib}bin`);
+        [res, err] = await run(`git clone https://github.com/PteroPackages/soar-ts.git ${lib}lib`);
         if (err) {
             err = err as ExecException;
             log.error(
@@ -107,7 +107,7 @@ export async function createConfig(link?: string) {
             );
         }
 
-        log.success(`cloned soar library into ${lib}bin`);
+        log.success(`cloned soar library into ${lib}lib`);
         log.warn([
             `please set the environment variable 'SOAR_PATH' to ${lib.slice(0, -1)}`,
             `command: '%bset SOAR_PATH=${lib.slice(0, -1)}%R'`
@@ -116,7 +116,7 @@ export async function createConfig(link?: string) {
     }
 
     const tmpl = readFileSync(
-        link || join(process.env.SOAR_PATH, 'bin/config.ex.yml'),
+        link || join(process.env.SOAR_PATH, 'lib/config.ex.yml'),
         'utf-8'
     );
     try {
