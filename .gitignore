@@ -3,7 +3,11 @@
 /scripts
 
 package-lock.json
+.soar-local.yml
 soar_log_*
+soar-alpine
+soar-linux
+soar-macos
+soar-win
 *.test.*
 *.exe
-.soar-local.yml

@@ -1,10 +1,10 @@
 {
   "name": "soar",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A command line application for the Pterodactyl panel",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc && pkg build/. && rename ptero-soar.exe soar.exe",
+    "build": "tsc && pkg build/.",
     "clean": "del soar.exe && del /s /q build"
   },
   "bin": "src/index.js",
@@ -13,7 +13,10 @@
       "src/**/*.js"
     ],
     "targets": [
-      "node16-win-x64"
+      "node16-win-x64",
+      "node16-linux-x64",
+      "node16-macos-x64",
+      "node16-alpine-x64"
     ]
   },
   "repository": {
@@ -29,7 +32,6 @@
   ],
   "author": "Devonte <https://github.com/devnote-dev>",
   "license": "MIT",
-  "private": true,
   "bugs": {
     "url": "https://github.com/PteroPackages/soar-ts/issues"
   },
