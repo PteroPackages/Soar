@@ -12,29 +12,35 @@ import (
 var Perms = os.O_CREATE | os.O_RDWR | os.O_TRUNC
 
 type Auth struct {
-	URL string
-	Key string
+	URL string `yaml:"url"`
+	Key string `yaml:"key"`
 }
 
 type HttpConfig struct {
-	MaxBodySize    bool
-	PromptSave     bool
-	SaveRequests   bool
-	SendFullBody   bool
-	RetryRateLimit bool
+	MaxBodySize    bool `yaml:"max_body_size"`
+	ParseBody      bool `yaml:"parse_body"`
+	PromptSave     bool `yaml:"prompt_save"`
+	SaveRequests   bool `yaml:"save_requests"`
+	RetryRateLimit bool `yaml:"retry_rate_limit"`
 }
 
 type LogConfig struct {
-	UseColor       bool
-	UseDebug       bool
-	IgnoreWarnings bool
+	UseColor       bool `yaml:"use_color"`
+	UseDebug       bool `yaml:"use_debug"`
+	IgnoreWarnings bool `yaml:"ignore_warnings"`
 }
 
 type Config struct {
-	Application Auth
-	Client      Auth
-	Http        HttpConfig
-	Logs        LogConfig
+	Application Auth       `yaml:"application"`
+	Client      Auth       `yaml:"client"`
+	Http        HttpConfig `yaml:"http"`
+	Logs        LogConfig  `yaml:"logs"`
+}
+
+func (c *Config) Format() string {
+	fmt, _ := yaml.Marshal(c)
+
+	return string(fmt)
 }
 
 func Get(local bool) (*Config, error) {
@@ -49,7 +55,7 @@ func Get(local bool) (*Config, error) {
 			return nil, err
 		}
 
-		path = filepath.Join(root, "config.yml")
+		path = filepath.Join(root, "soar", "config.yml")
 	}
 
 	info, err := os.Stat(path)
@@ -82,43 +88,43 @@ func Get(local bool) (*Config, error) {
 	return cfg, nil
 }
 
-func Create(path string, force bool) error {
+func Create(path string, force bool) (string, error) {
 	root, err := os.UserConfigDir()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	if path == "" {
-		path = filepath.Join(root, "config.yml")
+		path = filepath.Join(root, "soar", "config.yml")
 	}
 
 	if !filepath.IsAbs(path) {
-		return errors.New("file path is not absolute")
+		return "", errors.New("file path is not absolute")
 	}
 
 	info, err := os.Stat(path)
 	if err == nil {
 		if info.Name() != "config.yml" && info.Name() != "soar.yml" {
-			return errors.New("refusing to overwrite non-soar config file")
+			return "", errors.New("refusing to overwrite non-soar config file")
 		}
 
 		if !force {
-			return errors.New("a soar config already exists at this file path")
+			return "", errors.New("a soar config already exists at this file path")
 		}
 
 		if info.Mode()&fs.FileMode(Perms) == 0o0 {
-			return errors.New("missing read/write permissions for this file path")
+			return "", errors.New("missing read/write permissions for this file path")
 		}
 	}
 
 	file, err := os.OpenFile(path, Perms, fs.FileMode(Perms))
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer file.Close()
 
 	buf, _ := yaml.Marshal(Config{})
 	file.Write(buf)
 
-	return nil
+	return path, nil
 }
