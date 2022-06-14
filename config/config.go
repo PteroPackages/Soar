@@ -5,11 +5,10 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
-
-var Perms = os.O_CREATE | os.O_RDWR | os.O_TRUNC
 
 type Auth struct {
 	URL string `yaml:"url"`
@@ -96,6 +95,9 @@ func Create(path string, force bool) (string, error) {
 
 	if path == "" {
 		path = filepath.Join(root, "soar", "config.yml")
+	} else {
+		cwd, _ := os.Getwd()
+		path = filepath.Join(cwd, path)
 	}
 
 	if !filepath.IsAbs(path) {
@@ -104,7 +106,11 @@ func Create(path string, force bool) (string, error) {
 
 	info, err := os.Stat(path)
 	if err == nil {
-		if info.Name() != "config.yml" && info.Name() != "soar.yml" {
+		if info.IsDir() {
+			path = filepath.Join(path, "soar.yml")
+		}
+
+		if !strings.HasSuffix(path, "config.yml") && !strings.HasSuffix(path, "soar.yml") {
 			return "", errors.New("refusing to overwrite non-soar config file")
 		}
 
@@ -112,12 +118,12 @@ func Create(path string, force bool) (string, error) {
 			return "", errors.New("a soar config already exists at this file path")
 		}
 
-		if info.Mode()&fs.FileMode(Perms) == 0o0 {
+		if info.Mode()&fs.FileMode(os.O_RDWR) == 0 {
 			return "", errors.New("missing read/write permissions for this file path")
 		}
 	}
 
-	file, err := os.OpenFile(path, Perms, fs.FileMode(Perms))
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o644)
 	if err != nil {
 		return "", err
 	}
