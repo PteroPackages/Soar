@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var Perms = os.O_CREATE | os.O_RDWR | os.O_TRUNC
+
 type Auth struct {
 	URL string
 	Key string
@@ -36,31 +38,35 @@ type Config struct {
 }
 
 func Get(local bool) (*Config, error) {
-	var root string
+	var path string
 
 	if local {
-		root, _ = os.Getwd()
+		root, _ := os.Getwd()
+		path = filepath.Join(root, "soar.yml")
 	} else {
-		env, ok := os.LookupEnv("SOAR_PATH")
-		if !ok {
-			return nil, errors.New("environment variable 'SOAR_PATH' not set")
+		root, err := os.UserConfigDir()
+		if err != nil {
+			return nil, err
 		}
 
-		root = env
+		path = filepath.Join(root, "config.yml")
 	}
 
-	path := filepath.Join(root, "soar.yml")
 	info, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.New("soar path does not exist")
+			return nil, errors.New("file path does not exist")
 		}
 
 		return nil, err
 	}
 
+	if info.IsDir() {
+		return nil, errors.New("invalid file path")
+	}
+
 	if info.Mode()&fs.FileMode(os.O_RDONLY) == 0o0 {
-		return nil, errors.New("soar config file is not readable")
+		return nil, errors.New("file path is not readable")
 	}
 
 	buf, err := os.ReadFile(path)
@@ -77,27 +83,35 @@ func Get(local bool) (*Config, error) {
 }
 
 func Create(path string, force bool) error {
-	info, err := os.Stat(path)
+	root, err := os.UserConfigDir()
 	if err != nil {
 		return err
 	}
 
-	if !info.IsDir() {
-		if info.Name() != "soar.yml" {
+	if path == "" {
+		path = filepath.Join(root, "config.yml")
+	}
+
+	if !filepath.IsAbs(path) {
+		return errors.New("file path is not absolute")
+	}
+
+	info, err := os.Stat(path)
+	if err == nil {
+		if info.Name() != "config.yml" && info.Name() != "soar.yml" {
 			return errors.New("refusing to overwrite non-soar config file")
 		}
 
 		if !force {
 			return errors.New("a soar config already exists at this file path")
 		}
+
+		if info.Mode()&fs.FileMode(Perms) == 0o0 {
+			return errors.New("missing read/write permissions for this file path")
+		}
 	}
 
-	perms := os.O_CREATE | os.O_RDWR | os.O_TRUNC
-	if info.Mode()&fs.FileMode(perms) == 0o0 {
-		return errors.New("missing read/write permissions for this file path")
-	}
-
-	file, err := os.OpenFile(path, perms, fs.FileMode(perms))
+	file, err := os.OpenFile(path, Perms, fs.FileMode(Perms))
 	if err != nil {
 		return err
 	}
