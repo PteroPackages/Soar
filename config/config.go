@@ -104,10 +104,28 @@ func Create(path string, force bool) (string, error) {
 		return "", errors.New("file path is not absolute")
 	}
 
+	writeFile := func() error {
+		file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		buf, _ := yaml.Marshal(Config{})
+		file.Write(buf)
+
+		return nil
+	}
+
 	info, err := os.Stat(path)
 	if err == nil {
 		if info.IsDir() {
 			path = filepath.Join(path, "soar.yml")
+			if err = writeFile(); err != nil {
+				return "", err
+			}
+
+			return path, nil
 		}
 
 		if !strings.HasSuffix(path, "config.yml") && !strings.HasSuffix(path, "soar.yml") {
@@ -123,14 +141,9 @@ func Create(path string, force bool) (string, error) {
 		}
 	}
 
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o644)
-	if err != nil {
+	if err = writeFile(); err != nil {
 		return "", err
 	}
-	defer file.Close()
-
-	buf, _ := yaml.Marshal(Config{})
-	file.Write(buf)
 
 	return path, nil
 }
