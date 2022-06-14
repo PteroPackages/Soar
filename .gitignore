@@ -1,0 +1,16 @@
+# Binaries for programs and plugins
+/build
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries and files
+/test
+*.test
+*.sh
+*.cmd
+
+# Other files/directories
+soar.yml
