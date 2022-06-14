@@ -70,7 +70,7 @@ func Get(local bool) (*Config, error) {
 		return nil, errors.New("invalid file path")
 	}
 
-	if info.Mode()&fs.FileMode(os.O_RDONLY) == 0o0 {
+	if info.Mode()&0o644 == 0 {
 		return nil, errors.New("file path is not readable")
 	}
 
