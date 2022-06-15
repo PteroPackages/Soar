@@ -48,8 +48,12 @@ var configCmd = &cobra.Command{
 func init() {
 	initConfigCmd.Flags().String("dir", "", "the directory to create the config in")
 	initConfigCmd.Flags().BoolP("force", "f", false, "force overwrite the config")
+	initConfigCmd.Flags().BoolVar(&log.NoColor, "no-color", false, "disable ansi color codes")
+	initConfigCmd.Flags().BoolVar(&log.Persist, "save", false, "save the command and request logs")
 	configCmd.AddCommand(initConfigCmd)
 	configCmd.Flags().BoolP("local", "l", false, "get the local config")
+	configCmd.Flags().BoolVar(&log.NoColor, "no-color", false, "disable ansi color codes")
+	configCmd.Flags().BoolVar(&log.Persist, "save", false, "save the command and request logs")
 
 	rootCmd.AddCommand(configCmd)
 }

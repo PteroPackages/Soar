@@ -74,7 +74,7 @@ func (e *Entry) Format() []string {
 }
 
 type Logger struct {
-	Color   bool
+	NoColor bool
 	Debug   bool
 	Quiet   bool
 	Persist bool
@@ -84,7 +84,7 @@ type Logger struct {
 
 func New() *Logger {
 	return &Logger{
-		Color:   true,
+		NoColor: false,
 		Debug:   false,
 		Quiet:   false,
 		Persist: false,
@@ -94,7 +94,7 @@ func New() *Logger {
 
 func (l *Logger) Line(data string) *Entry {
 	e := Entry{
-		color: l.Color,
+		color: !l.NoColor,
 		quiet: l.Quiet,
 		time:  time.Now().Format(time.RFC822),
 		level: "",
@@ -108,7 +108,7 @@ func (l *Logger) Line(data string) *Entry {
 
 func (l *Logger) Info(data string) *Entry {
 	e := Entry{
-		color: l.Color,
+		color: !l.NoColor,
 		quiet: l.Quiet,
 		time:  time.Now().Format(time.RFC822),
 		level: "INFO",
@@ -122,7 +122,7 @@ func (l *Logger) Info(data string) *Entry {
 
 func (l *Logger) Warn(data string) *Entry {
 	e := Entry{
-		color: l.Color,
+		color: !l.NoColor,
 		quiet: l.Quiet,
 		time:  time.Now().Format(time.RFC822),
 		level: "WARN",
@@ -136,7 +136,7 @@ func (l *Logger) Warn(data string) *Entry {
 
 func (l *Logger) Error(data string) *Entry {
 	e := Entry{
-		color: l.Color,
+		color: !l.NoColor,
 		quiet: l.Quiet,
 		time:  time.Now().Format(time.RFC822),
 		level: "ERROR",
