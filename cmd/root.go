@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"runtime/debug"
+	"strings"
+
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/logger"
 	"github.com/spf13/cobra"
@@ -59,5 +62,15 @@ func init() {
 }
 
 func Execute() {
+	defer func() {
+		if state := recover(); state != nil {
+			stack := string(debug.Stack())
+			entry := log.Error("an unknown error occurred:")
+			for _, line := range strings.Split(stack, "\n") {
+				entry.Line(line)
+			}
+		}
+	}()
+
 	rootCmd.Execute()
 }
