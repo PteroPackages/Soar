@@ -1,11 +1,12 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/pteropackages/soar/config"
+	"github.com/pteropackages/soar/logger"
 	"github.com/spf13/cobra"
 )
+
+var log = logger.New()
 
 var rootCmd = &cobra.Command{
 	Use:     "soar",
@@ -21,11 +22,11 @@ var initConfigCmd = &cobra.Command{
 
 		path, err := config.Create(dir, force)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Error("failed to initialize config:").WithError(err).Log()
 			return
 		}
 
-		fmt.Println(path)
+		log.Line(path).Log()
 	},
 }
 
@@ -36,10 +37,11 @@ var configCmd = &cobra.Command{
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Error("failed to get config:").WithError(err).WithTip("soar config --help").Log()
+			return
 		}
 
-		fmt.Println(cfg.Format())
+		log.Line(cfg.Format()).Log()
 	},
 }
 
