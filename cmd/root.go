@@ -4,6 +4,7 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"github.com/pteropackages/soar/app"
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/logger"
 	"github.com/spf13/cobra"
@@ -53,12 +54,14 @@ func init() {
 	initConfigCmd.Flags().BoolP("force", "f", false, "force overwrite the config")
 	initConfigCmd.Flags().BoolVar(&log.NoColor, "no-color", false, "disable ansi color codes")
 	initConfigCmd.Flags().BoolVar(&log.Persist, "save", false, "save the command and request logs")
+
 	configCmd.AddCommand(initConfigCmd)
 	configCmd.Flags().BoolP("local", "l", false, "get the local config")
 	configCmd.Flags().BoolVar(&log.NoColor, "no-color", false, "disable ansi color codes")
 	configCmd.Flags().BoolVar(&log.Persist, "save", false, "save the command and request logs")
 
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(app.GroupCommands())
 }
 
 func Execute() {
