@@ -16,9 +16,8 @@ type Auth struct {
 }
 
 type HttpConfig struct {
-	MaxBodySize    bool `yaml:"max_body_size"`
+	MaxBodySize    int  `yaml:"max_body_size"`
 	ParseBody      bool `yaml:"parse_body"`
-	PromptSave     bool `yaml:"prompt_save"`
 	SaveRequests   bool `yaml:"save_requests"`
 	RetryRateLimit bool `yaml:"retry_rate_limit"`
 }
