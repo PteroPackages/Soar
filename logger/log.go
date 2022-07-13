@@ -35,8 +35,7 @@ func (l *Logger) SetLevel(level int) *Logger {
 var colorMap = strings.NewReplacer("$R", "\x1b[31m", "$Y", "\x1b[33m", "$B", "\x1b[34m", "$Z", "\x1b[0m")
 var blankMap = strings.NewReplacer("$R", "\x1b[0m", "$Y", "\x1b[0m", "$B", "\x1b[0m", "$Z", "\x1b[0m")
 
-func (l *Logger) color(data string, args ...interface{}) string {
-	str := fmt.Sprintf(data, args...)
+func (l *Logger) color(str string) string {
 	if l.UseColor {
 		return colorMap.Replace(str)
 	} else {
@@ -56,7 +55,7 @@ func (l *Logger) Line(data string, args ...interface{}) *Logger {
 }
 
 func (l *Logger) WithCmd(cmd string) *Logger {
-	l.writer.WriteString(l.color("run '%s' for more information", cmd))
+	l.writer.WriteString(l.color("run '" + cmd + "' for more information"))
 	return l
 }
 
