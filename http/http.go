@@ -7,21 +7,25 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/pteropackages/soar/config"
+	"github.com/pteropackages/soar/logger"
 )
 
 type Client struct {
 	http   *http.Client
 	config *config.Config
 	auth   *config.Auth
+	log    *logger.Logger
 }
 
-func New(cfg *config.Config, auth *config.Auth) *Client {
+func New(cfg *config.Config, auth *config.Auth, log *logger.Logger) *Client {
 	return &Client{
 		http:   &http.Client{},
 		config: cfg,
 		auth:   auth,
+		log:    log,
 	}
 }
 
@@ -65,10 +69,20 @@ func newError(err error, info []*ErrorInfo) *Error {
 }
 
 func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
+	c.log.Ignore().Info("request: %s %s", req.Method, req.URL.Path)
+	start := time.Now()
+
 	res, err := http.DefaultClient.Do(req)
+	taken := time.Since(start).Microseconds() / 1000
+
+	c.log.Debug("response: %d (%vms)", res.StatusCode, taken)
+	length := res.Header.Get("Content-Length")
+	c.log.Debug("content length: %s", length)
+
 	if err != nil {
 		return nil, newError(err, nil)
 	}
+	c.log.Ignore().Info("response: %d (%dms)", res.StatusCode, taken)
 
 	switch res.StatusCode {
 	case http.StatusOK:
@@ -86,7 +100,7 @@ func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
 		return nil, nil
 
 	default:
-		if length := req.Header.Get("Content-Length"); length != "" {
+		if length != "" {
 			val, err := strconv.Atoi(length)
 			if err != nil {
 				val = 0
