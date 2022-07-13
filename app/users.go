@@ -32,6 +32,7 @@ type user struct {
 var getUsersCmd = &cobra.Command{
 	Use: "users:get",
 	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {

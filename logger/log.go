@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/spf13/pflag"
 )
 
 type Logger struct {
@@ -14,7 +16,32 @@ type Logger struct {
 }
 
 func New() *Logger {
-	return &Logger{writer: os.Stdout}
+	return &Logger{
+		UseColor: true,
+		UseDebug: false,
+		Quiet:    false,
+		writer:   os.Stdout,
+	}
+}
+
+func (l *Logger) ApplyFlags(flags *pflag.FlagSet) {
+	if _, ok := os.LookupEnv("NO_COLOR"); ok {
+		l.UseColor = false
+	} else {
+		if term := os.Getenv("TERM"); term == "dumb" {
+			l.UseColor = false
+		} else if ok, _ := flags.GetBool("no-color"); ok {
+			l.UseColor = false
+		}
+	}
+
+	if ok, _ := flags.GetBool("debug"); ok {
+		l.UseDebug = true
+	}
+
+	if ok, _ := flags.GetBool("quiet"); ok {
+		l.Quiet = true
+	}
 }
 
 func (l *Logger) SetLevel(level int) *Logger {

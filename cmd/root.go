@@ -21,6 +21,7 @@ var initConfigCmd = &cobra.Command{
 	Use:     "init",
 	Example: "soar config init --dir=/",
 	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
 		force, _ := cmd.Flags().GetBool("force")
 		dir, _ := cmd.Flags().GetString("dir")
 
@@ -38,6 +39,7 @@ var configCmd = &cobra.Command{
 	Use:     "config",
 	Example: "soar config init --force",
 	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
@@ -52,15 +54,11 @@ var configCmd = &cobra.Command{
 func init() {
 	initConfigCmd.Flags().String("dir", "", "the directory to create the config in")
 	initConfigCmd.Flags().BoolP("force", "f", false, "force overwrite the config")
-	initConfigCmd.Flags().BoolVar(&log.UseColor, "no-color", false, "disable ansi color codes")
-
-	var color bool
+	initConfigCmd.Flags().Bool("no-color", false, "disable ansi color codes")
 
 	configCmd.AddCommand(initConfigCmd)
 	configCmd.Flags().BoolP("local", "l", false, "get the local config")
-	configCmd.Flags().BoolVar(&color, "no-color", false, "disable ansi color codes")
-
-	log.UseColor = !color
+	configCmd.Flags().Bool("no-color", false, "disable ansi color codes")
 
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(app.GroupCommands())
