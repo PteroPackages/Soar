@@ -12,6 +12,7 @@ type Logger struct {
 	UseColor bool
 	UseDebug bool
 	Quiet    bool
+	ignore   bool
 	writer   *os.File
 }
 
@@ -20,6 +21,7 @@ func New() *Logger {
 		UseColor: true,
 		UseDebug: false,
 		Quiet:    false,
+		ignore:   false,
 		writer:   os.Stdout,
 	}
 }
@@ -72,12 +74,12 @@ func (l *Logger) color(str string) string {
 
 func (l *Logger) Debug(data string, args ...interface{}) {
 	if l.UseDebug {
-		l.writer.WriteString(fmt.Sprintf(data, args...))
+		l.writer.WriteString("debug:" + fmt.Sprintf(data, args...) + "\n")
 	}
 }
 
 func (l *Logger) Line(data string, args ...interface{}) *Logger {
-	l.writer.WriteString(fmt.Sprintf(data, args...))
+	l.writer.WriteString(fmt.Sprintf(data, args...) + "\n")
 	return l
 }
 
@@ -86,7 +88,17 @@ func (l *Logger) WithCmd(cmd string) *Logger {
 	return l
 }
 
+func (l *Logger) Ignore() *Logger {
+	l.ignore = l.Quiet
+	return l
+}
+
 func (l *Logger) Info(data string, args ...interface{}) {
+	if l.ignore {
+		l.ignore = false
+		return
+	}
+
 	l.writer.WriteString(l.color("$Binfo$Z: "))
 	l.writer.WriteString(fmt.Sprintf(data, args...) + "\n")
 }
