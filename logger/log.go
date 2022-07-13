@@ -13,6 +13,10 @@ type Logger struct {
 	writer   *os.File
 }
 
+func New() *Logger {
+	return &Logger{writer: os.Stdout}
+}
+
 func (l *Logger) SetLevel(level int) *Logger {
 	switch level {
 	case 0:

@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var log = logger.Logger{}
+var log = logger.New()
 
 type user struct {
 	ID         int    `json:"id"`

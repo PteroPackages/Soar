@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var log = logger.Logger{}
+var log = logger.New()
 
 var rootCmd = &cobra.Command{
 	Use:     "soar",
@@ -54,9 +54,13 @@ func init() {
 	initConfigCmd.Flags().BoolP("force", "f", false, "force overwrite the config")
 	initConfigCmd.Flags().BoolVar(&log.UseColor, "no-color", false, "disable ansi color codes")
 
+	var color bool
+
 	configCmd.AddCommand(initConfigCmd)
 	configCmd.Flags().BoolP("local", "l", false, "get the local config")
-	configCmd.Flags().BoolVar(&log.UseColor, "no-color", false, "disable ansi color codes")
+	configCmd.Flags().BoolVar(&color, "no-color", false, "disable ansi color codes")
+
+	log.UseColor = !color
 
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(app.GroupCommands())
