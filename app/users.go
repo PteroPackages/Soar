@@ -46,7 +46,7 @@ var getUsersCmd = &cobra.Command{
 			return
 		}
 
-		ctx := http.New(cfg, &cfg.Application)
+		ctx := http.New(cfg, &cfg.Application, log)
 		if single {
 			req := ctx.Request("GET", "/api/application/users"+query)
 			buf, res := ctx.Execute(req)
