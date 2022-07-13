@@ -51,20 +51,20 @@ func (l *Logger) Line(data string, args ...interface{}) *Logger {
 }
 
 func (l *Logger) WithCmd(data string) *Logger {
-	l.color("run '%s' for more information", data)
+	l.writer.WriteString(l.color("run '%s' for more information", data))
 	return l
 }
 
 func (l *Logger) Info(data string, args ...interface{}) {
-	l.color("%Binfo%Z: "+data, args)
+	l.writer.WriteString(l.color("%Binfo%Z: "+data, args))
 }
 
 func (l *Logger) Warn(data string, args ...interface{}) {
-	l.color("%Ywarn%Z: "+data, args)
+	l.writer.WriteString(l.color("%Ywarn%Z: "+data, args))
 }
 
 func (l *Logger) Error(data string, args ...interface{}) *Logger {
-	l.color("%Rerror%Z: "+data, args)
+	os.Stderr.WriteString(l.color("%Rerror%Z: "+data, args))
 	return l
 }
 

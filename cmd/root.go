@@ -66,9 +66,9 @@ func Execute() {
 	defer func() {
 		if state := recover(); state != nil {
 			stack := string(debug.Stack())
-			entry := log.Error("an unknown error occurred:")
+			log.SetLevel(2).Error("an unknown error occurred:")
 			for _, line := range strings.Split(stack, "\n") {
-				entry.Line(line)
+				log.Line(line)
 			}
 		}
 	}()
