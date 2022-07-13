@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var log = logger.New()
+var log = logger.Logger{}
 
 var rootCmd = &cobra.Command{
 	Use:     "soar",
@@ -26,11 +26,11 @@ var initConfigCmd = &cobra.Command{
 
 		path, err := config.Create(dir, force)
 		if err != nil {
-			log.Error("failed to initialize config:").WithError(err).Log()
+			log.Error("failed to initialize config:").WithError(err)
 			return
 		}
 
-		log.Line(path).Log()
+		log.Line(path)
 	},
 }
 
@@ -41,24 +41,22 @@ var configCmd = &cobra.Command{
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
-			log.Error("failed to get config:").WithError(err).WithTip("soar config --help").Log()
+			log.Error("failed to get config:").WithError(err).WithCmd("soar config --help")
 			return
 		}
 
-		log.Line(cfg.Format()).Log()
+		log.Line(cfg.Format())
 	},
 }
 
 func init() {
 	initConfigCmd.Flags().String("dir", "", "the directory to create the config in")
 	initConfigCmd.Flags().BoolP("force", "f", false, "force overwrite the config")
-	initConfigCmd.Flags().BoolVar(&log.NoColor, "no-color", false, "disable ansi color codes")
-	initConfigCmd.Flags().BoolVar(&log.Persist, "save", false, "save the command and request logs")
+	initConfigCmd.Flags().BoolVar(&log.UseColor, "no-color", false, "disable ansi color codes")
 
 	configCmd.AddCommand(initConfigCmd)
 	configCmd.Flags().BoolP("local", "l", false, "get the local config")
-	configCmd.Flags().BoolVar(&log.NoColor, "no-color", false, "disable ansi color codes")
-	configCmd.Flags().BoolVar(&log.Persist, "save", false, "save the command and request logs")
+	configCmd.Flags().BoolVar(&log.UseColor, "no-color", false, "disable ansi color codes")
 
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(app.GroupCommands())

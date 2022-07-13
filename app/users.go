@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var log = logger.New()
+var log = logger.Logger{}
 
 type user struct {
 	ID         int    `json:"id"`
@@ -35,13 +35,13 @@ var getUsersCmd = &cobra.Command{
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
-			log.Error("failed to get config:").WithError(err).Log()
+			log.Error("failed to get config:").WithError(err)
 			return
 		}
 
 		single, query, err := parseUserQuery(cmd)
 		if err != nil {
-			log.Error("command error:").WithError(err).Log()
+			log.Error("command error:").WithError(err)
 			return
 		}
 
@@ -50,7 +50,7 @@ var getUsersCmd = &cobra.Command{
 			req := ctx.Request("GET", "/api/application/users"+query)
 			buf, res := ctx.Execute(req)
 			if !res.Ok() {
-				log.Error("failed requesting users:get").WithError(err).Log()
+				log.Error("failed requesting users:get").WithError(err)
 				return
 			}
 
@@ -59,24 +59,24 @@ var getUsersCmd = &cobra.Command{
 				A user   `json:"attributes"`
 			}
 			if err = json.Unmarshal(buf, &model); err != nil {
-				log.Error("failed to parse json:").WithError(err).Log()
+				log.Error("failed to parse json:").WithError(err)
 				return
 			}
 
 			fmt, err := json.MarshalIndent(model, "", "  ")
 			if err != nil {
-				log.Error("failed to parse response:").WithError(err).Log()
+				log.Error("failed to parse response:").WithError(err)
 				return
 			}
 
-			log.Line(string(fmt)).Log()
+			log.Line(string(fmt))
 			return
 		}
 
 		req := ctx.Request("GET", "/api/application/users")
 		buf, res := ctx.Execute(req)
 		if res != nil {
-			log.Error(res.Message()).Log()
+			log.Error(res.Message())
 			return
 		}
 
@@ -88,17 +88,17 @@ var getUsersCmd = &cobra.Command{
 			} `json:"data"`
 		}
 		if err = json.Unmarshal(buf, &model); err != nil {
-			log.Error("failed to parse json:").WithError(err).Log()
+			log.Error("failed to parse json:").WithError(err)
 			return
 		}
 
 		fmt, err := json.MarshalIndent(model, "", "  ")
 		if err != nil {
-			log.Error("failed to parse response:").WithError(err).Log()
+			log.Error("failed to parse response:").WithError(err)
 			return
 		}
 
-		log.Line(string(fmt)).Log()
+		log.Line(string(fmt))
 	},
 }
 
