@@ -48,17 +48,12 @@ type Error struct {
 	info []*ErrorInfo
 }
 
-func (e *Error) Message() string {
+func (e *Error) Error() string {
 	return e.msg
 }
 
 func (e *Error) Info() []*ErrorInfo {
 	return e.info
-}
-
-func (e *Error) Ok() bool {
-	fmt.Println(e.msg == "" || e.info == nil || len(e.info) == 0)
-	return e.msg == "" || e.info == nil || len(e.info) == 0
 }
 
 func newError(err error, info []*ErrorInfo) *Error {
