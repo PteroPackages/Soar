@@ -21,6 +21,7 @@ var initConfigCmd = &cobra.Command{
 	Example: "soar config init --dir=/",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
+
 		force, _ := cmd.Flags().GetBool("force")
 		dir, _ := cmd.Flags().GetString("dir")
 
@@ -39,6 +40,7 @@ var configCmd = &cobra.Command{
 	Example: "soar config init --force",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
+
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
