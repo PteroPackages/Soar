@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"runtime/debug"
-	"strings"
 
 	"github.com/pteropackages/soar/app"
 	"github.com/pteropackages/soar/config"
@@ -68,10 +67,7 @@ func Execute() {
 	defer func() {
 		if state := recover(); state != nil {
 			stack := string(debug.Stack())
-			log.SetLevel(2).Error("an unknown error occurred:")
-			for _, line := range strings.Split(stack, "\n") {
-				log.Line(line)
-			}
+			log.SetLevel(2).Error("a fatal error occurred:").Line(stack)
 		}
 	}()
 
