@@ -29,6 +29,9 @@ func New(cfg *config.Config, auth *config.Auth, log *logger.Logger) *Client {
 }
 
 func (c *Client) Request(method, path string, body *bytes.Buffer) *http.Request {
+	if body == nil {
+		body = &bytes.Buffer{}
+	}
 	req, _ := http.NewRequest(method, c.auth.URL+path, body)
 
 	req.Header.Set("User-Agent", "Soar Http Client")
