@@ -97,6 +97,7 @@ func (c *Client) Execute(req *http.Request) ([]byte, error) {
 			return nil, err
 		}
 
+		c.log.Error("received %d error(s):", len(data.Errors))
 		for _, e := range data.Errors {
 			c.log.Error(e.String())
 		}
