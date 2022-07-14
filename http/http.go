@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/pteropackages/soar/config"
@@ -41,31 +40,44 @@ func (c *Client) Request(method, path string) *http.Request {
 	return req
 }
 
-type ErrorInfo struct {
-	Status string `json:"string"`
+type errorInfo struct {
 	Code   string `json:"code"`
+	Status string `json:"status"`
 	Detail string `json:"detail"`
+}
+
+func (e *errorInfo) String() string {
+	detail := e.Detail
+	if detail == "" {
+		detail = "<no details>"
+	}
+
+	return fmt.Sprintf("%s (%s): %s", e.Code, e.Status, detail)
 }
 
 type Error struct {
 	msg  string
-	info []*ErrorInfo
+	info []*errorInfo
 }
 
 func (e *Error) Error() string {
 	return e.msg
 }
 
-func (e *Error) Info() []*ErrorInfo {
+func (e *Error) Info() []*errorInfo {
 	return e.info
 }
 
-func newError(err error, info []*ErrorInfo) *Error {
-	if err == nil {
-		return nil
+func newError(err error, info []*errorInfo) *Error {
+	if err != nil {
+		return &Error{msg: err.Error(), info: []*errorInfo{}}
 	}
 
-	return &Error{msg: err.Error(), info: info}
+	if len(info) != 0 {
+		return &Error{msg: "", info: info}
+	}
+
+	return nil
 }
 
 func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
@@ -74,10 +86,7 @@ func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
 
 	res, err := http.DefaultClient.Do(req)
 	taken := time.Since(start).Microseconds() / 1000
-
 	c.log.Debug("response: %d (%vms)", res.StatusCode, taken)
-	length := res.Header.Get("Content-Length")
-	c.log.Debug("content length: %s", length)
 
 	if err != nil {
 		return nil, newError(err, nil)
@@ -100,32 +109,19 @@ func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
 		return nil, nil
 
 	default:
-		if length != "" {
-			val, err := strconv.Atoi(length)
-			if err != nil {
-				val = 0
-			}
-
-			if val == 0 {
-				return nil, newError(fmt.Errorf("unknown api error: %s", res.Status), nil)
-			}
-
-			defer res.Body.Close()
-			buf, err := io.ReadAll(res.Body)
-			if err != nil {
-				return nil, newError(err, nil)
-			}
-
-			var data struct {
-				Errors []*ErrorInfo `json:"errors"`
-			}
-			if err = json.Unmarshal(buf, &data); err != nil {
-				return nil, newError(err, nil)
-			}
-
-			return nil, newError(err, data.Errors)
+		defer res.Body.Close()
+		buf, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, newError(fmt.Errorf("unknown api error: %s", res.Status), nil)
 		}
 
-		return nil, newError(fmt.Errorf("unknown api error: %s", res.Status), nil)
+		var data struct {
+			Errors []*errorInfo `json:"errors"`
+		}
+		if err = json.Unmarshal(buf, &data); err != nil {
+			return nil, newError(err, nil)
+		}
+
+		return nil, newError(nil, data.Errors)
 	}
 }
