@@ -40,6 +40,7 @@ var getUsersCmd = &cobra.Command{
 			config.HandleError(err, log)
 			return
 		}
+		cfg.ApplyFlags(cmd.Flags())
 
 		single, query, err := parseUserQuery(cmd)
 		if err != nil {

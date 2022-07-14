@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/pteropackages/soar/logger"
+	"github.com/spf13/pflag"
 	"gopkg.in/yaml.v3"
 )
 
@@ -41,6 +42,28 @@ func (c *Config) Format() string {
 	fmt, _ := yaml.Marshal(c)
 
 	return string(fmt)
+}
+
+func (c *Config) ApplyFlags(flags *pflag.FlagSet) {
+	if ok, _ := flags.GetBool("retry-ratelimit"); ok {
+		c.Http.RetryRateLimit = true
+	}
+	if ok, _ := flags.GetBool("no-retry-ratelimit"); ok {
+		c.Http.RetryRateLimit = false
+	}
+
+	if max, _ := flags.GetInt("max-body"); max != 0 {
+		if max >= 100 {
+			c.Http.MaxBodySize = max
+		}
+	}
+
+	if ok, _ := flags.GetBool("parse"); ok {
+		c.Http.ParseBody = true
+	}
+	if ok, _ := flags.GetBool("no-parse"); ok {
+		c.Http.ParseBody = false
+	}
 }
 
 func Get(local bool) (*Config, error) {
