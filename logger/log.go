@@ -83,6 +83,10 @@ func (l *Logger) Line(data string, args ...interface{}) *Logger {
 	return l
 }
 
+func (l *Logger) LineB(data []byte) {
+	l.Line(string(data))
+}
+
 func (l *Logger) WithCmd(cmd string) *Logger {
 	l.writer.WriteString(l.color("run '" + cmd + "' for more information"))
 	return l

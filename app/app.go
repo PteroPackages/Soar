@@ -13,7 +13,6 @@ func GroupCommands() *cobra.Command {
 
 	util.ApplyDefaultFlags(getUsersCmd)
 
-	getUsersCmd.Flags().BoolP("local", "l", false, "use the local config")
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
 

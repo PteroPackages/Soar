@@ -26,13 +26,14 @@ type user struct {
 	RootAdmin  bool   `json:"root_admin"`
 	TwoFactor  bool   `json:"2fa"`
 	CreatedAt  string `json:"created_at"`
-	UpdatedAt  string `json:"updated_at,omitempty"`
+	UpdatedAt  string `json:"updated_at"`
 }
 
 var getUsersCmd = &cobra.Command{
 	Use: "users:get",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
@@ -67,13 +68,18 @@ var getUsersCmd = &cobra.Command{
 				return
 			}
 
-			fmt, err := json.MarshalIndent(model, "", "  ")
+			var fmt []byte
+			if cfg.Http.ParseBody {
+				fmt, err = json.MarshalIndent(model.A, "", "  ")
+			} else {
+				fmt, err = json.MarshalIndent(model, "", "  ")
+			}
 			if err != nil {
 				log.Error("failed to parse response:").WithError(err)
 				return
 			}
 
-			log.Line(string(fmt))
+			log.LineB(fmt)
 			return
 		}
 
@@ -99,13 +105,22 @@ var getUsersCmd = &cobra.Command{
 			return
 		}
 
-		fmt, err := json.MarshalIndent(model, "", "  ")
+		var fmt []byte
+		if cfg.Http.ParseBody {
+			var inner []user
+			for _, u := range model.D {
+				inner = append(inner, u.A)
+			}
+			fmt, err = json.MarshalIndent(inner, "", "  ")
+		} else {
+			fmt, err = json.MarshalIndent(model, "", "  ")
+		}
 		if err != nil {
 			log.Error("failed to parse response:").WithError(err)
 			return
 		}
 
-		log.Line(string(fmt))
+		log.LineB(fmt)
 	},
 }
 
