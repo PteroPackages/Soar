@@ -2,21 +2,24 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/pteropackages/soar/logger"
 	"gopkg.in/yaml.v3"
 )
 
 type Auth struct {
-	URL string `yaml:"url"`
-	Key string `yaml:"key"`
+	URL string `validate:"required,url" yaml:"url"`
+	Key string `validate:"required" yaml:"key"`
 }
 
 type HttpConfig struct {
-	MaxBodySize    int  `yaml:"max_body_size"`
+	MaxBodySize    int  `validate:"required,gte=100" default:"100" yaml:"max_body_size"`
 	ParseBody      bool `yaml:"parse_body"`
 	RetryRateLimit bool `yaml:"retry_rate_limit"`
 }
@@ -28,9 +31,9 @@ type LogConfig struct {
 }
 
 type Config struct {
-	Application Auth       `yaml:"application"`
-	Client      Auth       `yaml:"client"`
-	Http        HttpConfig `yaml:"http"`
+	Application Auth       `validate:"required" yaml:"application"`
+	Client      Auth       `validate:"required" yaml:"client"`
+	Http        HttpConfig `validate:"required" yaml:"http"`
 	Logs        LogConfig  `yaml:"logs"`
 }
 
@@ -79,6 +82,12 @@ func Get(local bool) (*Config, error) {
 
 	var cfg *Config
 	if err = yaml.Unmarshal(buf, &cfg); err != nil {
+		return nil, err
+	}
+
+	validate := validator.New()
+	err = validate.Struct(cfg)
+	if err != nil {
 		return nil, err
 	}
 
@@ -144,4 +153,16 @@ func Create(path string, force bool) (string, error) {
 	}
 
 	return path, nil
+}
+
+func HandleError(err error, log *logger.Logger) {
+	if errs, ok := err.(validator.ValidationErrors); ok {
+		log.Error("failed to validate config, %d error(s):", len(errs))
+
+		for _, e := range errs {
+			log.Error(fmt.Sprintf("key '%s' didn't satisfy the '%s' tag", e.Namespace(), e.Tag()))
+		}
+	} else {
+		log.Error("failed to get config:").WithError(err).WithCmd("soar config --help")
+	}
 }

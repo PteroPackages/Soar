@@ -44,7 +44,7 @@ var configCmd = &cobra.Command{
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
-			log.Error("failed to get config:").WithError(err).WithCmd("soar config --help")
+			config.HandleError(err, log)
 			return
 		}
 

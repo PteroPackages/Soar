@@ -37,7 +37,7 @@ var getUsersCmd = &cobra.Command{
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
-			log.Error("failed to get config:").WithError(err)
+			config.HandleError(err, log)
 			return
 		}
 
