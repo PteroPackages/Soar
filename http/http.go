@@ -28,9 +28,8 @@ func New(cfg *config.Config, auth *config.Auth, log *logger.Logger) *Client {
 	}
 }
 
-func (c *Client) Request(method, path string) *http.Request {
-	var body bytes.Buffer
-	req, _ := http.NewRequest(method, c.auth.URL+path, &body)
+func (c *Client) Request(method, path string, body *bytes.Buffer) *http.Request {
+	req, _ := http.NewRequest(method, c.auth.URL+path, body)
 
 	req.Header.Set("User-Agent", "Soar Http Client")
 	req.Header.Set("Authorization", "Bearer "+c.auth.Key)
