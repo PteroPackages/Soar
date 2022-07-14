@@ -31,6 +31,16 @@ type user struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
+type attrModel struct {
+	O string `json:"object"`
+	A *user  `json:"attributes"`
+}
+
+type dataModel struct {
+	O string      `json:"object"`
+	D []attrModel `json:"data"`
+}
+
 var getUsersCmd = &cobra.Command{
 	Use: "users:get",
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -62,27 +72,24 @@ var getUsersCmd = &cobra.Command{
 				return
 			}
 
-			var model struct {
-				O string `json:"object"`
-				A user   `json:"attributes"`
-			}
+			var model attrModel
 			if err = json.Unmarshal(buf, &model); err != nil {
 				log.Error("failed to parse json:").WithError(err)
 				return
 			}
 
-			var fmt []byte
+			var str []byte
 			if cfg.Http.ParseBody {
-				fmt, err = json.MarshalIndent(model.A, "", "  ")
+				str, err = json.MarshalIndent(model.A, "", "  ")
 			} else {
-				fmt, err = json.MarshalIndent(model, "", "  ")
+				str, err = json.MarshalIndent(model, "", "  ")
 			}
 			if err != nil {
 				log.Error("failed to parse response:").WithError(err)
 				return
 			}
 
-			log.LineB(fmt)
+			log.LineB(str)
 			return
 		}
 
@@ -96,34 +103,28 @@ var getUsersCmd = &cobra.Command{
 			return
 		}
 
-		var model struct {
-			O string `json:"object"`
-			D []struct {
-				O string `json:"object"`
-				A user   `json:"attributes"`
-			} `json:"data"`
-		}
+		var model dataModel
 		if err = json.Unmarshal(buf, &model); err != nil {
 			log.Error("failed to parse json:").WithError(err)
 			return
 		}
 
-		var fmt []byte
+		var str []byte
 		if cfg.Http.ParseBody {
 			var inner []user
 			for _, u := range model.D {
-				inner = append(inner, u.A)
+				inner = append(inner, *u.A)
 			}
-			fmt, err = json.MarshalIndent(inner, "", "  ")
+			str, err = json.MarshalIndent(inner, "", "  ")
 		} else {
-			fmt, err = json.MarshalIndent(model, "", "  ")
+			str, err = json.MarshalIndent(model, "", "  ")
 		}
 		if err != nil {
 			log.Error("failed to parse response:").WithError(err)
 			return
 		}
 
-		log.LineB(fmt)
+		log.LineB(str)
 	},
 }
 
@@ -220,10 +221,7 @@ var createUserCmd = &cobra.Command{
 			return
 		}
 
-		var model struct {
-			O string `json:"object"`
-			A user   `json:"attributes"`
-		}
+		var model attrModel
 		if err = json.Unmarshal(res, &model); err != nil {
 			log.Error("failed to parse json:").WithError(err)
 			return
