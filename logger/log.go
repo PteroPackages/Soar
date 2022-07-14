@@ -114,22 +114,7 @@ func (l *Logger) Error(data string, args ...interface{}) *Logger {
 	return l
 }
 
-type errorInfo interface {
-	String() string
-}
-
-type httpError interface {
-	Info() []errorInfo
-}
-
 func (l *Logger) WithError(err error) *Logger {
-	if data, ok := err.(httpError); ok {
-		for _, i := range data.Info() {
-			l.Error(i.String())
-		}
-	} else {
-		l.Error(err.Error())
-	}
-
+	l.Error(err.Error())
 	return l
 }

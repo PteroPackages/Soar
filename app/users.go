@@ -49,9 +49,12 @@ var getUsersCmd = &cobra.Command{
 		ctx := http.New(cfg, &cfg.Application, log)
 		if single {
 			req := ctx.Request("GET", "/api/application/users"+query)
-			buf, res := ctx.Execute(req)
-			if res != nil {
-				log.Error("failed requesting users:get").WithError(res)
+			buf, err := ctx.Execute(req)
+			if err != nil {
+				log.WithError(err)
+				return
+			}
+			if buf == nil {
 				return
 			}
 

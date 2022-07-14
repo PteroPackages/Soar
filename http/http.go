@@ -55,32 +55,7 @@ func (e *errorInfo) String() string {
 	return fmt.Sprintf("%s (%s): %s", e.Code, e.Status, detail)
 }
 
-type Error struct {
-	msg  string
-	info []*errorInfo
-}
-
-func (e *Error) Error() string {
-	return e.msg
-}
-
-func (e *Error) Info() []*errorInfo {
-	return e.info
-}
-
-func newError(err error, info []*errorInfo) *Error {
-	if err != nil {
-		return &Error{msg: err.Error(), info: []*errorInfo{}}
-	}
-
-	if len(info) != 0 {
-		return &Error{msg: "", info: info}
-	}
-
-	return nil
-}
-
-func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
+func (c *Client) Execute(req *http.Request) ([]byte, error) {
 	c.log.Ignore().Info("request: %s %s", req.Method, req.URL.Path)
 	start := time.Now()
 
@@ -89,7 +64,7 @@ func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
 	c.log.Debug("response: %d (%vms)", res.StatusCode, taken)
 
 	if err != nil {
-		return nil, newError(err, nil)
+		return nil, err
 	}
 	c.log.Ignore().Info("response: %d (%dms)", res.StatusCode, taken)
 
@@ -103,7 +78,7 @@ func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
 	case http.StatusAccepted:
 		defer res.Body.Close()
 		buf, err := io.ReadAll(res.Body)
-		return buf, newError(err, nil)
+		return buf, err
 
 	case http.StatusNoContent:
 		return nil, nil
@@ -112,16 +87,20 @@ func (c *Client) Execute(req *http.Request) ([]byte, *Error) {
 		defer res.Body.Close()
 		buf, err := io.ReadAll(res.Body)
 		if err != nil {
-			return nil, newError(fmt.Errorf("unknown api error: %s", res.Status), nil)
+			return nil, fmt.Errorf("unknown api error: %s", res.Status)
 		}
 
 		var data struct {
 			Errors []*errorInfo `json:"errors"`
 		}
 		if err = json.Unmarshal(buf, &data); err != nil {
-			return nil, newError(err, nil)
+			return nil, err
 		}
 
-		return nil, newError(nil, data.Errors)
+		for _, e := range data.Errors {
+			c.log.Error(e.String())
+		}
+
+		return nil, nil
 	}
 }
