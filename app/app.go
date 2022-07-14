@@ -12,6 +12,7 @@ func GroupCommands() *cobra.Command {
 	}
 
 	util.ApplyDefaultFlags(getUsersCmd)
+	util.ApplyDefaultFlags(createUserCmd)
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
@@ -19,7 +20,10 @@ func GroupCommands() *cobra.Command {
 	getUsersCmd.Flags().String("email", "", "the email of the user")
 	getUsersCmd.Flags().String("uuid", "", "the uuid of the user")
 
+	createUserCmd.Flags().String("src", "", "the json file to read from")
+
 	cmd.AddCommand(getUsersCmd)
+	cmd.AddCommand(createUserCmd)
 
 	return cmd
 }

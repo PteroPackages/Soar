@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
 	"github.com/pteropackages/soar/logger"
+	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
 
@@ -50,7 +52,7 @@ var getUsersCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		if single {
-			req := ctx.Request("GET", "/api/application/users"+query)
+			req := ctx.Request("GET", "/api/application/users"+query, nil)
 			buf, err := ctx.Execute(req)
 			if err != nil {
 				log.WithError(err)
@@ -84,7 +86,7 @@ var getUsersCmd = &cobra.Command{
 			return
 		}
 
-		req := ctx.Request("GET", "/api/application/users"+query)
+		req := ctx.Request("GET", "/api/application/users"+query, nil)
 		buf, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -162,4 +164,82 @@ func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 	}
 
 	return single, query.String(), nil
+}
+
+var createUserCmd = &cobra.Command{
+	Use: "users:create",
+	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		src, _ := cmd.Flags().GetString("src")
+		if src == "" {
+			log.Error("a source file must be provided")
+			return
+		}
+
+		buf, err := util.SafeReadFile(src)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		var schema struct {
+			Username   string `json:"username"`
+			Email      string `json:"email"`
+			FirstName  string `json:"first_name"`
+			LastName   string `json:"last_name"`
+			Password   string `json:"password,omitempty"`
+			RootAdmin  bool   `json:"root_admin,omitempty"`
+			ExternalID string `json:"external_id,omitempty"`
+		}
+		if err = json.Unmarshal(buf, &schema); err != nil {
+			log.Error("failed to parse json:").WithError(err)
+			return
+		}
+
+		data, _ := json.Marshal(schema)
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("POST", "/api/application/users", &body)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+		if buf == nil {
+			return
+		}
+
+		var model struct {
+			O string `json:"object"`
+			A user   `json:"attributes"`
+		}
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.Error("failed to parse json:").WithError(err)
+			return
+		}
+
+		var str []byte
+		if cfg.Http.ParseBody {
+			str, err = json.MarshalIndent(model.A, "", "  ")
+		} else {
+			str, err = json.MarshalIndent(model, "", "  ")
+		}
+		if err != nil {
+			log.Error("failed to parse response:").WithError(err)
+			return
+		}
+
+		log.LineB(str)
+	},
 }
