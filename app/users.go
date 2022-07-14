@@ -31,7 +31,7 @@ type user struct {
 
 var getUsersCmd = &cobra.Command{
 	Use: "users:get",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
 		local, _ := cmd.Flags().GetBool("local")
@@ -84,7 +84,7 @@ var getUsersCmd = &cobra.Command{
 			return
 		}
 
-		req := ctx.Request("GET", "/api/application/users")
+		req := ctx.Request("GET", "/api/application/users"+query)
 		buf, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -141,6 +141,24 @@ func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 		}
 
 		query.WriteString("/external/" + ext)
+	}
+
+	var params []string
+	if val, _ := flags.GetString("username"); val != "" {
+		params = append(params, "filter[username]="+val)
+	}
+	if val, _ := flags.GetString("email"); val != "" {
+		params = append(params, "filter[email]="+val)
+	}
+	if val, _ := flags.GetString("uuid"); val != "" {
+		params = append(params, "filter[uuid]="+val)
+	}
+
+	if len(params) != 0 {
+		query.WriteString("?" + params[0])
+		for _, p := range params[1:] {
+			query.WriteString("&" + p)
+		}
 	}
 
 	return single, query.String(), nil

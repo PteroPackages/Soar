@@ -15,6 +15,9 @@ func GroupCommands() *cobra.Command {
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
+	getUsersCmd.Flags().String("username", "", "the username of the user")
+	getUsersCmd.Flags().String("email", "", "the email of the user")
+	getUsersCmd.Flags().String("uuid", "", "the uuid of the user")
 
 	cmd.AddCommand(getUsersCmd)
 

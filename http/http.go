@@ -57,6 +57,7 @@ func (e *errorInfo) String() string {
 
 func (c *Client) Execute(req *http.Request) ([]byte, error) {
 	c.log.Ignore().Info("request: %s %s", req.Method, req.URL.Path)
+	c.log.Debug("url: %s", req.URL.String())
 	start := time.Now()
 
 	res, err := http.DefaultClient.Do(req)
