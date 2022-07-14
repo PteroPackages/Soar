@@ -74,7 +74,7 @@ func (l *Logger) color(str string) string {
 
 func (l *Logger) Debug(data string, args ...interface{}) {
 	if l.UseDebug {
-		l.writer.WriteString("debug:" + fmt.Sprintf(data, args...) + "\n")
+		l.writer.WriteString("debug: " + fmt.Sprintf(data, args...) + "\n")
 	}
 }
 
@@ -114,7 +114,22 @@ func (l *Logger) Error(data string, args ...interface{}) *Logger {
 	return l
 }
 
+type errorInfo interface {
+	String() string
+}
+
+type httpError interface {
+	Info() []errorInfo
+}
+
 func (l *Logger) WithError(err error) *Logger {
-	l.Error(err.Error())
+	if data, ok := err.(httpError); ok {
+		for _, i := range data.Info() {
+			l.Error(i.String())
+		}
+	} else {
+		l.Error(err.Error())
+	}
+
 	return l
 }
