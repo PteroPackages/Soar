@@ -43,6 +43,9 @@ func GroupCommands() *cobra.Command {
 
 	createUserCmd.Flags().String("src", "", "the json file to read from")
 
+	getServersCmd.Flags().Int("id", 0, "the id of the server")
+	getServersCmd.Flags().String("external", "", "the external id of the server")
+
 	cmd.AddCommand(getUsersCmd)
 	cmd.AddCommand(createUserCmd)
 	cmd.AddCommand(deleteUserCmd)

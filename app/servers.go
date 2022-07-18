@@ -2,6 +2,9 @@ package app
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
@@ -57,7 +60,45 @@ var getServersCmd = &cobra.Command{
 		}
 		cfg.ApplyFlags(cmd.Flags())
 
+		single, query, err := parseServerQuery(cmd)
+		if err != nil {
+			log.Error("command error:").WithError(err)
+			return
+		}
+
 		ctx := http.New(cfg, &cfg.Application, log)
+		if single {
+			req := ctx.Request("GET", "/api/application/servers"+query, nil)
+			res, err := ctx.Execute(req)
+			if err != nil {
+				log.WithError(err)
+				return
+			}
+			if res == nil {
+				return
+			}
+
+			var model serverAttrModel
+			if err = json.Unmarshal(res, &model); err != nil {
+				log.Error("failed to parse json:").WithError(err)
+				return
+			}
+
+			var buf []byte
+			if cfg.Http.ParseBody {
+				buf, err = json.MarshalIndent(model.A, "", "  ")
+			} else {
+				buf, err = json.MarshalIndent(model, "", "  ")
+			}
+			if err != nil {
+				log.Error("failed to parse response:").WithError(err)
+				return
+			}
+
+			log.LineB(buf)
+			return
+		}
+
 		req := ctx.Request("GET", "/api/application/servers", nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
@@ -87,4 +128,25 @@ var getServersCmd = &cobra.Command{
 
 		log.LineB(buf)
 	},
+}
+
+func parseServerQuery(cmd *cobra.Command) (bool, string, error) {
+	var query strings.Builder
+	single := false
+	flags := cmd.Flags()
+
+	if id, _ := flags.GetInt("id"); id != 0 {
+		single = true
+		query.WriteString(fmt.Sprintf("/%d", id))
+	}
+
+	if ext, _ := flags.GetString("external"); ext != "" {
+		if query.Len() != 0 {
+			return false, "", errors.New("id an external flags specified; pick one")
+		}
+
+		query.WriteString("/external/" + ext)
+	}
+
+	return single, query.String(), nil
 }
