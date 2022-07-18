@@ -34,6 +34,9 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(createUserCmd)
 	util.ApplyDefaultFlags(deleteUserCmd)
 	util.ApplyDefaultFlags(getServersCmd)
+	util.ApplyDefaultFlags(suspendServerCmd)
+	util.ApplyDefaultFlags(unsuspendServerCmd)
+	util.ApplyDefaultFlags(reinstallServerCmd)
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
@@ -50,6 +53,9 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(createUserCmd)
 	cmd.AddCommand(deleteUserCmd)
 	cmd.AddCommand(getServersCmd)
+	cmd.AddCommand(suspendServerCmd)
+	cmd.AddCommand(unsuspendServerCmd)
+	cmd.AddCommand(reinstallServerCmd)
 
 	return cmd
 }

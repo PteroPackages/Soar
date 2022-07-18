@@ -150,3 +150,90 @@ func parseServerQuery(cmd *cobra.Command) (bool, string, error) {
 
 	return single, query.String(), nil
 }
+
+var suspendServerCmd = &cobra.Command{
+	Use: "servers:suspend",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		if len(args) == 0 {
+			log.Error("no server id specified")
+			return
+		} else if len(args) > 1 {
+			log.Error("more than one server id argument specified").WithCmd("soar app servers:suspend --help")
+			return
+		}
+
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("POST", "/api/application/servers/"+args[0]+"/suspend", nil)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var unsuspendServerCmd = &cobra.Command{
+	Use: "servers:unsuspend",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		if len(args) == 0 {
+			log.Error("no server id specified")
+			return
+		} else if len(args) > 1 {
+			log.Error("more than one server id argument specified").WithCmd("soar app servers:unsuspend --help")
+			return
+		}
+
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("POST", "/api/application/servers/"+args[0]+"/unsuspend", nil)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var reinstallServerCmd = &cobra.Command{
+	Use: "servers:reinstall",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		if len(args) == 0 {
+			log.Error("no server id specified")
+			return
+		} else if len(args) > 1 {
+			log.Error("more than one server id argument specified").WithCmd("soar app servers:reinstall --help")
+			return
+		}
+
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("POST", "/api/application/servers/"+args[0]+"/reinstall", nil)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
