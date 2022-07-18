@@ -111,7 +111,11 @@ var getNodesCmd = &cobra.Command{
 
 		var buf []byte
 		if cfg.Http.ParseBody {
-			buf, err = json.MarshalIndent(model.D, "", "  ")
+			inner := make([]*node, 0, len(model.D))
+			for _, m := range model.D {
+				inner = append(inner, m.A)
+			}
+			buf, err = json.MarshalIndent(inner, "", "  ")
 		} else {
 			buf, err = json.MarshalIndent(model, "", "  ")
 		}
