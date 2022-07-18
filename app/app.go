@@ -1,9 +1,12 @@
 package app
 
 import (
+	"github.com/pteropackages/soar/logger"
 	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
+
+var log = logger.New()
 
 func GroupCommands() *cobra.Command {
 	cmd := &cobra.Command{
@@ -14,6 +17,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(getUsersCmd)
 	util.ApplyDefaultFlags(createUserCmd)
 	util.ApplyDefaultFlags(deleteUserCmd)
+	util.ApplyDefaultFlags(getServersCmd)
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
@@ -26,6 +30,7 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(getUsersCmd)
 	cmd.AddCommand(createUserCmd)
 	cmd.AddCommand(deleteUserCmd)
+	cmd.AddCommand(getServersCmd)
 
 	return cmd
 }

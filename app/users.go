@@ -9,12 +9,9 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
-	"github.com/pteropackages/soar/logger"
 	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
-
-var log = logger.New()
 
 type user struct {
 	ID         int    `json:"id"`
@@ -31,14 +28,14 @@ type user struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
-type attrModel struct {
+type userAttrModel struct {
 	O string `json:"object"`
 	A *user  `json:"attributes"`
 }
 
-type dataModel struct {
-	O string      `json:"object"`
-	D []attrModel `json:"data"`
+type userDataModel struct {
+	O string          `json:"object"`
+	D []userAttrModel `json:"data"`
 }
 
 var getUsersCmd = &cobra.Command{
@@ -63,68 +60,68 @@ var getUsersCmd = &cobra.Command{
 		ctx := http.New(cfg, &cfg.Application, log)
 		if single {
 			req := ctx.Request("GET", "/api/application/users"+query, nil)
-			buf, err := ctx.Execute(req)
+			res, err := ctx.Execute(req)
 			if err != nil {
 				log.WithError(err)
 				return
 			}
-			if buf == nil {
+			if res == nil {
 				return
 			}
 
-			var model attrModel
-			if err = json.Unmarshal(buf, &model); err != nil {
+			var model userAttrModel
+			if err = json.Unmarshal(res, &model); err != nil {
 				log.Error("failed to parse json:").WithError(err)
 				return
 			}
 
-			var str []byte
+			var buf []byte
 			if cfg.Http.ParseBody {
-				str, err = json.MarshalIndent(model.A, "", "  ")
+				buf, err = json.MarshalIndent(model.A, "", "  ")
 			} else {
-				str, err = json.MarshalIndent(model, "", "  ")
+				buf, err = json.MarshalIndent(model, "", "  ")
 			}
 			if err != nil {
 				log.Error("failed to parse response:").WithError(err)
 				return
 			}
 
-			log.LineB(str)
+			log.LineB(buf)
 			return
 		}
 
 		req := ctx.Request("GET", "/api/application/users"+query, nil)
-		buf, err := ctx.Execute(req)
+		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
 			return
 		}
-		if buf == nil {
+		if res == nil {
 			return
 		}
 
-		var model dataModel
-		if err = json.Unmarshal(buf, &model); err != nil {
+		var model userDataModel
+		if err = json.Unmarshal(res, &model); err != nil {
 			log.Error("failed to parse json:").WithError(err)
 			return
 		}
 
-		var str []byte
+		var buf []byte
 		if cfg.Http.ParseBody {
 			var inner []user
 			for _, u := range model.D {
 				inner = append(inner, *u.A)
 			}
-			str, err = json.MarshalIndent(inner, "", "  ")
+			buf, err = json.MarshalIndent(inner, "", "  ")
 		} else {
-			str, err = json.MarshalIndent(model, "", "  ")
+			buf, err = json.MarshalIndent(model, "", "  ")
 		}
 		if err != nil {
 			log.Error("failed to parse response:").WithError(err)
 			return
 		}
 
-		log.LineB(str)
+		log.LineB(buf)
 	},
 }
 
@@ -186,7 +183,7 @@ var createUserCmd = &cobra.Command{
 			return
 		}
 
-		buf, err := util.SafeReadFile(src)
+		res, err := util.SafeReadFile(src)
 		if err != nil {
 			log.WithError(err)
 			return
@@ -201,7 +198,7 @@ var createUserCmd = &cobra.Command{
 			RootAdmin  bool   `json:"root_admin,omitempty"`
 			ExternalID string `json:"external_id,omitempty"`
 		}
-		if err = json.Unmarshal(buf, &schema); err != nil {
+		if err = json.Unmarshal(res, &schema); err != nil {
 			log.Error("failed to parse json:").WithError(err)
 			return
 		}
@@ -212,16 +209,16 @@ var createUserCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("POST", "/api/application/users", &body)
-		res, err := ctx.Execute(req)
+		res, err = ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
 			return
 		}
-		if buf == nil {
+		if res == nil {
 			return
 		}
 
-		var model attrModel
+		var model userAttrModel
 		if err = json.Unmarshal(res, &model); err != nil {
 			log.Error("failed to parse json:").WithError(err)
 			return
