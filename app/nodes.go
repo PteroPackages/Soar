@@ -148,3 +148,76 @@ func parseNodeQuery(cmd *cobra.Command) (bool, string, error) {
 
 	return single, query.String(), nil
 }
+
+type configModel struct {
+	Debug   bool   `json:"debug"`
+	UUID    string `json:"uuid"`
+	TokenID string `json:"token_id"`
+	Token   string `json:"token"`
+	API     struct {
+		Host string `json:"host"`
+		Port int    `json:"port"`
+		SSL  struct {
+			Enabled bool   `json:"enabled"`
+			Cert    string `json:"cert"`
+			Key     string `json:"key"`
+		} `json:"ssl"`
+		UploadLimit int `json:"upload_limit"`
+	} `json:"api"`
+	System struct {
+		Data string `json:"data"`
+		SFTP struct {
+			BindPort int `json:"bind_port"`
+		} `json:"sftp"`
+	} `json:"system"`
+	AllowedMounts []string `json:"allowed_mounts"`
+	Remote        string   `json:"remote"`
+}
+
+var getNodeConfigCmd = &cobra.Command{
+	Use: "nodes:config",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		if len(args) == 0 {
+			log.Error("no node id specified")
+			return
+		} else if len(args) > 1 {
+			log.Error("more than one node id argument specified").WithCmd("soar app nodes:config --help")
+			return
+		}
+
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("GET", "/api/application/nodes/"+args[0]+"/configuration", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+		if res == nil {
+			return
+		}
+
+		var model configModel
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.Error("failed to parse json:").WithError(err)
+			return
+		}
+
+		buf, err := json.MarshalIndent(model, "", "  ")
+		if err != nil {
+			log.Error("failed to parse response:").WithError(err)
+			return
+		}
+
+		log.LineB(buf)
+	},
+}

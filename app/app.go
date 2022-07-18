@@ -38,6 +38,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(unsuspendServerCmd)
 	util.ApplyDefaultFlags(reinstallServerCmd)
 	util.ApplyDefaultFlags(getNodesCmd)
+	util.ApplyDefaultFlags(getNodeConfigCmd)
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
@@ -60,6 +61,7 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(unsuspendServerCmd)
 	cmd.AddCommand(reinstallServerCmd)
 	cmd.AddCommand(getNodesCmd)
+	cmd.AddCommand(getNodeConfigCmd)
 
 	return cmd
 }
