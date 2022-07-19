@@ -43,7 +43,7 @@ type nodeDataModel struct {
 
 var getNodesCmd = &cobra.Command{
 	Use: "nodes:get",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
 		local, _ := cmd.Flags().GetBool("local")

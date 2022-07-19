@@ -37,6 +37,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(suspendServerCmd)
 	util.ApplyDefaultFlags(unsuspendServerCmd)
 	util.ApplyDefaultFlags(reinstallServerCmd)
+	util.ApplyDefaultFlags(deleteServerCmd)
 	util.ApplyDefaultFlags(getNodesCmd)
 	util.ApplyDefaultFlags(getNodeConfigCmd)
 
@@ -50,6 +51,8 @@ func GroupCommands() *cobra.Command {
 
 	getServersCmd.Flags().Int("id", 0, "the id of the server")
 	getServersCmd.Flags().String("external", "", "the external id of the server")
+
+	deleteServerCmd.Flags().Bool("force", false, "force delete the server")
 
 	getNodesCmd.Flags().Int("id", 0, "the id of the node")
 
