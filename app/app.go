@@ -41,6 +41,8 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(getNodesCmd)
 	util.ApplyDefaultFlags(getNodeConfigCmd)
 	util.ApplyDefaultFlags(getLocationsCmd)
+	util.ApplyDefaultFlags(getNestsCmd)
+	util.ApplyDefaultFlags(getNestEggsCmd)
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
@@ -59,6 +61,10 @@ func GroupCommands() *cobra.Command {
 
 	getLocationsCmd.Flags().Int("id", 0, "the id of the location")
 
+	getNestsCmd.Flags().Int("id", 0, "the id of the nest")
+
+	getNestEggsCmd.Flags().Int("id", 0, "the id of the egg")
+
 	cmd.AddCommand(getUsersCmd)
 	cmd.AddCommand(createUserCmd)
 	cmd.AddCommand(deleteUserCmd)
@@ -69,6 +75,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(getNodesCmd)
 	cmd.AddCommand(getNodeConfigCmd)
 	cmd.AddCommand(getLocationsCmd)
+	cmd.AddCommand(getNestsCmd)
+	cmd.AddCommand(getNestEggsCmd)
 
 	return cmd
 }
