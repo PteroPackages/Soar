@@ -42,7 +42,9 @@ type nodeDataModel struct {
 }
 
 var getNodesCmd = &cobra.Command{
-	Use: "nodes:get",
+	Use:   "nodes:get",
+	Short: "gets panel nodes",
+	Long:  getNodesHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
@@ -175,7 +177,9 @@ type configModel struct {
 }
 
 var getNodeConfigCmd = &cobra.Command{
-	Use: "nodes:config",
+	Use:   "nodes:config",
+	Short: "gets a node config",
+	Long:  "Gets the configuration for a specified node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
 

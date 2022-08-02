@@ -39,7 +39,9 @@ type userDataModel struct {
 }
 
 var getUsersCmd = &cobra.Command{
-	Use: "users:get",
+	Use:   "users:get",
+	Short: "gets panel users",
+	Long:  getUsersHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
@@ -165,7 +167,9 @@ func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 }
 
 var createUserCmd = &cobra.Command{
-	Use: "users:create",
+	Use:   "users:create",
+	Short: "creates a user",
+	Long:  createUserHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
@@ -240,7 +244,9 @@ var createUserCmd = &cobra.Command{
 }
 
 var deleteUserCmd = &cobra.Command{
-	Use:       "users:delete",
+	Use:       "users:delete <id>",
+	Short:     "deletes a user",
+	Long:      "Deletes a user account from the panel by its ID.",
 	ValidArgs: []string{"id"},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())

@@ -28,7 +28,9 @@ type locDataModel struct {
 }
 
 var getLocationsCmd = &cobra.Command{
-	Use: "locations:get",
+	Use:   "locations:get",
+	Short: "gets panel node locations",
+	Long:  getLocationsHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 

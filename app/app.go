@@ -26,8 +26,9 @@ type Limits struct {
 
 func GroupCommands() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "app",
-		Example: "soar app <group> <subcommands> [arguments]",
+		Use:   "app <subcommand> [options]",
+		Short: "application api management",
+		Long:  "Commands for interacting with the application API.",
 	}
 
 	util.ApplyDefaultFlags(getUsersCmd)
@@ -49,20 +50,13 @@ func GroupCommands() *cobra.Command {
 	getUsersCmd.Flags().String("username", "", "the username of the user")
 	getUsersCmd.Flags().String("email", "", "the email of the user")
 	getUsersCmd.Flags().String("uuid", "", "the uuid of the user")
-
 	createUserCmd.Flags().String("src", "", "the json file to read from")
-
 	getServersCmd.Flags().Int("id", 0, "the id of the server")
 	getServersCmd.Flags().String("external", "", "the external id of the server")
-
 	deleteServerCmd.Flags().Bool("force", false, "force delete the server")
-
 	getNodesCmd.Flags().Int("id", 0, "the id of the node")
-
 	getLocationsCmd.Flags().Int("id", 0, "the id of the location")
-
 	getNestsCmd.Flags().Int("id", 0, "the id of the nest")
-
 	getNestEggsCmd.Flags().Int("id", 0, "the id of the egg")
 
 	cmd.AddCommand(getUsersCmd)

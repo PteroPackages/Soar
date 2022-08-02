@@ -69,7 +69,9 @@ type eggDataModel struct {
 }
 
 var getNestsCmd = &cobra.Command{
-	Use: "nests:get",
+	Use:   "nests:get",
+	Short: "gets panel nests",
+	Long:  getNestsHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
@@ -146,7 +148,9 @@ var getNestsCmd = &cobra.Command{
 }
 
 var getNestEggsCmd = &cobra.Command{
-	Use: "nests:eggs:get",
+	Use:   "nests:eggs:get <id>",
+	Short: "gets panel eggs for a nest",
+	Long:  getNestEggsHelp,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
 

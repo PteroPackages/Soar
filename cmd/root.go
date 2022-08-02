@@ -17,7 +17,7 @@ var rootCmd = &cobra.Command{
 }
 
 var initConfigCmd = &cobra.Command{
-	Use:     "init",
+	Use:     "init [flags]",
 	Example: "soar config init --dir=/",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
@@ -36,7 +36,7 @@ var initConfigCmd = &cobra.Command{
 }
 
 var configCmd = &cobra.Command{
-	Use:     "config",
+	Use:     "config [init] [flags]",
 	Example: "soar config init --force",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
@@ -63,6 +63,7 @@ func init() {
 
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(app.GroupCommands())
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 }
 
 func Execute() {
