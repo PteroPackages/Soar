@@ -66,6 +66,7 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(suspendServerCmd)
 	cmd.AddCommand(unsuspendServerCmd)
 	cmd.AddCommand(reinstallServerCmd)
+	cmd.AddCommand(deleteServerCmd)
 	cmd.AddCommand(getNodesCmd)
 	cmd.AddCommand(getNodeConfigCmd)
 	cmd.AddCommand(getLocationsCmd)

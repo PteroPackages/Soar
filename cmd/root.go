@@ -13,6 +13,7 @@ var log = logger.New()
 
 var rootCmd = &cobra.Command{
 	Use:     "soar",
+	Short:   "Commands for interacting with Pterodactyl via the API",
 	Version: Version,
 }
 
@@ -37,6 +38,8 @@ var initConfigCmd = &cobra.Command{
 
 var configCmd = &cobra.Command{
 	Use:     "config [init] [flags]",
+	Short:   "manages the soar config",
+	Long:    "Manages the soar config for HTTP and logging",
 	Example: "soar config init --force",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
