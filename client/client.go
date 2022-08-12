@@ -16,8 +16,10 @@ func GroupCommands() *cobra.Command {
 	}
 
 	util.ApplyDefaultFlags(getAccountCmd)
+	util.ApplyDefaultFlags(getPermissionsCmd)
 
 	cmd.AddCommand(getAccountCmd)
+	cmd.AddCommand(getPermissionsCmd)
 
 	return cmd
 }

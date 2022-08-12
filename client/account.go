@@ -66,3 +66,53 @@ var getAccountCmd = &cobra.Command{
 		log.LineB(buf)
 	},
 }
+
+var getPermissionsCmd = &cobra.Command{
+	Use:     "account:perms",
+	Aliases: []string{"account:p"},
+	Short:   "gets system permissions",
+	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("GET", "/api/client/permissions", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+		if res == nil {
+			return
+		}
+
+		var model struct {
+			O string                 `json:"object"`
+			A map[string]interface{} `json:"attributes"`
+		}
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.Error("failed to parse json:").WithError(err)
+			return
+		}
+
+		var buf []byte
+		if cfg.Http.ParseBody {
+			buf, err = json.MarshalIndent(model.A, "", "  ")
+		} else {
+			buf, err = json.MarshalIndent(model, "", "  ")
+		}
+		if err != nil {
+			log.Error("failed to parse response:").WithError(err)
+			return
+		}
+
+		log.LineB(buf)
+	},
+}
