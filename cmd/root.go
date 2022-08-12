@@ -4,6 +4,7 @@ import (
 	"runtime/debug"
 
 	"github.com/pteropackages/soar/app"
+	"github.com/pteropackages/soar/client"
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/logger"
 	"github.com/spf13/cobra"
@@ -66,6 +67,7 @@ func init() {
 
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(app.GroupCommands())
+	rootCmd.AddCommand(client.GroupCommands())
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 }
 
