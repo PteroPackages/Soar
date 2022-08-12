@@ -17,8 +17,10 @@ func ApplyDefaultFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("retry-ratelimit", "r", false, "retry request on ratelimit")
 	cmd.Flags().BoolP("no-retry-ratelimit", "R", false, "don't retry request on ratelimit")
 	cmd.Flags().Int("max-body", 0, "the maximum body size to accept")
-	cmd.Flags().BoolP("parse", "p", false, "parse the response body")
-	cmd.Flags().BoolP("no-parse", "P", false, "don't parse the response body")
+	cmd.Flags().BoolP("parse-body", "b", false, "parse the response body")
+	cmd.Flags().BoolP("no-parse-body", "B", false, "don't parse the response body")
+	cmd.Flags().BoolP("parse-indent", "i", false, "indent the response body")
+	cmd.Flags().BoolP("no-parse-indent", "I", false, "don't indent the response body")
 }
 
 func SafeReadFile(path string) ([]byte, error) {

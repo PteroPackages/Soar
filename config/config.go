@@ -59,11 +59,18 @@ func (c *Config) ApplyFlags(flags *pflag.FlagSet) {
 		}
 	}
 
-	if ok, _ := flags.GetBool("parse"); ok {
+	if ok, _ := flags.GetBool("parse-body"); ok {
 		c.Http.ParseBody = true
 	}
-	if ok, _ := flags.GetBool("no-parse"); ok {
+	if ok, _ := flags.GetBool("no-parse-body"); ok {
 		c.Http.ParseBody = false
+	}
+
+	if ok, _ := flags.GetBool("parse-indent"); ok {
+		c.Http.ParseIndent = true
+	}
+	if ok, _ := flags.GetBool("no-parse-indent"); ok {
+		c.Http.ParseIndent = false
 	}
 }
 
