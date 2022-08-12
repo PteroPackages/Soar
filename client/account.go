@@ -1,22 +1,10 @@
 package client
 
 import (
-	"encoding/json"
-
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
 	"github.com/spf13/cobra"
 )
-
-type account struct {
-	ID        int    `json:"id"`
-	Admin     bool   `json:"admin"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Language  string `json:"language"`
-}
 
 var getAccountCmd = &cobra.Command{
 	Use:   "account:get",
@@ -39,27 +27,10 @@ var getAccountCmd = &cobra.Command{
 			log.WithError(err)
 			return
 		}
-		if res == nil {
-			return
-		}
 
-		var model struct {
-			O string   `json:"object"`
-			A *account `json:"attributes"`
-		}
-		if err = json.Unmarshal(res, &model); err != nil {
-			log.Error("failed to parse json:").WithError(err)
-			return
-		}
-
-		var buf []byte
-		if cfg.Http.ParseBody {
-			buf, err = json.MarshalIndent(model.A, "", "  ")
-		} else {
-			buf, err = json.MarshalIndent(model, "", "  ")
-		}
+		buf, err := http.HandleItemResponse(res, cfg)
 		if err != nil {
-			log.Error("failed to parse response:").WithError(err)
+			log.WithError(err)
 			return
 		}
 
@@ -93,23 +64,41 @@ var getPermissionsCmd = &cobra.Command{
 			return
 		}
 
-		var model struct {
-			O string                 `json:"object"`
-			A map[string]interface{} `json:"attributes"`
-		}
-		if err = json.Unmarshal(res, &model); err != nil {
-			log.Error("failed to parse json:").WithError(err)
+		buf, err := http.HandleItemResponse(res, cfg)
+		if err != nil {
+			log.WithError(err)
 			return
 		}
 
-		var buf []byte
-		if cfg.Http.ParseBody {
-			buf, err = json.MarshalIndent(model.A, "", "  ")
-		} else {
-			buf, err = json.MarshalIndent(model, "", "  ")
-		}
+		log.LineB(buf)
+	},
+}
+
+var getServersCmd = &cobra.Command{
+	Use:   "servers:get",
+	Short: "gets account servers",
+	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
 		if err != nil {
-			log.Error("failed to parse response:").WithError(err)
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("GET", "/api/client", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		buf, err := http.HandleDataResponse(res, cfg)
+		if err != nil {
+			log.WithError(err)
 			return
 		}
 

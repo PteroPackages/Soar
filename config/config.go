@@ -22,6 +22,7 @@ type Auth struct {
 type HttpConfig struct {
 	MaxBodySize    int  `validate:"required,gte=100" default:"100" yaml:"max_body_size"`
 	ParseBody      bool `yaml:"parse_body"`
+	ParseIndent    bool `yaml:"parse_indent"`
 	RetryRateLimit bool `yaml:"retry_rate_limit"`
 }
 
