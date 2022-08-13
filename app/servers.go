@@ -1,7 +1,6 @@
 package app
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -10,42 +9,6 @@ import (
 	"github.com/pteropackages/soar/http"
 	"github.com/spf13/cobra"
 )
-
-type server struct {
-	ID            int           `json:"id"`
-	ExternalID    string        `json:"external_id"`
-	UUID          string        `json:"uuid"`
-	Identifier    string        `json:"identifer"`
-	Name          string        `json:"name"`
-	Description   string        `json:"description"`
-	Status        string        `json:"status"`
-	Suspended     bool          `json:"suspended"`
-	Limits        Limits        `json:"limits"`
-	FeatureLimits FeatureLimits `json:"feature_limits"`
-	User          int           `json:"user"`
-	Node          int           `json:"node"`
-	Allocation    int           `json:"allocation"`
-	Nest          int           `json:"nest"`
-	Egg           int           `json:"egg"`
-	Container     struct {
-		StartupCommand string                 `json:"startup_command"`
-		Image          string                 `json:"image"`
-		Installed      int                    `json:"installed"`
-		Environment    map[string]interface{} `json:"environment"`
-	} `json:"container"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-}
-
-type serverAttrModel struct {
-	O string  `json:"object"`
-	A *server `json:"attributes"`
-}
-
-type serverDataModel struct {
-	O string            `json:"object"`
-	D []serverAttrModel `json:"data"`
-}
 
 var getServersCmd = &cobra.Command{
 	Use:   "servers:get",
@@ -68,67 +31,28 @@ var getServersCmd = &cobra.Command{
 			return
 		}
 
-		ctx := http.New(cfg, &cfg.Application, log)
+		path := "/api/application/servers"
 		if single {
-			req := ctx.Request("GET", "/api/application/servers"+query, nil)
-			res, err := ctx.Execute(req)
-			if err != nil {
-				log.WithError(err)
-				return
-			}
-			if res == nil {
-				return
-			}
-
-			var model serverAttrModel
-			if err = json.Unmarshal(res, &model); err != nil {
-				log.Error("failed to parse json:").WithError(err)
-				return
-			}
-
-			var buf []byte
-			if cfg.Http.ParseBody {
-				buf, err = json.MarshalIndent(model.A, "", "  ")
-			} else {
-				buf, err = json.MarshalIndent(model, "", "  ")
-			}
-			if err != nil {
-				log.Error("failed to parse response:").WithError(err)
-				return
-			}
-
-			log.LineB(buf)
-			return
+			path += query
 		}
 
-		req := ctx.Request("GET", "/api/application/servers", nil)
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("GET", path, nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
 			return
 		}
-		if res == nil {
-			return
-		}
-
-		var model serverDataModel
-		if err = json.Unmarshal(res, &model); err != nil {
-			log.Error("failed to parse json:").WithError(err)
-			return
-		}
 
 		var buf []byte
-		if cfg.Http.ParseBody {
-			inner := make([]*server, 0, len(model.D))
-			for _, m := range model.D {
-				inner = append(inner, m.A)
-			}
-			buf, err = json.MarshalIndent(inner, "", "  ")
+
+		if single {
+			buf, err = http.HandleItemResponse(res, cfg)
 		} else {
-			buf, err = json.MarshalIndent(model, "", "  ")
+			buf, err = http.HandleDataResponse(res, cfg)
 		}
 		if err != nil {
-			log.Error("failed to parse response:").WithError(err)
+			log.WithError(err)
 			return
 		}
 
