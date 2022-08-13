@@ -11,6 +11,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type node struct {
+	ID                 int    `json:"id"`
+	Name               string `json:"name"`
+	Description        string `json:"description"`
+	LocationID         int    `json:"location_id"`
+	Public             bool   `json:"public"`
+	FQDN               string `json:"fqdn"`
+	Scheme             string `json:"scheme"`
+	BehindProxy        bool   `json:"behind_proxy"`
+	Memory             int    `json:"memory"`
+	MemoryOverallocate int    `json:"memory_overallocate"`
+	Disk               int    `json:"disk"`
+	DiskOverallocate   int    `json:"disk_overallocate"`
+	DaemonBase         string `json:"daemon_base"`
+	DaemonSFTP         int    `json:"daemon_sftp"`
+	DaemonListen       int    `json:"daemon_listen"`
+	MaintenanceMode    bool   `json:"maintenance_mode"`
+	UploadSize         int    `json:"upload_size"`
+}
+
+type nodeAttrModel struct {
+	O string `json:"object"`
+	A *node  `json:"attributes"`
+}
+
+type nodeDataModel struct {
+	O string          `json:"object"`
+	D []nodeAttrModel `json:"data"`
+}
+
 var getNodesCmd = &cobra.Command{
 	Use:   "nodes:get",
 	Short: "gets panel nodes",
@@ -32,28 +62,67 @@ var getNodesCmd = &cobra.Command{
 			return
 		}
 
-		path := "/api/application/nodes"
+		ctx := http.New(cfg, &cfg.Application, log)
 		if single {
-			path += query
+			req := ctx.Request("GET", "/api/application/nodes"+query, nil)
+			res, err := ctx.Execute(req)
+			if err != nil {
+				log.WithError(err)
+				return
+			}
+			if res == nil {
+				return
+			}
+
+			var model nodeAttrModel
+			if err = json.Unmarshal(res, &model); err != nil {
+				log.Error("failed to parse json:").WithError(err)
+				return
+			}
+
+			var buf []byte
+			if cfg.Http.ParseBody {
+				buf, err = json.MarshalIndent(model.A, "", "  ")
+			} else {
+				buf, err = json.MarshalIndent(model, "", "  ")
+			}
+			if err != nil {
+				log.Error("failed to parse response:").WithError(err)
+				return
+			}
+
+			log.LineB(buf)
+			return
 		}
 
-		ctx := http.New(cfg, &cfg.Application, log)
-		req := ctx.Request("GET", path, nil)
+		req := ctx.Request("GET", "/api/application/nodes", nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
 			return
 		}
+		if res == nil {
+			return
+		}
+
+		var model nodeDataModel
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.Error("failed to parse json:").WithError(err)
+			return
+		}
 
 		var buf []byte
-
-		if single {
-			buf, err = http.HandleItemResponse(res, cfg)
+		if cfg.Http.ParseBody {
+			inner := make([]*node, 0, len(model.D))
+			for _, m := range model.D {
+				inner = append(inner, m.A)
+			}
+			buf, err = json.MarshalIndent(inner, "", "  ")
 		} else {
-			buf, err = http.HandleDataResponse(res, cfg)
+			buf, err = json.MarshalIndent(model, "", "  ")
 		}
 		if err != nil {
-			log.WithError(err)
+			log.Error("failed to parse response:").WithError(err)
 			return
 		}
 
@@ -80,6 +149,31 @@ func parseNodeQuery(cmd *cobra.Command) (bool, string, error) {
 	}
 
 	return single, query.String(), nil
+}
+
+type configModel struct {
+	Debug   bool   `json:"debug"`
+	UUID    string `json:"uuid"`
+	TokenID string `json:"token_id"`
+	Token   string `json:"token"`
+	API     struct {
+		Host string `json:"host"`
+		Port int    `json:"port"`
+		SSL  struct {
+			Enabled bool   `json:"enabled"`
+			Cert    string `json:"cert"`
+			Key     string `json:"key"`
+		} `json:"ssl"`
+		UploadLimit int `json:"upload_limit"`
+	} `json:"api"`
+	System struct {
+		Data string `json:"data"`
+		SFTP struct {
+			BindPort int `json:"bind_port"`
+		} `json:"sftp"`
+	} `json:"system"`
+	AllowedMounts []string `json:"allowed_mounts"`
+	Remote        string   `json:"remote"`
 }
 
 var getNodeConfigCmd = &cobra.Command{
@@ -112,21 +206,20 @@ var getNodeConfigCmd = &cobra.Command{
 			log.WithError(err)
 			return
 		}
+		if res == nil {
+			return
+		}
 
-		var buf []byte
+		var model configModel
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.Error("failed to parse json:").WithError(err)
+			return
+		}
 
-		if cfg.Http.ParseIndent {
-			var model interface{}
-			if err = json.Unmarshal(res, &model); err != nil {
-				log.WithError(err)
-				return
-			}
-
-			buf, err = json.MarshalIndent(model, "", "  ")
-			if err != nil {
-				log.WithError(err)
-				return
-			}
+		buf, err := json.MarshalIndent(model, "", "  ")
+		if err != nil {
+			log.Error("failed to parse response:").WithError(err)
+			return
 		}
 
 		log.LineB(buf)

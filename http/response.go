@@ -53,9 +53,9 @@ func HandleDataResponse(buf []byte, cfg *config.Config) ([]byte, error) {
 	var err error
 
 	if cfg.Http.ParseBody {
-		inner := make([]interface{}, 0, len(model.D))
+		inner := make([]*interface{}, 0, len(model.D))
 		for _, m := range model.D {
-			inner = append(inner, m.A)
+			inner = append(inner, &m.A)
 		}
 
 		if cfg.Http.ParseIndent {
