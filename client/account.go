@@ -226,6 +226,102 @@ var disableTwoFactorCmd = &cobra.Command{
 	},
 }
 
+var getAccountActivityCmd = &cobra.Command{
+	Use:   "account:activity",
+	Short: "gets the account activity logs",
+	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("GET", "/api/client/account/activity", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		buf, err := http.HandleDataResponse(res, cfg)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		log.LineB(buf)
+	},
+}
+
+var getAPIKeysCmd = &cobra.Command{
+	Use:     "account:api-keys:get",
+	Aliases: []string{"account:apikeys:get"},
+	Short:   "gets the account api keys",
+	Run: func(cmd *cobra.Command, _ []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("GET", "/api/client/account/api-keys", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		buf, err := http.HandleDataResponse(res, cfg)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		log.LineB(buf)
+	},
+}
+
+var deleteAPIKeyCmd = &cobra.Command{
+	Use:     "account:api-keys:delete",
+	Aliases: []string{"account:apikeys:delete"},
+	Short:   "deletes an api key",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		if len(args) == 0 {
+			log.Error("no api key identifier specified")
+			return
+		} else if len(args) > 1 {
+			log.Error("more than 1 argument specified (expected: identifier)")
+			return
+		}
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("DELETE", "/api/client/account/api-keys/"+args[0], nil)
+		if _, err := ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
 var getServersCmd = &cobra.Command{
 	Use:   "servers:get",
 	Short: "gets account servers",
