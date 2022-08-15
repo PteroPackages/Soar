@@ -8,22 +8,6 @@ import (
 
 var log = logger.New()
 
-type FeatureLimits struct {
-	Allocations int `json:"allocations"`
-	Backups     int `json:"backups"`
-	Databases   int `json:"databases"`
-}
-
-type Limits struct {
-	Memory      int    `json:"memory"`
-	Disk        int    `json:"disk"`
-	Swap        int    `json:"swap"`
-	IO          int    `json:"io"`
-	CPU         int    `json:"cpu"`
-	Threads     string `json:"threads"`
-	OOMDisabled bool   `json:"oom_disabled"`
-}
-
 func GroupCommands() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "app <subcommand> [options]",
