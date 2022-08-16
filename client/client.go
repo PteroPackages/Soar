@@ -24,6 +24,11 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(getAccountActivityCmd)
 	util.ApplyDefaultFlags(getAPIKeysCmd)
 	util.ApplyDefaultFlags(deleteAPIKeyCmd)
+	util.ApplyDefaultFlags(getServerWSCmd)
+	util.ApplyDefaultFlags(getServerResourcesCmd)
+	util.ApplyDefaultFlags(getServerActivityCmd)
+	util.ApplyDefaultFlags(sendServerCommandCmd)
+	util.ApplyDefaultFlags(setServerPowerStateCmd)
 
 	cmd.AddCommand(getAccountCmd)
 	cmd.AddCommand(getPermissionsCmd)
@@ -34,6 +39,11 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(getAccountActivityCmd)
 	cmd.AddCommand(getAPIKeysCmd)
 	cmd.AddCommand(deleteAPIKeyCmd)
+	cmd.AddCommand(getServerWSCmd)
+	cmd.AddCommand(getServerResourcesCmd)
+	cmd.AddCommand(getServerActivityCmd)
+	cmd.AddCommand(sendServerCommandCmd)
+	cmd.AddCommand(setServerPowerStateCmd)
 
 	return cmd
 }
