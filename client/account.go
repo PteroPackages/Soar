@@ -7,6 +7,7 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
+	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
 
@@ -149,6 +150,10 @@ var enableTwoFactorCmd = &cobra.Command{
 	Short:   "enables two-factor on the account",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"two-factor code", "password"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -157,17 +162,6 @@ var enableTwoFactorCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no two-factor code specified")
-			return
-		} else if len(args) == 1 {
-			log.Error("no account password specified")
-			return
-		} else if len(args) > 2 {
-			log.Error("more than 2 arguments specified (expected: token, password)")
-			return
-		}
 
 		data, _ := json.Marshal(map[string]string{"code": args[0], "password": args[1]})
 		body := bytes.Buffer{}
@@ -196,6 +190,10 @@ var disableTwoFactorCmd = &cobra.Command{
 	Aliases: []string{"2fa:disable"},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"password"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -204,14 +202,6 @@ var disableTwoFactorCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no password specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than 1 argument specified (expected: password)")
-			return
-		}
 
 		data, _ := json.Marshal(map[string]string{"password": args[0]})
 		body := bytes.Buffer{}
@@ -297,6 +287,10 @@ var deleteAPIKeyCmd = &cobra.Command{
 	Short:   "deletes an api key",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -305,14 +299,6 @@ var deleteAPIKeyCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no api key identifier specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than 1 argument specified (expected: identifier)")
-			return
-		}
 
 		ctx := http.New(cfg, &cfg.Client, log)
 		req := ctx.Request("DELETE", "/api/client/account/api-keys/"+args[0], nil)
