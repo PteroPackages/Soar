@@ -11,6 +11,9 @@ cd Soar
 go build
 ```
 
+## Getting Started
+After installing, run `soar config init` to generate a config file, this will be at `/etc/.soar/config.yml` on Linux-based systems or `%APPDATA%\.soar\config.yml` on Windows systems. You can also specify the `--dir=` flag to generate the config in a specific directory. Next, enter your credentials for the application and client section (you can also set other options). Now you're ready to soar! **Note:** by default Soar will use the global config for operations, to use the local config you must specify the `--local` or `-l` flag in the command.
+
 ## Commands
 You can also view available commands by running `soar help <command>`.
 
@@ -55,7 +58,7 @@ servers:resources       gets server resource usage
 servers:websocket       gets the server websocket data
 ```
 
-### Config
+### Config Management
 ```
 config          shows the config
 config init     initializes a new config
