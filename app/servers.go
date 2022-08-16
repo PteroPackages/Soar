@@ -12,7 +12,7 @@ import (
 )
 
 var getServersCmd = &cobra.Command{
-	Use:   "servers:get [--id id] [--external id]",
+	Use:   "servers:get [--id id] [--external id] [--name name]\n\t[--desc info] [--uuid id] [--image name]",
 	Short: "gets panel servers",
 	Long:  getServersHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -32,13 +32,8 @@ var getServersCmd = &cobra.Command{
 			return
 		}
 
-		path := "/api/application/servers"
-		if single {
-			path += query
-		}
-
 		ctx := http.New(cfg, &cfg.Application, log)
-		req := ctx.Request("GET", path, nil)
+		req := ctx.Request("GET", "/api/application/servers"+query, nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -63,6 +58,7 @@ var getServersCmd = &cobra.Command{
 
 func parseServerQuery(cmd *cobra.Command) (bool, string, error) {
 	var query strings.Builder
+	var params []string
 	single := false
 	flags := cmd.Flags()
 
@@ -73,10 +69,37 @@ func parseServerQuery(cmd *cobra.Command) (bool, string, error) {
 
 	if ext, _ := flags.GetString("external"); ext != "" {
 		if query.Len() != 0 {
-			return false, "", errors.New("id an external flags specified; pick one")
+			return false, "", errors.New("id and external flags specified; pick one")
 		}
 
+		single = true
 		query.WriteString("/external/" + ext)
+	}
+
+	if value, _ := flags.GetString("name"); value != "" {
+		params = append(params, "filter[name]="+value)
+	}
+
+	if value, _ := flags.GetString("desc"); value != "" {
+		params = append(params, "filter[description]="+value)
+	}
+
+	if value, _ := flags.GetString("uuid"); value != "" {
+		params = append(params, "filter[uuid]="+value)
+	}
+
+	if value, _ := flags.GetString("image"); value != "" {
+		params = append(params, "filter[image]="+value)
+	}
+
+	if len(params) > 0 {
+		query.WriteString("?" + params[0])
+
+		if len(params) > 1 {
+			for _, p := range params {
+				query.WriteString("&" + p)
+			}
+		}
 	}
 
 	return single, query.String(), nil
