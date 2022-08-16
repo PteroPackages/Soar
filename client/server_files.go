@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/url"
 	"os"
@@ -241,5 +242,72 @@ var downloadFileCmd = &cobra.Command{
 		log.Debug("attempting file write")
 		defer file.Close()
 		file.Write(res)
+	},
+}
+
+var renameFileCmd = &cobra.Command{
+	Use:   "files:rename identifier old-name new-name [--root path]",
+	Short: "renames a file on the server",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "old-name", "new-name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		root, _ := cmd.Flags().GetString("root")
+		info := map[string]string{"from": args[1], "to": args[2]}
+		data, _ := json.Marshal(struct {
+			Root  string              `json:"root"`
+			Files []map[string]string `json:"files"`
+		}{Root: root, Files: []map[string]string{info}})
+
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("PUT", "/api/client/servers/"+args[0]+"/files/rename", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var copyFileCmd = &cobra.Command{
+	Use:     "files:copy identifier name",
+	Aliases: []string{"files:cp"},
+	Short:   "copies a file",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		data, _ := json.Marshal(map[string]string{"location": args[1]})
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/copy", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
 	},
 }

@@ -33,11 +33,14 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(listFilesCmd)
 	util.ApplyDefaultFlags(getFileContentsCmd)
 	util.ApplyDefaultFlags(downloadFileCmd)
+	util.ApplyDefaultFlags(renameFileCmd)
+	util.ApplyDefaultFlags(copyFileCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
 	downloadFileCmd.Flags().String("dest", "", "the path to save the file at")
 	downloadFileCmd.Flags().BoolP("url-only", "U", false, "only return the url")
+	renameFileCmd.Flags().String("root", "/", "the root directory of the file")
 
 	cmd.AddCommand(getAccountCmd)
 	cmd.AddCommand(getPermissionsCmd)
@@ -57,6 +60,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(listFilesCmd)
 	cmd.AddCommand(getFileContentsCmd)
 	cmd.AddCommand(downloadFileCmd)
+	cmd.AddCommand(renameFileCmd)
+	cmd.AddCommand(copyFileCmd)
 
 	return cmd
 }
