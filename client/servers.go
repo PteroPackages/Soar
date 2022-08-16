@@ -43,7 +43,7 @@ var getServersCmd = &cobra.Command{
 }
 
 var getServerWSCmd = &cobra.Command{
-	Use:     "servers:websocket",
+	Use:     "servers:websocket identifier",
 	Aliases: []string{"servers:ws"},
 	Short:   "gets the server websocket data",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -105,7 +105,7 @@ var getServerWSCmd = &cobra.Command{
 }
 
 var getServerResourcesCmd = &cobra.Command{
-	Use:     "servers:resources",
+	Use:     "servers:resources identifier",
 	Aliases: []string{"servers:usage"},
 	Short:   "gets server resource usage",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -142,7 +142,7 @@ var getServerResourcesCmd = &cobra.Command{
 }
 
 var getServerActivityCmd = &cobra.Command{
-	Use:   "servers:activity",
+	Use:   "servers:activity identifier",
 	Short: "gets the server activity logs",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
@@ -178,7 +178,7 @@ var getServerActivityCmd = &cobra.Command{
 }
 
 var sendServerCommandCmd = &cobra.Command{
-	Use:     "servers:command",
+	Use:     "servers:command identifier command",
 	Aliases: []string{"servers:cmd"},
 	Short:   "sends a command to the server console",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -209,7 +209,7 @@ var sendServerCommandCmd = &cobra.Command{
 }
 
 var setServerPowerStateCmd = &cobra.Command{
-	Use:     "servers:power",
+	Use:     "servers:power identifier state",
 	Aliases: []string{"servers:state", "servers:status", "servers:toggle"},
 	Short:   "sets the server power state",
 	Run: func(cmd *cobra.Command, args []string) {

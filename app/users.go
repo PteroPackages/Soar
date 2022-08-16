@@ -14,7 +14,7 @@ import (
 )
 
 var getUsersCmd = &cobra.Command{
-	Use:   "users:get",
+	Use:   "users:get [--id id] [--external id] [--username name] [--email email] [--uuid id]",
 	Short: "gets panel users",
 	Long:  getUsersHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -103,7 +103,7 @@ func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 }
 
 var createUserCmd = &cobra.Command{
-	Use:   "users:create",
+	Use:   "users:create --src path",
 	Short: "creates a user",
 	Long:  createUserHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -166,7 +166,7 @@ var createUserCmd = &cobra.Command{
 }
 
 var deleteUserCmd = &cobra.Command{
-	Use:   "users:delete <id>",
+	Use:   "users:delete id",
 	Short: "deletes a user",
 	Long:  "Deletes a user account from the panel by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {

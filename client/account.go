@@ -145,12 +145,12 @@ var getTwoFactorCodeCmd = &cobra.Command{
 }
 
 var enableTwoFactorCmd = &cobra.Command{
-	Use:     "account:2fa:enable",
+	Use:     "account:2fa:enable code password",
 	Aliases: []string{"2fa:enable"},
 	Short:   "enables two-factor on the account",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"two-factor code", "password"}); err != nil {
+		if err := util.RequireArgs(args, []string{"code", "password"}); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -186,7 +186,7 @@ var enableTwoFactorCmd = &cobra.Command{
 }
 
 var disableTwoFactorCmd = &cobra.Command{
-	Use:     "account:2fa:disable",
+	Use:     "account:2fa:disable password",
 	Aliases: []string{"2fa:disable"},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
@@ -282,7 +282,7 @@ var getAPIKeysCmd = &cobra.Command{
 }
 
 var deleteAPIKeyCmd = &cobra.Command{
-	Use:     "account:api-keys:delete",
+	Use:     "account:api-keys:delete identifier",
 	Aliases: []string{"account:apikeys:delete"},
 	Short:   "deletes an api key",
 	Run: func(cmd *cobra.Command, args []string) {

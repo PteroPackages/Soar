@@ -12,7 +12,7 @@ import (
 )
 
 var getServersCmd = &cobra.Command{
-	Use:   "servers:get",
+	Use:   "servers:get [--id id] [--external id]",
 	Short: "gets panel servers",
 	Long:  getServersHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -83,7 +83,7 @@ func parseServerQuery(cmd *cobra.Command) (bool, string, error) {
 }
 
 var suspendServerCmd = &cobra.Command{
-	Use:   "servers:suspend <id>",
+	Use:   "servers:suspend id",
 	Short: "suspends a server",
 	Long:  "Suspends a server on the panel by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -110,7 +110,7 @@ var suspendServerCmd = &cobra.Command{
 }
 
 var unsuspendServerCmd = &cobra.Command{
-	Use:   "servers:unsuspend <id>",
+	Use:   "servers:unsuspend id",
 	Short: "unsuspends a server",
 	Long:  "Unsuspends a server on the panel by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -137,7 +137,7 @@ var unsuspendServerCmd = &cobra.Command{
 }
 
 var reinstallServerCmd = &cobra.Command{
-	Use:   "servers:reinstall <id>",
+	Use:   "servers:reinstall id",
 	Short: "reinstalls a server",
 	Long:  "Triggers the reinstall process for a server by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -164,7 +164,7 @@ var reinstallServerCmd = &cobra.Command{
 }
 
 var deleteServerCmd = &cobra.Command{
-	Use:   "servers:delete <id>",
+	Use:   "servers:delete id [--force]",
 	Short: "deletes a server",
 	Long:  "Deletes a server on the panel by its ID (supports the --force flag).",
 	Run: func(cmd *cobra.Command, args []string) {

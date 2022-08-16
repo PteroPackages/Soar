@@ -13,14 +13,13 @@ import (
 var log = logger.New()
 
 var rootCmd = &cobra.Command{
-	Use:     "soar",
+	Use:     "soar subcommand [options] arguments",
 	Short:   "Commands for interacting with Pterodactyl via the API",
 	Version: Version,
 }
 
 var initConfigCmd = &cobra.Command{
-	Use:     "init [flags]",
-	Example: "soar config init --dir=/",
+	Use: "init [--dir path] [--force]",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
@@ -38,10 +37,9 @@ var initConfigCmd = &cobra.Command{
 }
 
 var configCmd = &cobra.Command{
-	Use:     "config [init] [flags]",
-	Short:   "manages the soar config",
-	Long:    "Manages the soar config for HTTP and logging",
-	Example: "soar config init --force",
+	Use:   "config [init]",
+	Short: "manages the soar config",
+	Long:  "Manages the soar config for HTTP and logging",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 

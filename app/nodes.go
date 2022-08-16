@@ -84,12 +84,12 @@ func parseNodeQuery(cmd *cobra.Command) (bool, string, error) {
 }
 
 var getNodeConfigCmd = &cobra.Command{
-	Use:   "nodes:config",
+	Use:   "nodes:config node-id",
 	Short: "gets a node config",
 	Long:  "Gets the configuration for a specified node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"node id"}); err != nil {
+		if err := util.RequireArgs(args, []string{"node-id"}); err != nil {
 			log.WithError(err)
 			return
 		}

@@ -10,7 +10,7 @@ import (
 )
 
 var getNestsCmd = &cobra.Command{
-	Use:   "nests:get",
+	Use:   "nests:get [--id id]",
 	Short: "gets panel nests",
 	Long:  getNestsHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -55,12 +55,13 @@ var getNestsCmd = &cobra.Command{
 }
 
 var getNestEggsCmd = &cobra.Command{
-	Use:   "nests:eggs:get <id>",
-	Short: "gets panel eggs for a nest",
-	Long:  getNestEggsHelp,
+	Use:     "nests:eggs:get nest-id [--id id]",
+	Aliases: []string{"eggs:get"},
+	Short:   "gets panel eggs for a nest",
+	Long:    getNestEggsHelp,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"nest id"}); err != nil {
+		if err := util.RequireArgs(args, []string{"nest-id"}); err != nil {
 			log.WithError(err)
 			return
 		}

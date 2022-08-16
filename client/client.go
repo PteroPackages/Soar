@@ -10,7 +10,7 @@ var log = logger.New()
 
 func GroupCommands() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "client <subcommand> [options]",
+		Use:   "client subcommand [options]",
 		Short: "client api management",
 		Long:  "Commands for interacting with the CLient API.",
 	}
