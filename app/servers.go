@@ -7,6 +7,7 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
+	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
 
@@ -87,6 +88,10 @@ var suspendServerCmd = &cobra.Command{
 	Long:  "Suspends a server on the panel by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -95,14 +100,6 @@ var suspendServerCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no server id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one server id argument specified").WithCmd("soar app servers:suspend --help")
-			return
-		}
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("POST", "/api/application/servers/"+args[0]+"/suspend", nil)
@@ -118,6 +115,10 @@ var unsuspendServerCmd = &cobra.Command{
 	Long:  "Unsuspends a server on the panel by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -126,14 +127,6 @@ var unsuspendServerCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no server id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one server id argument specified").WithCmd("soar app servers:unsuspend --help")
-			return
-		}
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("POST", "/api/application/servers/"+args[0]+"/unsuspend", nil)
@@ -149,6 +142,10 @@ var reinstallServerCmd = &cobra.Command{
 	Long:  "Triggers the reinstall process for a server by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -157,14 +154,6 @@ var reinstallServerCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no server id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one server id argument specified").WithCmd("soar app servers:reinstall --help")
-			return
-		}
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("POST", "/api/application/servers/"+args[0]+"/reinstall", nil)
@@ -180,6 +169,10 @@ var deleteServerCmd = &cobra.Command{
 	Long:  "Deletes a server on the panel by its ID (supports the --force flag).",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -188,14 +181,6 @@ var deleteServerCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no server id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one server id argument specified").WithCmd("soar app servers:delete --help")
-			return
-		}
 
 		path := "/api/application/servers/" + args[0]
 		if force, _ := cmd.Flags().GetBool("force"); force {

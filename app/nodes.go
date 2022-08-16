@@ -8,6 +8,7 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
+	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
 
@@ -88,6 +89,10 @@ var getNodeConfigCmd = &cobra.Command{
 	Long:  "Gets the configuration for a specified node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"node id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -96,14 +101,6 @@ var getNodeConfigCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no node id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one node id argument specified").WithCmd("soar app nodes:config --help")
-			return
-		}
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("GET", "/api/application/nodes/"+args[0]+"/configuration", nil)

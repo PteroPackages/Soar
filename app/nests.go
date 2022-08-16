@@ -5,6 +5,7 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
+	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
 
@@ -59,6 +60,10 @@ var getNestEggsCmd = &cobra.Command{
 	Long:  getNestEggsHelp,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"nest id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -67,14 +72,6 @@ var getNestEggsCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no nest id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one nest id argument specified").WithCmd("soar app nests:eggs:get --help")
-			return
-		}
 
 		path := fmt.Sprintf("/api/application/nests/%s/eggs", args[0])
 		id, _ := cmd.Flags().GetInt("id")

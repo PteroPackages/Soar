@@ -166,12 +166,15 @@ var createUserCmd = &cobra.Command{
 }
 
 var deleteUserCmd = &cobra.Command{
-	Use:       "users:delete <id>",
-	Short:     "deletes a user",
-	Long:      "Deletes a user account from the panel by its ID.",
-	ValidArgs: []string{"id"},
+	Use:   "users:delete <id>",
+	Short: "deletes a user",
+	Long:  "Deletes a user account from the panel by its ID.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
+			log.WithError(err)
+			return
+		}
 
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
@@ -180,14 +183,6 @@ var deleteUserCmd = &cobra.Command{
 			return
 		}
 		cfg.ApplyFlags(cmd.Flags())
-
-		if len(args) == 0 {
-			log.Error("no user id specified")
-			return
-		} else if len(args) > 1 {
-			log.Error("more than one user id argument specified").WithCmd("soar app users:delete --help")
-			return
-		}
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("DELETE", "/api/application/users/"+args[0], nil)
