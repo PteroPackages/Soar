@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -47,4 +48,26 @@ func SafeReadFile(path string) ([]byte, error) {
 	}
 
 	return os.ReadFile(path)
+}
+
+func RequireArgs(input, required []string) error {
+	if len(input) == 0 {
+		return fmt.Errorf("no arguments specified (expected %d)", len(required))
+	}
+
+	if len(input) < len(required) {
+		missing := required[len(input)]
+		include := ""
+		if len(required)-len(input) > 1 {
+			include = fmt.Sprintf(" and %d more", len(required)-1)
+		}
+
+		return fmt.Errorf("missing argument '%s'%s", missing, include)
+	}
+
+	if len(input) > len(required) {
+		return fmt.Errorf("got %d more argument(s) than required (expected %d)", len(input)-len(required), len(required))
+	}
+
+	return nil
 }
