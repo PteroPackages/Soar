@@ -2,7 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -13,7 +12,7 @@ import (
 )
 
 var getNodesCmd = &cobra.Command{
-	Use:   "nodes:get",
+	Use:   "nodes:get [--id id] [--name name] [--uuid id] [--fqdn name] [--token token]",
 	Short: "gets panel nodes",
 	Long:  getNodesHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -33,13 +32,8 @@ var getNodesCmd = &cobra.Command{
 			return
 		}
 
-		path := "/api/application/nodes"
-		if single {
-			path += query
-		}
-
 		ctx := http.New(cfg, &cfg.Application, log)
-		req := ctx.Request("GET", path, nil)
+		req := ctx.Request("GET", "/api/application/nodes"+query, nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -64,6 +58,7 @@ var getNodesCmd = &cobra.Command{
 
 func parseNodeQuery(cmd *cobra.Command) (bool, string, error) {
 	var query strings.Builder
+	var params []string
 	single := false
 	flags := cmd.Flags()
 
@@ -72,12 +67,30 @@ func parseNodeQuery(cmd *cobra.Command) (bool, string, error) {
 		query.WriteString(fmt.Sprintf("/%d", id))
 	}
 
-	if ext, _ := flags.GetString("external"); ext != "" {
-		if query.Len() != 0 {
-			return false, "", errors.New("id an external flags specified; pick one")
-		}
+	if value, _ := flags.GetString("name"); value != "" {
+		params = append(params, "filter[name]="+value)
+	}
 
-		query.WriteString("/external/" + ext)
+	if value, _ := flags.GetString("uuid"); value != "" {
+		params = append(params, "filter[uuid]="+value)
+	}
+
+	if value, _ := flags.GetString("fqdn"); value != "" {
+		params = append(params, "filter[fqdn]="+value)
+	}
+
+	if value, _ := flags.GetString("token"); value != "" {
+		params = append(params, "filter[daemon_token_id]="+value)
+	}
+
+	if len(params) > 0 {
+		query.WriteString("?" + params[0])
+
+		if len(params) > 1 {
+			for _, p := range params {
+				query.WriteString("&" + p)
+			}
+		}
 	}
 
 	return single, query.String(), nil
