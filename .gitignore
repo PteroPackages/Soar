@@ -13,4 +13,4 @@
 *.cmd
 
 # Other files/directories
-soar.yml
+.soar.yml

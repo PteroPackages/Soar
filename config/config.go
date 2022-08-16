@@ -79,14 +79,14 @@ func Get(local bool) (*Config, error) {
 
 	if local {
 		root, _ := os.Getwd()
-		path = filepath.Join(root, "soar.yml")
+		path = filepath.Join(root, ".soar.yml")
 	} else {
 		root, err := os.UserConfigDir()
 		if err != nil {
 			return nil, err
 		}
 
-		path = filepath.Join(root, "soar", "config.yml")
+		path = filepath.Join(root, ".soar", "config.yml")
 	}
 
 	info, err := os.Stat(path)
@@ -132,7 +132,7 @@ func Create(path string, force bool) (string, error) {
 	}
 
 	if path == "" {
-		path = filepath.Join(root, "soar", "config.yml")
+		path = filepath.Join(root, ".soar", "config.yml")
 	} else {
 		cwd, _ := os.Getwd()
 		path = filepath.Join(cwd, path)
@@ -158,7 +158,7 @@ func Create(path string, force bool) (string, error) {
 	info, err := os.Stat(path)
 	if err == nil {
 		if info.IsDir() {
-			path = filepath.Join(path, "soar.yml")
+			path = filepath.Join(path, ".soar.yml")
 			if err = writeFile(); err != nil {
 				return "", err
 			}
@@ -166,7 +166,7 @@ func Create(path string, force bool) (string, error) {
 			return path, nil
 		}
 
-		if !strings.HasSuffix(path, "config.yml") && !strings.HasSuffix(path, "soar.yml") {
+		if !strings.HasSuffix(path, "config.yml") && !strings.HasSuffix(path, ".soar.yml") {
 			return "", errors.New("refusing to overwrite non-soar config file")
 		}
 
