@@ -34,13 +34,8 @@ var getUsersCmd = &cobra.Command{
 			return
 		}
 
-		path := "/api/application/users"
-		if single {
-			path += query
-		}
-
 		ctx := http.New(cfg, &cfg.Application, log)
-		req := ctx.Request("GET", path, nil)
+		req := ctx.Request("GET", "/api/application/users"+query, nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -65,6 +60,7 @@ var getUsersCmd = &cobra.Command{
 
 func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 	var query strings.Builder
+	var params []string
 	single := false
 	flags := cmd.Flags()
 
@@ -75,27 +71,32 @@ func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 
 	if ext, _ := flags.GetString("external"); ext != "" {
 		if query.Len() != 0 {
-			return false, "", errors.New("id an external flags specified; pick one")
+			return false, "", errors.New("id and external flags specified; pick one")
 		}
 
+		single = true
 		query.WriteString("/external/" + ext)
 	}
 
-	var params []string
 	if val, _ := flags.GetString("username"); val != "" {
 		params = append(params, "filter[username]="+val)
 	}
+
 	if val, _ := flags.GetString("email"); val != "" {
 		params = append(params, "filter[email]="+val)
 	}
+
 	if val, _ := flags.GetString("uuid"); val != "" {
 		params = append(params, "filter[uuid]="+val)
 	}
 
-	if len(params) != 0 {
+	if len(params) > 0 {
 		query.WriteString("?" + params[0])
-		for _, p := range params[1:] {
-			query.WriteString("&" + p)
+
+		if len(params) > 1 {
+			for _, p := range params {
+				query.WriteString("&" + p)
+			}
 		}
 	}
 

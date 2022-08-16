@@ -31,9 +31,9 @@ func GroupCommands() *cobra.Command {
 
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
-	getUsersCmd.Flags().String("username", "", "the username of the user")
-	getUsersCmd.Flags().String("email", "", "the email of the user")
-	getUsersCmd.Flags().String("uuid", "", "the uuid of the user")
+	getUsersCmd.Flags().String("username", "", "filter by user username")
+	getUsersCmd.Flags().String("email", "", "filter by user email")
+	getUsersCmd.Flags().String("uuid", "", "filter by user uuid")
 	createUserCmd.Flags().String("src", "", "the json file to read from")
 	getServersCmd.Flags().Int("id", 0, "the id of the server")
 	getServersCmd.Flags().String("external", "", "the external id of the server")
