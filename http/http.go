@@ -28,6 +28,19 @@ func New(cfg *config.Config, auth *config.Auth, log *logger.Logger) *Client {
 	}
 }
 
+func Request(method, url string, body *bytes.Buffer) *http.Request {
+	if body == nil {
+		body = &bytes.Buffer{}
+	}
+	req, _ := http.NewRequest(method, url, body)
+
+	req.Header.Set("User-Agent", "Soar Http Client")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	return req
+}
+
 func (c *Client) Request(method, path string, body *bytes.Buffer) *http.Request {
 	if body == nil {
 		body = &bytes.Buffer{}
