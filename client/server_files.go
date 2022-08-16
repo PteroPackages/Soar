@@ -2,6 +2,9 @@ package client
 
 import (
 	"encoding/json"
+	"net/url"
+	"os"
+	"path/filepath"
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
@@ -124,5 +127,119 @@ var listFilesCmd = &cobra.Command{
 
 			log.LineB(buf)
 		}
+	},
+}
+
+var getFileContentsCmd = &cobra.Command{
+	Use:   "files:contents identifier name",
+	Short: "gets the contents of a file",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		path := "/api/client/servers/" + args[0] + "/files/contents?file="
+		path += url.QueryEscape(args[1])
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("GET", path, nil)
+		req.Header.Set("Accept", "text/plain")
+
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		log.LineB(res)
+	},
+}
+
+var downloadFileCmd = &cobra.Command{
+	Use:     "files:download identifier name [--dest path] [-U | --url-only]",
+	Aliases: []string{"files:down"},
+	Short:   "downloads a file or returns the url",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		dest, _ := cmd.Flags().GetString("dest")
+		if dest == "" {
+			cwd, _ := os.Getwd()
+			dest = filepath.Join(cwd, args[1])
+		}
+
+		skip, _ := cmd.Flags().GetBool("url-only")
+
+		_, err := os.Stat(dest)
+		if err == nil && !skip {
+			log.Error("destination path already exists")
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		path := "/api/client/servers/" + args[0] + "/files/download?file="
+		path += url.QueryEscape(args[1])
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		urlReq := ctx.Request("GET", path, nil)
+		res, err := ctx.Execute(urlReq)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		var model struct {
+			Attributes struct {
+				URL string `json:"url"`
+			} `json:"attributes"`
+		}
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		if skip {
+			log.Line(model.Attributes.URL)
+			return
+		}
+
+		dlReq := http.Request("GET", model.Attributes.URL, nil)
+		dlReq.Header.Set("Accept", "application/octet-stream")
+		res, err = ctx.Execute(dlReq)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		file, err := os.Create(dest)
+		if err != nil {
+			log.Error("failed to create file:").WithError(err)
+			return
+		}
+
+		log.Debug("attempting file write")
+		defer file.Close()
+		file.Write(res)
 	},
 }
