@@ -29,6 +29,11 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(getServerActivityCmd)
 	util.ApplyDefaultFlags(sendServerCommandCmd)
 	util.ApplyDefaultFlags(setServerPowerStateCmd)
+	util.ApplyDefaultFlags(getDatabasesCmd)
+	util.ApplyDefaultFlags(listFilesCmd)
+
+	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
+	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
 
 	cmd.AddCommand(getAccountCmd)
 	cmd.AddCommand(getPermissionsCmd)
@@ -44,6 +49,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(getServerActivityCmd)
 	cmd.AddCommand(sendServerCommandCmd)
 	cmd.AddCommand(setServerPowerStateCmd)
+	cmd.AddCommand(getDatabasesCmd)
+	cmd.AddCommand(listFilesCmd)
 
 	return cmd
 }
