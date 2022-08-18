@@ -25,6 +25,16 @@ type file struct {
 	ModifiedAt string `json:"modified_at"`
 }
 
+type fractalFile struct {
+	O string `json:"object"`
+	A *file  `json:"attributes"`
+}
+
+type fractalFileList struct {
+	O string        `json:"object"`
+	D []fractalFile `json:"data"`
+}
+
 var listFilesCmd = &cobra.Command{
 	Use:     "files:list identifier [-d | --dir] [-f | --file]",
 	Aliases: []string{"files:ls", "files:dir"},
@@ -56,25 +66,14 @@ var listFilesCmd = &cobra.Command{
 		dirOnly, _ := cmd.Flags().GetBool("dir")
 
 		if fileOnly || dirOnly {
-			var model struct {
-				O string `json:"object"`
-				D []struct {
-					O string `json:"object"`
-					A *file  `json:"attributes"`
-				} `json:"data"`
-			}
+			var model fractalFileList
+
 			if err = json.Unmarshal(res, &model); err != nil {
 				log.WithError(err)
 				return
 			}
 
-			var filtered struct {
-				O string `json:"object"`
-				D []struct {
-					O string `json:"object"`
-					A *file  `json:"attributes"`
-				} `json:"data"`
-			}
+			var filtered fractalFileList
 			filtered.O = "list"
 
 			if fileOnly {
@@ -129,6 +128,77 @@ var listFilesCmd = &cobra.Command{
 
 			log.LineB(buf)
 		}
+	},
+}
+
+var getFileInfoCmd = &cobra.Command{
+	Use:     "files:info identifier name",
+	Aliases: []string{"files:stat"},
+	Short:   "gets the file info for a specific file",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("GET", "/api/client/servers/"+args[0]+"/files/list", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		var model fractalFileList
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		target := fractalFile{}
+		for _, file := range model.D {
+			if file.A.Name == args[1] {
+				target = file
+				break
+			}
+		}
+
+		if target == (fractalFile{}) {
+			log.Error("file not found")
+			return
+		}
+
+		var buf []byte
+
+		if cfg.Http.ParseBody {
+			if cfg.Http.ParseIndent {
+				buf, err = json.MarshalIndent(target.A, "", "  ")
+			} else {
+				buf, err = json.Marshal(target.A)
+			}
+		} else {
+			if cfg.Http.ParseIndent {
+				buf, err = json.MarshalIndent(target, "", "  ")
+			} else {
+				buf, err = json.Marshal(target)
+			}
+		}
+
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		log.LineB(buf)
 	},
 }
 
