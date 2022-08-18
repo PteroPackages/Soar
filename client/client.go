@@ -42,6 +42,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(decompressFileCmd)
 	util.ApplyDefaultFlags(deleteFilesCmd)
 	util.ApplyDefaultFlags(createFolderCmd)
+	util.ApplyDefaultFlags(chmodFileCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
@@ -53,6 +54,7 @@ func GroupCommands() *cobra.Command {
 	decompressFileCmd.Flags().String("root", "/", "the root directory of the file")
 	deleteFilesCmd.Flags().String("root", "/", "the root directory of the files")
 	createFolderCmd.Flags().String("root", "/", "the root directory for the folder")
+	chmodFileCmd.Flags().String("root", "/", "the root directory of the file")
 
 	cmd.AddCommand(getAccountCmd)
 	cmd.AddCommand(getPermissionsCmd)
@@ -82,6 +84,7 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(decompressFileCmd)
 	cmd.AddCommand(deleteFilesCmd)
 	cmd.AddCommand(createFolderCmd)
+	cmd.AddCommand(chmodFileCmd)
 
 	return cmd
 }

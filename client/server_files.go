@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
@@ -604,6 +605,45 @@ var createFolderCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Client, log)
 		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/create-folder", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var chmodFileCmd = &cobra.Command{
+	Use:   "files:chmod identifier name mode [--root dir]",
+	Short: "changes the permissions of a file",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name", "mode"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		mode, err := strconv.Atoi(args[2])
+		if err != nil {
+			log.Error("failed to parse mode bits:").WithError(err)
+			return
+		}
+
+		root, _ := cmd.Flags().GetString("root")
+		info := map[string]interface{}{"file": args[1], "mode": mode}
+		data, _ := json.Marshal(map[string]interface{}{"root": root, "files": []interface{}{info}})
+		log.LineB(data)
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/chmod", &body)
 		if _, err = ctx.Execute(req); err != nil {
 			log.WithError(err)
 		}
