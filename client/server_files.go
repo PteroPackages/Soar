@@ -36,7 +36,7 @@ type fractalFileList struct {
 }
 
 var listFilesCmd = &cobra.Command{
-	Use:     "files:list identifier [-d | --dir] [-f | --file]",
+	Use:     "files:list identifier [-d | --dir] [-f | --file] [--root dir]",
 	Aliases: []string{"files:ls", "files:dir"},
 	Short:   "lists files on a server",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -54,8 +54,12 @@ var listFilesCmd = &cobra.Command{
 		}
 		cfg.ApplyFlags(cmd.Flags())
 
+		root, _ := cmd.Flags().GetString("root")
+		path := "/api/client/servers/" + args[0] + "/files/list?list&directory="
+		path += url.QueryEscape(root)
+
 		ctx := http.New(cfg, &cfg.Client, log)
-		req := ctx.Request("GET", "/api/client/servers/"+args[0]+"/files/list?directory=tests", nil)
+		req := ctx.Request("GET", path, nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -132,12 +136,12 @@ var listFilesCmd = &cobra.Command{
 }
 
 var getFileInfoCmd = &cobra.Command{
-	Use:     "files:info identifier name",
+	Use:     "files:info identifier path",
 	Aliases: []string{"files:stat"},
 	Short:   "gets the file info for a specific file",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+		if err := util.RequireArgs(args, []string{"identifier", "path"}); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -203,12 +207,12 @@ var getFileInfoCmd = &cobra.Command{
 }
 
 var getFileContentsCmd = &cobra.Command{
-	Use:     "files:contents identifier name",
+	Use:     "files:contents identifier path",
 	Aliases: []string{"files:cat"},
 	Short:   "gets the contents of a file",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+		if err := util.RequireArgs(args, []string{"identifier", "path"}); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -239,12 +243,12 @@ var getFileContentsCmd = &cobra.Command{
 }
 
 var downloadFileCmd = &cobra.Command{
-	Use:     "files:download identifier name [--dest path] [-U | --url-only]",
+	Use:     "files:download identifier path [--dest path] [-U | --url-only]",
 	Aliases: []string{"files:down"},
 	Short:   "downloads a file or returns the url",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+		if err := util.RequireArgs(args, []string{"identifier", "path"}); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -338,10 +342,7 @@ var renameFileCmd = &cobra.Command{
 
 		root, _ := cmd.Flags().GetString("root")
 		info := map[string]string{"from": args[1], "to": args[2]}
-		data, _ := json.Marshal(struct {
-			Root  string              `json:"root"`
-			Files []map[string]string `json:"files"`
-		}{Root: root, Files: []map[string]string{info}})
+		data, _ := json.Marshal(map[string]interface{}{"root": root, "files": info})
 
 		body := bytes.Buffer{}
 		body.Write(data)
@@ -355,12 +356,12 @@ var renameFileCmd = &cobra.Command{
 }
 
 var copyFileCmd = &cobra.Command{
-	Use:     "files:copy identifier name",
+	Use:     "files:copy identifier path",
 	Aliases: []string{"files:cp"},
 	Short:   "copies a file",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+		if err := util.RequireArgs(args, []string{"identifier", "path"}); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -386,12 +387,12 @@ var copyFileCmd = &cobra.Command{
 }
 
 var writeFileCmd = &cobra.Command{
-	Use:        "files:write identifier name content",
+	Use:        "files:write identifier path content",
 	Short:      "writes content to a file",
 	SuggestFor: []string{"files:create"},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgsOverflow(args, []string{"identifier", "name"}, 1); err != nil {
+		if err := util.RequireArgsOverflow(args, []string{"identifier", "path"}, 1); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -425,13 +426,13 @@ var writeFileCmd = &cobra.Command{
 }
 
 var createFileCmd = &cobra.Command{
-	Use:        "files:create identifier name",
+	Use:        "files:create identifier path",
 	Aliases:    []string{"files:touch"},
 	Short:      "creates an empty file",
 	SuggestFor: []string{"files:create"},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgsOverflow(args, []string{"identifier", "name"}, 1); err != nil {
+		if err := util.RequireArgsOverflow(args, []string{"identifier", "path"}, 1); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -504,7 +505,7 @@ var compressFilesCmd = &cobra.Command{
 }
 
 var decompressFileCmd = &cobra.Command{
-	Use:     "files:decompress identifier file [--root dir]",
+	Use:     "files:decompress identifier name [--root dir]",
 	Aliases: []string{"files:dcmp", "files:unzip"},
 	Short:   "decompresses an archived file",
 	Run: func(cmd *cobra.Command, args []string) {

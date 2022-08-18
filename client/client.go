@@ -44,6 +44,7 @@ func GroupCommands() *cobra.Command {
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
+	listFilesCmd.Flags().String("root", "/", "the root directory")
 	downloadFileCmd.Flags().String("dest", "", "the path to save the file at")
 	downloadFileCmd.Flags().BoolP("url-only", "U", false, "only return the url")
 	renameFileCmd.Flags().String("root", "/", "the root directory of the file")
