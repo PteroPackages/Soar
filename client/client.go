@@ -50,7 +50,11 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(removeSubUserCmd)
 	util.ApplyDefaultFlags(getStartupCmd)
 	util.ApplyDefaultFlags(setStartupCmd)
+	util.ApplyDefaultFlags(renameServerCmd)
+	util.ApplyDefaultFlags(reinstallServerCmd)
+	util.ApplyDefaultFlags(setDockerImageCmd)
 
+	getServersCmd.Flags().String("id", "", "the identifier of the server")
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
 	listFilesCmd.Flags().String("root", "/", "the root directory")
@@ -106,6 +110,9 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(removeSubUserCmd)
 	cmd.AddCommand(getStartupCmd)
 	cmd.AddCommand(setStartupCmd)
+	cmd.AddCommand(renameServerCmd)
+	cmd.AddCommand(reinstallServerCmd)
+	cmd.AddCommand(setDockerImageCmd)
 
 	return cmd
 }
