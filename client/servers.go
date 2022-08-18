@@ -11,7 +11,7 @@ import (
 )
 
 var getServersCmd = &cobra.Command{
-	Use:   "servers:get",
+	Use:   "servers:get [--id identifier]",
 	Short: "gets account servers",
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
@@ -24,15 +24,26 @@ var getServersCmd = &cobra.Command{
 		}
 		cfg.ApplyFlags(cmd.Flags())
 
+		id, _ := cmd.Flags().GetString("id")
+		path := "/api/client"
+		if id != "" {
+			path += "/servers/" + id
+		}
+
 		ctx := http.New(cfg, &cfg.Client, log)
-		req := ctx.Request("GET", "/api/client", nil)
+		req := ctx.Request("GET", path, nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
 			return
 		}
 
-		buf, err := http.HandleDataResponse(res, cfg)
+		var buf []byte
+		if id != "" {
+			buf, err = http.HandleItemResponse(res, cfg)
+		} else {
+			buf, err = http.HandleDataResponse(res, cfg)
+		}
 		if err != nil {
 			log.WithError(err)
 			return
