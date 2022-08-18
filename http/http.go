@@ -106,16 +106,27 @@ func (c *Client) Execute(req *http.Request) ([]byte, error) {
 			return nil, fmt.Errorf("unknown api error: %s", res.Status)
 		}
 
-		var data struct {
-			Errors []*errorInfo `json:"errors"`
-		}
-		if err = json.Unmarshal(buf, &data); err != nil {
-			return nil, err
-		}
+		if res.Request.URL.Host == c.auth.URL {
+			var data struct {
+				Errors []*errorInfo `json:"errors"`
+			}
+			if err = json.Unmarshal(buf, &data); err != nil {
+				return nil, err
+			}
 
-		c.log.Error("received %d error(s):", len(data.Errors))
-		for _, e := range data.Errors {
-			c.log.Error(e.String())
+			c.log.Error("received %d error(s):", len(data.Errors))
+			for _, e := range data.Errors {
+				c.log.Error(e.String())
+			}
+		} else {
+			var data struct {
+				Error string `json:"error"`
+			}
+			if err = json.Unmarshal(buf, &data); err != nil {
+				return nil, err
+			}
+
+			c.log.Error("received an error:").Error(data.Error)
 		}
 
 		return nil, nil
