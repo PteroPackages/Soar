@@ -38,6 +38,8 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(copyFileCmd)
 	util.ApplyDefaultFlags(writeFileCmd)
 	util.ApplyDefaultFlags(createFileCmd)
+	util.ApplyDefaultFlags(compressFilesCmd)
+	util.ApplyDefaultFlags(decompressFileCmd)
 	util.ApplyDefaultFlags(createFolderCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
@@ -45,6 +47,8 @@ func GroupCommands() *cobra.Command {
 	downloadFileCmd.Flags().String("dest", "", "the path to save the file at")
 	downloadFileCmd.Flags().BoolP("url-only", "U", false, "only return the url")
 	renameFileCmd.Flags().String("root", "/", "the root directory of the file")
+	compressFilesCmd.Flags().String("root", "/", "the root directory of the files")
+	decompressFileCmd.Flags().String("root", "/", "the root directory of the file")
 	createFolderCmd.Flags().String("root", "/", "the root directory for the folder")
 
 	cmd.AddCommand(getAccountCmd)
@@ -70,6 +74,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(copyFileCmd)
 	cmd.AddCommand(writeFileCmd)
 	cmd.AddCommand(createFileCmd)
+	cmd.AddCommand(compressFilesCmd)
+	cmd.AddCommand(decompressFileCmd)
 	cmd.AddCommand(createFolderCmd)
 
 	return cmd

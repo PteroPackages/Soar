@@ -55,7 +55,7 @@ var listFilesCmd = &cobra.Command{
 		cfg.ApplyFlags(cmd.Flags())
 
 		ctx := http.New(cfg, &cfg.Client, log)
-		req := ctx.Request("GET", "/api/client/servers/"+args[0]+"/files/list", nil)
+		req := ctx.Request("GET", "/api/client/servers/"+args[0]+"/files/list?directory=tests", nil)
 		res, err := ctx.Execute(req)
 		if err != nil {
 			log.WithError(err)
@@ -318,8 +318,9 @@ var downloadFileCmd = &cobra.Command{
 }
 
 var renameFileCmd = &cobra.Command{
-	Use:   "files:rename identifier old-name new-name [--root path]",
-	Short: "renames a file on the server",
+	Use:     "files:rename identifier old-name new-name [--root path]",
+	Aliases: []string{"files:move", "files:mv"},
+	Short:   "renames a file on the server",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
 		if err := util.RequireArgs(args, []string{"identifier", "old-name", "new-name"}); err != nil {
@@ -454,6 +455,80 @@ var createFileCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Client, log)
 		req := ctx.Request("POST", path, nil)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var compressFilesCmd = &cobra.Command{
+	Use:     "files:compress identifier files... [--root dir]",
+	Aliases: []string{"files:cmp", "files:zip"},
+	Short:   "compresses one or more files and folders",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgsOverflow(args, []string{"identifier"}, 20); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		root, _ := cmd.Flags().GetString("root")
+		data, _ := json.Marshal(map[string]interface{}{"root": root, "files": args[1:]})
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/compress", &body)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		buf, err := http.HandleItemResponse(res, cfg)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		log.LineB(buf)
+	},
+}
+
+var decompressFileCmd = &cobra.Command{
+	Use:     "files:decompress identifier file [--root dir]",
+	Aliases: []string{"files:dcmp", "files:unzip"},
+	Short:   "decompresses an archived file",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		root, _ := cmd.Flags().GetString("root")
+		data, _ := json.Marshal(map[string]string{"root": root, "file": args[1]})
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/decompress", &body)
 		if _, err = ctx.Execute(req); err != nil {
 			log.WithError(err)
 		}
