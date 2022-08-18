@@ -638,12 +638,64 @@ var chmodFileCmd = &cobra.Command{
 		root, _ := cmd.Flags().GetString("root")
 		info := map[string]interface{}{"file": args[1], "mode": mode}
 		data, _ := json.Marshal(map[string]interface{}{"root": root, "files": []interface{}{info}})
-		log.LineB(data)
 		body := bytes.Buffer{}
 		body.Write(data)
 
 		ctx := http.New(cfg, &cfg.Client, log)
 		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/chmod", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var pullFileCmd = &cobra.Command{
+	Use:   "files:pull identifier url [--dest dir] [--name name]\n\t[--use-header] [-f | --foreground]",
+	Short: "pulls a file from a remote source",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "url"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		source, err := url.Parse(args[1])
+		if err != nil {
+			log.Error("failed to parse url:").WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		dest, _ := cmd.Flags().GetString("dest")
+		name, _ := cmd.Flags().GetString("name")
+		useHeader, _ := cmd.Flags().GetBool("use-header")
+		foreground, _ := cmd.Flags().GetBool("foreground")
+
+		info := map[string]interface{}{
+			"url":        source.String(),
+			"use_header": useHeader,
+			"foreground": foreground,
+		}
+		if dest != "" {
+			info["directory"] = dest
+		}
+		if name != "" {
+			info["filename"] = name
+		}
+
+		data, _ := json.Marshal(info)
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/pull", &body)
 		if _, err = ctx.Execute(req); err != nil {
 			log.WithError(err)
 		}
