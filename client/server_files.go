@@ -26,8 +26,9 @@ type file struct {
 }
 
 var listFilesCmd = &cobra.Command{
-	Use:   "files:list identifier [-d | --dir] [-f | --file]",
-	Short: "lists files on a server",
+	Use:     "files:list identifier [-d | --dir] [-f | --file]",
+	Aliases: []string{"files:ls", "files:dir"},
+	Short:   "lists files on a server",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
 		if err := util.RequireArgs(args, []string{"identifier"}); err != nil {
@@ -132,8 +133,9 @@ var listFilesCmd = &cobra.Command{
 }
 
 var getFileContentsCmd = &cobra.Command{
-	Use:   "files:contents identifier name",
-	Short: "gets the contents of a file",
+	Use:     "files:contents identifier name",
+	Aliases: []string{"files:cat"},
+	Short:   "gets the contents of a file",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
 		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
@@ -306,6 +308,45 @@ var copyFileCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Client, log)
 		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/copy", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var writeFileCmd = &cobra.Command{
+	Use:        "files:write identifier name content",
+	Short:      "writes content to a file",
+	SuggestFor: []string{"files:create"},
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgsOverflow(args, []string{"identifier", "name"}, 1); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		if len(args) == 2 {
+			log.Error("missing argument 'content'").Error("did you mean to run the 'files:create' command?")
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		body := bytes.Buffer{}
+		body.Write([]byte(args[2]))
+
+		path := "/api/client/servers/" + args[0] + "/files/write?file="
+		path += url.QueryEscape(args[1])
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", path, &body)
+		req.Header.Set("Content-Type", "text/plain")
 		if _, err = ctx.Execute(req); err != nil {
 			log.WithError(err)
 		}
