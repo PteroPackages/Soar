@@ -18,8 +18,8 @@ var getNodesCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, _ []string) {
 		log.ApplyFlags(cmd.Flags())
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -107,8 +107,8 @@ var getNodeConfigCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return

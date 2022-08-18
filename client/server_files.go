@@ -49,8 +49,8 @@ var listFilesCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -149,8 +149,8 @@ var getFileInfoCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -220,8 +220,8 @@ var getFileContentsCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -270,8 +270,8 @@ var downloadFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -335,8 +335,8 @@ var renameFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -369,8 +369,8 @@ var copyFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -405,8 +405,8 @@ var writeFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -446,8 +446,8 @@ var createFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -481,8 +481,8 @@ var compressFilesCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -523,8 +523,8 @@ var decompressFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -560,8 +560,8 @@ var deleteFilesCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -592,8 +592,8 @@ var createFolderCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -623,8 +623,8 @@ var chmodFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -667,8 +667,8 @@ var pullFileCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
@@ -722,8 +722,8 @@ var uploadFilesCmd = &cobra.Command{
 			return
 		}
 
-		local, _ := cmd.Flags().GetBool("local")
-		cfg, err := config.Get(local)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
 			config.HandleError(err, log)
 			return
