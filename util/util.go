@@ -71,3 +71,25 @@ func RequireArgs(input, required []string) error {
 
 	return nil
 }
+
+func RequireArgsOverflow(input, required []string, overflow int) error {
+	if len(input) == 0 {
+		return fmt.Errorf("no arguments specified (expected %d)", len(required)+overflow)
+	}
+
+	if len(input) < len(required) {
+		missing := required[len(input)]
+		include := ""
+		if len(required)-len(input) > 1 {
+			include = fmt.Sprintf(" and %d more", len(required)-1)
+		}
+
+		return fmt.Errorf("missing argument '%s'%s", missing, include)
+	}
+
+	if len(input) > len(required)+overflow {
+		return fmt.Errorf("got %d more argument(s) than required (expected %d)", len(input)-len(required)-overflow, len(required)+overflow)
+	}
+
+	return nil
+}
