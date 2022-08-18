@@ -44,6 +44,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(createFolderCmd)
 	util.ApplyDefaultFlags(chmodFileCmd)
 	util.ApplyDefaultFlags(pullFileCmd)
+	util.ApplyDefaultFlags(uploadFilesCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
@@ -60,6 +61,8 @@ func GroupCommands() *cobra.Command {
 	pullFileCmd.Flags().String("name", "", "the name to save the file as")
 	pullFileCmd.Flags().Bool("use-header", false, "use the source content header")
 	pullFileCmd.Flags().BoolP("foreground", "f", false, "pull the file in the foreground")
+	uploadFilesCmd.Flags().String("dest", "", "the path to upload files to")
+	uploadFilesCmd.Flags().BoolP("url-only", "U", false, "only return the url")
 
 	cmd.AddCommand(getAccountCmd)
 	cmd.AddCommand(getPermissionsCmd)
@@ -91,6 +94,7 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(createFolderCmd)
 	cmd.AddCommand(chmodFileCmd)
 	cmd.AddCommand(pullFileCmd)
+	cmd.AddCommand(uploadFilesCmd)
 
 	return cmd
 }

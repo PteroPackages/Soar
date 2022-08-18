@@ -3,6 +3,8 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"io"
+	"mime/multipart"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -698,6 +700,110 @@ var pullFileCmd = &cobra.Command{
 		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/pull", &body)
 		if _, err = ctx.Execute(req); err != nil {
 			log.WithError(err)
+		}
+	},
+}
+
+var uploadFilesCmd = &cobra.Command{
+	Use:     "files:upload identifier files... [--dest path] [-U | --url-only]",
+	Aliases: []string{"files:up"},
+	Short:   "uploads one or more files to the server",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgsOverflow(args, []string{"identifier"}, 10); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		skip, _ := cmd.Flags().GetBool("url-only")
+
+		if len(args) == 1 && !skip {
+			log.Error("at least one file must be specified to upload")
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		urlReq := ctx.Request("GET", "/api/client/servers/"+args[0]+"/files/upload", nil)
+		res, err := ctx.Execute(urlReq)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		var model struct {
+			Attributes struct {
+				URL string `json:"url"`
+			} `json:"attributes"`
+		}
+		if err = json.Unmarshal(res, &model); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		if skip {
+			log.Line(model.Attributes.URL)
+			return
+		}
+
+		var files []string
+
+		for _, path := range args[1:] {
+			info, err := os.Stat(path)
+			if err != nil {
+				if os.IsNotExist(err) {
+					log.Warn("'%s' file does not exist", path)
+				} else {
+					log.Warn("'%s' raised an unexpected error, skipping", path)
+				}
+
+				continue
+			}
+
+			if info.IsDir() {
+				log.Warn("'%s' cannot upload directories, skipping", path)
+				continue
+			}
+
+			files = append(files, path)
+		}
+
+		log.Debug("%v", files)
+
+		if len(files) == 0 {
+			log.Error("no files found to upload")
+			return
+		}
+
+		body := bytes.Buffer{}
+		writer := multipart.NewWriter(&body)
+		part, _ := writer.CreateFormField("files")
+
+		for _, path := range files {
+			file, err := os.Open(path)
+			if err != nil {
+				log.Warn("could not open '%s', skipping", path)
+				continue
+			}
+
+			io.Copy(part, file)
+			file.Close()
+		}
+
+		writer.Close()
+
+		upReq := http.Request("POST", model.Attributes.URL, &body)
+		upReq.Header.Set("Content-Type", writer.FormDataContentType())
+		if _, err = ctx.Execute(upReq); err != nil {
+			log.WithError(err)
+			return
 		}
 	},
 }
