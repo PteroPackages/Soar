@@ -48,6 +48,8 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(getSubUsersCmd)
 	util.ApplyDefaultFlags(addSubUserCmd)
 	util.ApplyDefaultFlags(removeSubUserCmd)
+	util.ApplyDefaultFlags(getStartupCmd)
+	util.ApplyDefaultFlags(setStartupCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
@@ -102,6 +104,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(getSubUsersCmd)
 	cmd.AddCommand(addSubUserCmd)
 	cmd.AddCommand(removeSubUserCmd)
+	cmd.AddCommand(getStartupCmd)
+	cmd.AddCommand(setStartupCmd)
 
 	return cmd
 }
