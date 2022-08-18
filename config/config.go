@@ -148,7 +148,14 @@ func Create(path string, force bool) (string, error) {
 	}
 
 	if path == "" {
-		path = filepath.Join(root, ".soar", "config.yml")
+		base := filepath.Join(root, ".soar")
+		if _, err = os.Stat(base); err != nil {
+			if err = os.MkdirAll(base, 0o755); err != nil {
+				return "", errors.New("failed to create .soar directory at config directory")
+			}
+		}
+
+		path = filepath.Join(base, "config.yml")
 	} else {
 		cwd, _ := os.Getwd()
 		path = filepath.Join(cwd, path)
