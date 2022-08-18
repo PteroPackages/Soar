@@ -352,3 +352,40 @@ var writeFileCmd = &cobra.Command{
 		}
 	},
 }
+
+var createFileCmd = &cobra.Command{
+	Use:        "files:create identifier name",
+	Aliases:    []string{"files:touch"},
+	Short:      "creates an empty file",
+	SuggestFor: []string{"files:create"},
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgsOverflow(args, []string{"identifier", "name"}, 1); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		if len(args) > 2 {
+			log.Error("got %d more argument(s) than required (expected 2)", len(args)-2).
+				Error("did you mean to run the 'files:create' command?")
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		path := "/api/client/servers/" + args[0] + "/files/write?file="
+		path += url.QueryEscape(args[1])
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", path, nil)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}

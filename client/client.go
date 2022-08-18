@@ -36,6 +36,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(renameFileCmd)
 	util.ApplyDefaultFlags(copyFileCmd)
 	util.ApplyDefaultFlags(writeFileCmd)
+	util.ApplyDefaultFlags(createFileCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
@@ -64,6 +65,7 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(renameFileCmd)
 	cmd.AddCommand(copyFileCmd)
 	cmd.AddCommand(writeFileCmd)
+	cmd.AddCommand(createFileCmd)
 
 	return cmd
 }
