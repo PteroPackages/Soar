@@ -45,6 +45,9 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(chmodFileCmd)
 	util.ApplyDefaultFlags(pullFileCmd)
 	util.ApplyDefaultFlags(uploadFilesCmd)
+	util.ApplyDefaultFlags(getSubUsersCmd)
+	util.ApplyDefaultFlags(addSubUserCmd)
+	util.ApplyDefaultFlags(removeSubUserCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
 	listFilesCmd.Flags().BoolP("file", "f", false, "only list files")
@@ -63,6 +66,7 @@ func GroupCommands() *cobra.Command {
 	pullFileCmd.Flags().BoolP("foreground", "f", false, "pull the file in the foreground")
 	uploadFilesCmd.Flags().String("dest", "", "the path to upload files to")
 	uploadFilesCmd.Flags().BoolP("url-only", "U", false, "only return the url")
+	getSubUsersCmd.Flags().String("uuid", "", "the uuid of the subuser")
 
 	cmd.AddCommand(getAccountCmd)
 	cmd.AddCommand(getPermissionsCmd)
@@ -95,6 +99,9 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(chmodFileCmd)
 	cmd.AddCommand(pullFileCmd)
 	cmd.AddCommand(uploadFilesCmd)
+	cmd.AddCommand(getSubUsersCmd)
+	cmd.AddCommand(addSubUserCmd)
+	cmd.AddCommand(removeSubUserCmd)
 
 	return cmd
 }
