@@ -12,7 +12,9 @@ go build
 ```
 
 ## Getting Started
-After installing, run `soar config init` to generate a config file. On Linux-based systems this can be found in the user config directory (usually `$HOME/.config/.soar/config.yml`), and on Windows systems it can be found at `%APPDATA%\.soar\config.yml`. You can also specify the `--dir=` flag to generate the config in a specific directory. Next, enter your credentials for the application and client section (you can also set other options). Now you're ready to soar! **Note:** by default Soar will use the global config for operations, to use the local config you must specify the `--local` or `-l` flag in the command.
+After installing, run `soar config init` to generate a config file. On Linux-based systems this can be found in the user config directory (usually `$HOME/.config/.soar/config.yml`), and on Windows systems it can be found at `%APPDATA%\.soar\config.yml`. You can also specify the `--dir=` flag to generate the config in a specific directory. Next, enter your credentials for the application and client section (you can also set other options). Now you're ready to soar!
+
+**Note:** by default Soar will check for a local config to use, if not found then it will use the global config. If you have a local config but don't want to use it, you can specify the `--global` or `-g` flag in the command to force use the global config.
 
 ## Commands
 You can also view available commands by running `soar help <command>`.
@@ -45,11 +47,22 @@ account:api-keys:get    gets the account api keys
 account:get             gets account information
 account:perms           gets system permissions
 databases:get           gets server databases
+files:chmod             changes the permissions of a file
+files:compress          compresses one or more files and folders
 files:contents          gets the contents of a file
 files:copy              copies a file
+files:create            creates an empty file
+files:decompress        decompresses an archived file
+files:decompress        decompresses an archived file
+files:delete            deletes one or more files
 files:download          downloads a file or returns the url
+files:folder            creates a folder
+files:info              gets the file info for a specific file
 files:list              lists files on a server
+files:pull              pulls a file from a remote source
 files:rename            renames a file on the server
+files:upload            uploads one or more files to the server
+files:write             writes content to a file
 servers:activity        gets the server activity logs
 servers:command         sends a command to the server console
 servers:get             gets account servers

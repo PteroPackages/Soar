@@ -74,13 +74,19 @@ func (c *Config) ApplyFlags(flags *pflag.FlagSet) {
 	}
 }
 
-func Get(local bool) (*Config, error) {
+func GetStatic(global bool) (*Config, error) {
 	var path string
 
-	if local {
+	if !global {
 		root, _ := os.Getwd()
 		path = filepath.Join(root, ".soar.yml")
-	} else {
+
+		if _, err := os.Stat(path); err != nil {
+			path = ""
+		}
+	}
+
+	if path == "" {
 		root, err := os.UserConfigDir()
 		if err != nil {
 			return nil, err
@@ -107,7 +113,7 @@ func Get(local bool) (*Config, error) {
 	}
 
 	if info.IsDir() {
-		return nil, errors.New("invalid file path")
+		return nil, errors.New("invalid file path, cannot be a directory")
 	}
 
 	if info.Mode()&0o644 == 0 {
@@ -121,6 +127,15 @@ func Get(local bool) (*Config, error) {
 
 	var cfg *Config
 	if err = yaml.Unmarshal(buf, &cfg); err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+func Get(global bool) (*Config, error) {
+	cfg, err := GetStatic(global)
+	if err != nil {
 		return nil, err
 	}
 
@@ -214,7 +229,7 @@ func HandleError(err error, log *logger.Logger) {
 		log.Error("failed to validate config, %d error(s):", len(errs))
 
 		for _, e := range errs {
-			log.Error(fmt.Sprintf("key %s didn't satisfy the '%s' tag", e.Namespace(), e.Tag()))
+			log.Error(fmt.Sprintf("field %s didn't satisfy the '%s' tag", e.Namespace(), e.Tag()))
 		}
 	} else {
 		log.Error("failed to get config:").WithError(err).WithCmd("soar config --help")
