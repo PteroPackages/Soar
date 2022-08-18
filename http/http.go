@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pteropackages/soar/config"
@@ -106,7 +107,10 @@ func (c *Client) Execute(req *http.Request) ([]byte, error) {
 			return nil, fmt.Errorf("unknown api error: %s", res.Status)
 		}
 
-		if res.Request.URL.Host == c.auth.URL {
+		c.log.Debug("host: %s", res.Request.Host)
+		c.log.Debug(string(buf))
+
+		if strings.Contains(c.auth.URL, res.Request.Host) {
 			var data struct {
 				Errors []*errorInfo `json:"errors"`
 			}
