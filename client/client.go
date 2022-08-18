@@ -40,6 +40,7 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(createFileCmd)
 	util.ApplyDefaultFlags(compressFilesCmd)
 	util.ApplyDefaultFlags(decompressFileCmd)
+	util.ApplyDefaultFlags(deleteFilesCmd)
 	util.ApplyDefaultFlags(createFolderCmd)
 
 	listFilesCmd.Flags().BoolP("dir", "d", false, "only list directories")
@@ -50,6 +51,7 @@ func GroupCommands() *cobra.Command {
 	renameFileCmd.Flags().String("root", "/", "the root directory of the file")
 	compressFilesCmd.Flags().String("root", "/", "the root directory of the files")
 	decompressFileCmd.Flags().String("root", "/", "the root directory of the file")
+	deleteFilesCmd.Flags().String("root", "/", "the root directory of the files")
 	createFolderCmd.Flags().String("root", "/", "the root directory for the folder")
 
 	cmd.AddCommand(getAccountCmd)
@@ -77,6 +79,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(createFileCmd)
 	cmd.AddCommand(compressFilesCmd)
 	cmd.AddCommand(decompressFileCmd)
+	cmd.AddCommand(decompressFileCmd)
+	cmd.AddCommand(deleteFilesCmd)
 	cmd.AddCommand(createFolderCmd)
 
 	return cmd

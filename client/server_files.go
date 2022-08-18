@@ -473,6 +473,11 @@ var compressFilesCmd = &cobra.Command{
 			return
 		}
 
+		if len(args) == 1 {
+			log.Error("at least one file must be specified to compress")
+			return
+		}
+
 		local, _ := cmd.Flags().GetBool("local")
 		cfg, err := config.Get(local)
 		if err != nil {
@@ -530,6 +535,43 @@ var decompressFileCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Client, log)
 		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/decompress", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var deleteFilesCmd = &cobra.Command{
+	Use:     "files:delete identifer files... [--root dir]",
+	Aliases: []string{"files:rm"},
+	Short:   "deletes one or more files",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgsOverflow(args, []string{"identifier"}, 10); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		if len(args) == 1 {
+			log.Error("at least one file must be specified to delete")
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		root, _ := cmd.Flags().GetString("root")
+		data, _ := json.Marshal(map[string]interface{}{"root": root, "files": args[1:]})
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/delete", &body)
 		if _, err = ctx.Execute(req); err != nil {
 			log.WithError(err)
 		}
