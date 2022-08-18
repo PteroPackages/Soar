@@ -459,3 +459,35 @@ var createFileCmd = &cobra.Command{
 		}
 	},
 }
+
+var createFolderCmd = &cobra.Command{
+	Use:     "files:folder identifier name [--root dir]",
+	Aliases: []string{"files:mkdir"},
+	Short:   "creates a folder",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"identifier", "name"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		local, _ := cmd.Flags().GetBool("local")
+		cfg, err := config.Get(local)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		root, _ := cmd.Flags().GetString("root")
+		data, _ := json.Marshal(map[string]string{"root": root, "name": args[1]})
+		body := bytes.Buffer{}
+		body.Write(data)
+
+		ctx := http.New(cfg, &cfg.Client, log)
+		req := ctx.Request("POST", "/api/client/servers/"+args[0]+"/files/create-folder", &body)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
