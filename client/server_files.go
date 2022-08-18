@@ -784,7 +784,6 @@ var uploadFilesCmd = &cobra.Command{
 
 		body := bytes.Buffer{}
 		writer := multipart.NewWriter(&body)
-		part, _ := writer.CreateFormField("files")
 
 		for _, path := range files {
 			file, err := os.Open(path)
@@ -793,6 +792,7 @@ var uploadFilesCmd = &cobra.Command{
 				continue
 			}
 
+			part, _ := writer.CreateFormFile("files", file.Name())
 			io.Copy(part, file)
 			file.Close()
 		}
