@@ -20,7 +20,7 @@ type Auth struct {
 }
 
 type HttpConfig struct {
-	MaxBodySize    int  `validate:"required,gte=100" default:"100" yaml:"max_body_size"`
+	MaxBodySize    int  `validate:"required,gte=100" yaml:"max_body_size"`
 	ParseBody      bool `yaml:"parse_body"`
 	ParseIndent    bool `yaml:"parse_indent"`
 	RetryRateLimit bool `yaml:"retry_rate_limit"`
@@ -86,6 +86,14 @@ func Get(local bool) (*Config, error) {
 			return nil, err
 		}
 
+		if _, err = os.Stat(root); err != nil {
+			if os.IsNotExist(err) {
+				return nil, fmt.Errorf("user config directory not found (path: %s)", root)
+			}
+
+			return nil, err
+		}
+
 		path = filepath.Join(root, ".soar", "config.yml")
 	}
 
@@ -128,6 +136,14 @@ func Get(local bool) (*Config, error) {
 func Create(path string, force bool) (string, error) {
 	root, err := os.UserConfigDir()
 	if err != nil {
+		return "", err
+	}
+
+	if _, err = os.Stat(root); err != nil {
+		if os.IsNotExist(err) {
+			return "", fmt.Errorf("user config directory not found (path: %s)", root)
+		}
+
 		return "", err
 	}
 
@@ -191,7 +207,7 @@ func HandleError(err error, log *logger.Logger) {
 		log.Error("failed to validate config, %d error(s):", len(errs))
 
 		for _, e := range errs {
-			log.Error(fmt.Sprintf("key '%s' didn't satisfy the '%s' tag", e.Namespace(), e.Tag()))
+			log.Error(fmt.Sprintf("key %s didn't satisfy the '%s' tag", e.Namespace(), e.Tag()))
 		}
 	} else {
 		log.Error("failed to get config:").WithError(err).WithCmd("soar config --help")
