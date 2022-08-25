@@ -77,12 +77,12 @@ func (c *Client) Execute(req *http.Request) ([]byte, error) {
 	start := time.Now()
 
 	res, err := http.DefaultClient.Do(req)
-	taken := time.Since(start).Microseconds() / 1000
-	c.log.Debug("response: %d (%vms)", res.StatusCode, taken)
-
 	if err != nil {
 		return nil, err
 	}
+
+	taken := time.Since(start).Microseconds() / 1000
+	c.log.Debug("response: %d (%vms)", res.StatusCode, taken)
 	c.log.Ignore().Info("response: %d (%dms)", res.StatusCode, taken)
 
 	switch res.StatusCode {
