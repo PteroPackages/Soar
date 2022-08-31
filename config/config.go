@@ -20,7 +20,6 @@ type Auth struct {
 }
 
 type HttpConfig struct {
-	MaxBodySize    int  `validate:"required,gte=100" yaml:"max_body_size"`
 	ParseBody      bool `yaml:"parse_body"`
 	ParseIndent    bool `yaml:"parse_indent"`
 	RetryRateLimit bool `yaml:"retry_rate_limit"`
@@ -51,12 +50,6 @@ func (c *Config) ApplyFlags(flags *pflag.FlagSet) {
 	}
 	if ok, _ := flags.GetBool("no-retry-ratelimit"); ok {
 		c.Http.RetryRateLimit = false
-	}
-
-	if max, _ := flags.GetInt("max-body"); max != 0 {
-		if max >= 100 {
-			c.Http.MaxBodySize = max
-		}
 	}
 
 	if ok, _ := flags.GetBool("parse-body"); ok {
