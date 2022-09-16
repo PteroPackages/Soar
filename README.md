@@ -7,8 +7,8 @@ See the [releases page](https://github.com/PteroPackages/Soar/releases).
 ### Building from Source
 ```bash
 git clone https://github.com/PteroPackages/Soar.git
-cd Soar
-go build
+cd Soar && make
+# or 'go build' if on Windows without make
 ```
 
 ## Getting Started
@@ -38,7 +38,7 @@ users:get         gets panel users
 
 ### Client API
 ```
-account:2fa:disable
+account:2fa:disable     
 account:2fa:enable      enables two-factor on the account
 account:2fa:get         gets account two-factor code
 account:activity        gets the account activity logs
@@ -69,6 +69,14 @@ servers:get             gets account servers
 servers:power           sets the server power state
 servers:resources       gets server resource usage
 servers:websocket       gets the server websocket data
+settings:image          sets the docker image for a server
+settings:reinstall      reinstalls a server
+settings:rename         renames a server
+startup:get             gets the startup information for a server
+startup:set             updates a startup variable on a server
+subusers:add            adds a subuser to the server
+subusers:get            gets the server subusers
+subusers:remove         removes a subuser from the server
 ```
 
 ### Config Management
