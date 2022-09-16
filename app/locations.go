@@ -31,7 +31,7 @@ var getLocationsCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("GET", path, nil)
-		res, err := ctx.Execute(req)
+		res, err := ctx.ExecuteWithFlags(req, cmd.Flags())
 		if err != nil {
 			log.WithError(err)
 			return

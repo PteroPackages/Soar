@@ -29,6 +29,13 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(getNestsCmd)
 	util.ApplyDefaultFlags(getNestEggsCmd)
 
+	util.ApplyFilterFlags(getUsersCmd)
+	util.ApplyFilterFlags(getServersCmd)
+	util.ApplyFilterFlags(getNodesCmd)
+	util.ApplyFilterFlags(getLocationsCmd)
+	util.ApplyFilterFlags(getNestsCmd)
+	util.ApplyFilterFlags(getNestEggsCmd)
+
 	getUsersCmd.Flags().Int("id", 0, "the id of the user")
 	getUsersCmd.Flags().String("external", "", "the external id of the user")
 	getUsersCmd.Flags().String("username", "", "filter by user username")
