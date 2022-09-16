@@ -27,6 +27,7 @@ jobs:
           upx build/soar_win32.exe && chmod +x build/soar_win32.exe
 
       - name: Changelog
+        id: get_changelog
         run: |
           sed -n "/^## ${{ github.ref_name }}/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE
           echo ::set-output name=version_name::`sed -nr "s/^## (${{ github.ref_name }} .*)$/\1/p" CHANGELOG.md`
@@ -38,7 +39,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          release_name: ${{ steps.extract_changelog.outputs.version_name }}
+          release_name: ${{ steps.get_changelog.outputs.version_name }}
           body_path: ./RELEASE
           draft: true
           prerelease: false
