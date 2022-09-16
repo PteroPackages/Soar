@@ -44,6 +44,7 @@ func HandleDataResponse(buf []byte, cfg *config.Config) ([]byte, error) {
 			O string      `json:"object"`
 			A interface{} `json:"attributes"`
 		} `json:"data"`
+		M map[string]interface{} `json:"meta,omitempty"`
 	}
 	if err := json.Unmarshal(buf, &model); err != nil {
 		return nil, err
