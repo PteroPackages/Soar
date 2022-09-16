@@ -1,10 +1,8 @@
 name: Create Release
 on:
   push:
-    branches:
-      - v*
-    types:
-      - created
+    tags:
+      - 'v*'
 
 jobs:
   release:
