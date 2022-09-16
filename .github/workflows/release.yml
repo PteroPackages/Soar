@@ -19,7 +19,7 @@ jobs:
       - name: Build
         run: |
           GOOS=linux GOARCH=amd64 go build -o build/soar_linux soar.go
-          GOOS=windows GOARCH=amd64 go build -o build/soar_win32 soar.go
+          GOOS=windows GOARCH=amd64 go build -o build/soar_win32.exe soar.go
 
       - name: Compress
         run: |
