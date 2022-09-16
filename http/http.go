@@ -58,9 +58,10 @@ func (c *Client) Request(method, path string, body *bytes.Buffer) *http.Request 
 }
 
 type errorInfo struct {
-	Code   string `json:"code"`
-	Status string `json:"status"`
-	Detail string `json:"detail"`
+	Code   string                 `json:"code"`
+	Status string                 `json:"status"`
+	Detail string                 `json:"detail"`
+	Meta   map[string]interface{} `json:"meta,omitempty"`
 }
 
 func (e *errorInfo) String() string {
@@ -130,27 +131,43 @@ func (c *Client) Execute(req *http.Request) ([]byte, error) {
 		c.log.Debug("host: %s", res.Request.Host)
 		c.log.Debug(string(buf))
 
-		if strings.Contains(c.auth.URL, res.Request.Host) {
-			var data struct {
-				Errors []*errorInfo `json:"errors"`
-			}
-			if err = json.Unmarshal(buf, &data); err != nil {
-				return nil, err
-			}
+		if c.config.Http.ParseErrors {
+			if strings.Contains(c.auth.URL, res.Request.Host) {
+				var data struct {
+					Errors []*errorInfo `json:"errors"`
+				}
+				if err = json.Unmarshal(buf, &data); err != nil {
+					return nil, err
+				}
 
-			c.log.Error("received %d error(s):", len(data.Errors))
-			for _, e := range data.Errors {
-				c.log.Error(e.String())
+				c.log.Error("received %d error(s):", len(data.Errors))
+				for _, e := range data.Errors {
+					c.log.Error(e.String())
+				}
+			} else {
+				var data struct {
+					Error string `json:"error"`
+				}
+				if err = json.Unmarshal(buf, &data); err != nil {
+					return nil, err
+				}
+
+				c.log.Error("received an error:").Error(data.Error)
 			}
 		} else {
-			var data struct {
-				Error string `json:"error"`
-			}
-			if err = json.Unmarshal(buf, &data); err != nil {
-				return nil, err
+			if c.config.Http.ParseIndent {
+				var raw interface{}
+				if err = json.Unmarshal(buf, &raw); err != nil {
+					return nil, err
+				}
+
+				buf, err = json.MarshalIndent(raw, "", "  ")
+				if err != nil {
+					return nil, err
+				}
 			}
 
-			c.log.Error("received an error:").Error(data.Error)
+			c.log.LineB(buf)
 		}
 
 		return nil, nil

@@ -21,6 +21,7 @@ type Auth struct {
 
 type HttpConfig struct {
 	ParseBody      bool `yaml:"parse_body"`
+	ParseErrors    bool `yaml:"parse_errors"`
 	ParseIndent    bool `yaml:"parse_indent"`
 	RetryRateLimit bool `yaml:"retry_rate_limit"`
 }
@@ -57,6 +58,13 @@ func (c *Config) ApplyFlags(flags *pflag.FlagSet) {
 	}
 	if ok, _ := flags.GetBool("no-parse-body"); ok {
 		c.Http.ParseBody = false
+	}
+
+	if ok, _ := flags.GetBool("parse-errors"); ok {
+		c.Http.ParseErrors = true
+	}
+	if ok, _ := flags.GetBool("no-parse-errors"); ok {
+		c.Http.ParseErrors = false
 	}
 
 	if ok, _ := flags.GetBool("parse-indent"); ok {

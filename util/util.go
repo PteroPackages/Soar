@@ -19,6 +19,8 @@ func ApplyDefaultFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("no-retry-ratelimit", "R", false, "don't retry request on ratelimit")
 	cmd.Flags().BoolP("parse-body", "b", false, "parse the response body")
 	cmd.Flags().BoolP("no-parse-body", "B", false, "don't parse the response body")
+	cmd.Flags().BoolP("parse-errors", "e", false, "parse the response errors")
+	cmd.Flags().BoolP("no-parse-errors", "E", false, "don't parse the response errors")
 	cmd.Flags().BoolP("parse-indent", "i", false, "indent the response body")
 	cmd.Flags().BoolP("no-parse-indent", "I", false, "don't indent the response body")
 }
