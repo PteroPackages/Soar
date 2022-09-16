@@ -29,8 +29,8 @@ jobs:
       - name: Changelog
         id: get_changelog
         run: |
-          sed -n "/^## ${{ github.ref_name }}/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE
-          echo ::set-output name=version_name::`sed -nr "s/^## (${{ github.ref_name }} .*)$/\1/p" CHANGELOG.md`
+          sed -n "/^## \[${${{ github.ref_name }}:1}\]/,/^## /{/^## /b;p}" CHANGELOG.md > ./RELEASE
+          echo ::set-output name=version_name::`sed -nr "s/^## (\[${${{ github.ref_name }}:1}\] .*)$/\1/p" CHANGELOG.md`
 
       - name: Release
         id: create_release
