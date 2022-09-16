@@ -23,6 +23,11 @@ func ApplyDefaultFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("no-parse-indent", "I", false, "don't indent the response body")
 }
 
+func ApplyFilterFlags(cmd *cobra.Command) {
+	cmd.Flags().Int("page", 0, "the page to request from")
+	cmd.Flags().Int("per-page", 0, "the number of results to return")
+}
+
 func SafeReadFile(path string) ([]byte, error) {
 	if !filepath.IsAbs(path) {
 		root, _ := os.Getwd()

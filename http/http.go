@@ -11,6 +11,7 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/logger"
+	"github.com/spf13/pflag"
 )
 
 type Client struct {
@@ -71,7 +72,26 @@ func (e *errorInfo) String() string {
 	return fmt.Sprintf("%s (%s): %s", e.Code, e.Status, detail)
 }
 
+func (c *Client) ExecuteWithFlags(req *http.Request, flags *pflag.FlagSet) ([]byte, error) {
+	query := req.URL.Query()
+
+	if val, _ := flags.GetInt("page"); val > 0 {
+		query.Add("page", fmt.Sprint(val))
+	}
+
+	if val, _ := flags.GetInt("per-page"); val > 0 {
+		if val > 100 {
+			val = 100
+		}
+		query.Add("per_page", fmt.Sprint(val))
+	}
+
+	req.URL.RawQuery = query.Encode()
+	return c.Execute(req)
+}
+
 func (c *Client) Execute(req *http.Request) ([]byte, error) {
+	req.URL.Query()
 	c.log.Ignore().Info("request: %s %s", req.Method, req.URL.Path)
 	c.log.Debug("url: %s", req.URL.String())
 	start := time.Now()
