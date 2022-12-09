@@ -93,8 +93,12 @@ func (c *Client) ExecuteWithFlags(req *http.Request, flags *pflag.FlagSet) ([]by
 
 func (c *Client) Execute(req *http.Request) ([]byte, error) {
 	req.URL.Query()
-	c.log.Ignore().Info("request: %s %s", req.Method, req.URL.Path)
-	c.log.Debug("url: %s", req.URL.String())
+	c.log.Ignore().Info("request %s %s", req.Method, req.URL.Path)
+	c.log.Debug("%s %s", req.Method, req.URL.String())
+	c.log.Debug("Content-Type: %s", req.Header.Get("Content-Type"))
+	c.log.Debug("Content-Length: %s", req.Header.Get("Content-Length"))
+	c.log.Debug("Accept: %s", req.Header.Get("Accept"))
+
 	start := time.Now()
 
 	res, err := http.DefaultClient.Do(req)
@@ -103,8 +107,11 @@ func (c *Client) Execute(req *http.Request) ([]byte, error) {
 	}
 
 	taken := time.Since(start).Microseconds() / 1000
-	c.log.Debug("response: %d (%vms)", res.StatusCode, taken)
-	c.log.Ignore().Info("response: %d (%dms)", res.StatusCode, taken)
+	c.log.Debug("response %d (%vms)", res.StatusCode, taken)
+	c.log.Ignore().Info("response %d (%dms)", res.StatusCode, taken)
+	for k, v := range res.Header {
+		c.log.Debug("%s: %v", k, strings.Join(v, ","))
+	}
 
 	switch res.StatusCode {
 	case http.StatusOK:
