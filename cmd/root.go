@@ -1,13 +1,18 @@
 package cmd
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"runtime/debug"
 
 	"github.com/pteropackages/soar/app"
 	"github.com/pteropackages/soar/client"
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/logger"
+	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 var log = logger.New()
@@ -33,6 +38,70 @@ var initConfigCmd = &cobra.Command{
 		}
 
 		log.Line(path)
+	},
+}
+
+var copyConfigCmd = &cobra.Command{
+	Use:   "copy scope",
+	Short: "copies a global or local config to the corresponding destination",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+
+		if err := util.RequireArgs(args, []string{"scope"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		var global bool
+
+		switch args[0] {
+		case "global":
+			global = true
+		case "local":
+			global = false
+		default:
+			log.Error("invalid config scope; must be global or local")
+			return
+		}
+
+		var path string
+
+		if global {
+			root, err := os.UserConfigDir()
+			if err != nil {
+				log.Error("failed to get global config:").WithError(err)
+			}
+
+			if _, err = os.Stat(root); err != nil {
+				if os.IsNotExist(err) {
+					log.Error(fmt.Sprintf("user config directory not found (path: %s)", err))
+					return
+				}
+
+				log.WithError(err)
+				return
+			}
+			path = filepath.Join(root, ".soar", "config.yml")
+		} else {
+			root, _ := os.Getwd()
+			path = filepath.Join(root, ".soar.yml")
+		}
+
+		cfg, err := config.GetStatic(global)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		file, err := os.Create(path)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+		defer file.Close()
+
+		buf, _ := yaml.Marshal(cfg)
+		file.Write(buf)
 	},
 }
 
@@ -69,6 +138,7 @@ func init() {
 	initConfigCmd.Flags().Bool("no-color", false, "disable ansi color codes")
 
 	configCmd.AddCommand(initConfigCmd)
+	configCmd.AddCommand(copyConfigCmd)
 	configCmd.Flags().BoolP("global", "g", false, "use the global config")
 	configCmd.Flags().Bool("no-color", false, "disable ansi color codes")
 	configCmd.Flags().BoolP("validate", "v", false, "validate the config")
