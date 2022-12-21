@@ -97,12 +97,12 @@ func parseNodeQuery(cmd *cobra.Command) (bool, string, error) {
 }
 
 var getNodeConfigCmd = &cobra.Command{
-	Use:   "nodes:config node-id",
+	Use:   "nodes:config id",
 	Short: "gets a node config",
 	Long:  "Gets the configuration for a specified node.",
 	Run: func(cmd *cobra.Command, args []string) {
 		log.ApplyFlags(cmd.Flags())
-		if err := util.RequireArgs(args, []string{"node-id"}); err != nil {
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
 			log.WithError(err)
 			return
 		}
@@ -140,5 +140,36 @@ var getNodeConfigCmd = &cobra.Command{
 		}
 
 		log.LineB(buf)
+	},
+}
+
+var getNodeAllocationsCmd = &cobra.Command{
+	Use:   "nodes:alloc:get id",
+	Short: "gets node allocations",
+	Long:  "Gets the allocations for a specified node.",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"id"}); err != nil {
+			log.WithError(err)
+			return
+		}
+
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
+		if err != nil {
+			config.HandleError(err, log)
+			return
+		}
+		cfg.ApplyFlags(cmd.Flags())
+
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("GET", "/api/application/nodes/"+args[0]+"/allocations", nil)
+		res, err := ctx.Execute(req)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		log.LineB(res)
 	},
 }
