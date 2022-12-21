@@ -2,9 +2,12 @@ package app
 
 var getUsersHelp = "Gets a list of user accounts from the panel (supports the --id flag)."
 
-var createUserHelp = "Creates a user account on the panel using the information provided " +
-	"from a source\nfile specified by the --src flag. The file should be in the JSON format " +
-	"with the\nusername, first_name, last_name, and email fields specified (and optional)."
+var createUserHelp = "Creates a user account on the panel using the data provided from one of the following options:\n" +
+	"'--data source' - takes a set of key-value pairs for arguments (e.g. \"username=example email=test@example.com\")\n" +
+	"'--data-file file' - takes a file path to a JSON file with the data fields\n" +
+	"'--data-json source' - takes a raw JSON data input\n\n" +
+	"The username, email, first_name, last_name and root_admin fields are required.\n" +
+	"The external_id and password fields are optional and are omitted by default."
 
 var getServersHelp = "Gets a list of servers from the panel (supports the --id flag)."
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/pteropackages/soar/config"
 	"github.com/pteropackages/soar/http"
+	"github.com/pteropackages/soar/input"
 	"github.com/pteropackages/soar/util"
 	"github.com/spf13/cobra"
 )
@@ -104,7 +105,7 @@ func parseUserQuery(cmd *cobra.Command) (bool, string, error) {
 }
 
 var createUserCmd = &cobra.Command{
-	Use:   "users:create --src path",
+	Use:   "users:create --data[-file | -json] source",
 	Short: "creates a user",
 	Long:  createUserHelp,
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -118,35 +119,43 @@ var createUserCmd = &cobra.Command{
 		}
 		cfg.ApplyFlags(cmd.Flags())
 
-		src, _ := cmd.Flags().GetString("src")
-		if src == "" {
-			log.Error("a source file must be provided")
+		var payload []byte
+		data, _ := cmd.Flags().GetString("data")
+		file, _ := cmd.Flags().GetString("file")
+		js, _ := cmd.Flags().GetString("json")
+
+		switch {
+		case data != "":
+			payload, err = parseInputSource(data)
+			if err != nil {
+				log.WithError(err).Error("failed to parse data input")
+				return
+			}
+		case file != "":
+			v, err := util.SafeReadFile(file)
+			if err != nil {
+				log.WithError(err)
+				return
+			}
+
+			payload, err = parseJSONSource(v)
+			if err != nil {
+				log.WithError(err).Error("failed to parse json input")
+				return
+			}
+		case js != "":
+			payload, err = parseJSONSource([]byte(js))
+			if err != nil {
+				log.WithError(err).Error("failed to parse json input")
+				return
+			}
+		default:
+			log.Error("no data source provided").Error("'--data', '--data-file' or '--data-json' must be specified")
 			return
 		}
 
-		input, err := util.SafeReadFile(src)
-		if err != nil {
-			log.WithError(err)
-			return
-		}
-
-		var schema struct {
-			Username   string `json:"username"`
-			Email      string `json:"email"`
-			FirstName  string `json:"first_name"`
-			LastName   string `json:"last_name"`
-			Password   string `json:"password,omitempty"`
-			RootAdmin  bool   `json:"root_admin,omitempty"`
-			ExternalID string `json:"external_id,omitempty"`
-		}
-		if err = json.Unmarshal(input, &schema); err != nil {
-			log.Error("failed to parse json:").WithError(err)
-			return
-		}
-
-		data, _ := json.Marshal(schema)
 		body := bytes.Buffer{}
-		body.Write(data)
+		body.Write(payload)
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("POST", "/api/application/users", &body)
@@ -164,6 +173,44 @@ var createUserCmd = &cobra.Command{
 
 		log.LineB(buf)
 	},
+}
+
+func parseInputSource(in string) ([]byte, error) {
+	m, err := input.Parse(in)
+	if err != nil {
+		return nil, err
+	}
+
+	d := input.Definition{
+		"username":    input.StringNode,
+		"email":       input.StringNode,
+		"external_id": input.NullStringNode,
+		"first_name":  input.StringNode,
+		"last_name":   input.StringNode,
+		"root_admin":  input.BoolNode,
+		"password":    input.NullStringNode,
+	}
+
+	return input.Marshal(d, m)
+}
+
+func parseJSONSource(d []byte) ([]byte, error) {
+	var schema struct {
+		Username   string `json:"username"`
+		Email      string `json:"email"`
+		ExternalID string `json:"external_id,omitempty"`
+		FirstName  string `json:"first_name"`
+		LastName   string `json:"last_name"`
+		RootAdmin  bool   `json:"root_admin,omitempty"`
+		Password   string `json:"password,omitempty"`
+	}
+
+	if err := json.Unmarshal(d, &schema); err != nil {
+		return nil, err
+	}
+
+	v, _ := json.Marshal(schema)
+	return v, nil
 }
 
 var deleteUserCmd = &cobra.Command{
