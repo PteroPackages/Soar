@@ -2,7 +2,6 @@ package input
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 )
@@ -24,7 +23,6 @@ func Parse(input string) (map[string]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(k)
 
 		if err := readSpace(r); err != nil {
 			if errors.Is(err, io.EOF) {
@@ -38,7 +36,6 @@ func Parse(input string) (map[string]string, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(v)
 
 		m[k] = v
 	}
