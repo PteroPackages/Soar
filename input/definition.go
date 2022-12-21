@@ -2,7 +2,6 @@ package input
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -26,7 +25,12 @@ func Marshal(def Definition, input map[string]string) ([]byte, error) {
 	for k, n := range def {
 		v, ok := input[k]
 		if !ok {
-			return nil, errors.New("missing key in input for definition")
+			if n == NullStringNode {
+				p[k] = nil
+				continue
+			}
+
+			return nil, fmt.Errorf("missing key '%s' in input for definition", k)
 		}
 
 		switch n {
