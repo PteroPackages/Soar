@@ -252,18 +252,35 @@ var createAllocationsCmd = &cobra.Command{
 
 		ctx := http.New(cfg, &cfg.Application, log)
 		req := ctx.Request("POST", fmt.Sprintf("/api/application/nodes/%s/allocations", args[0]), &body)
-		res, err := ctx.Execute(req)
-		if err != nil {
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
+	},
+}
+
+var deleteAllocationCmd = &cobra.Command{
+	Use:   "nodes:alloc:delete node id",
+	Short: "deletes an allocation",
+	Long:  "Deletes an allocation from a specified node.",
+	Run: func(cmd *cobra.Command, args []string) {
+		log.ApplyFlags(cmd.Flags())
+		if err := util.RequireArgs(args, []string{"node", "id"}); err != nil {
 			log.WithError(err)
 			return
 		}
 
-		buf, err := http.HandleItemResponse(res, cfg)
+		global, _ := cmd.Flags().GetBool("global")
+		cfg, err := config.Get(global)
 		if err != nil {
-			log.WithError(err)
+			config.HandleError(err, log)
 			return
 		}
+		cfg.ApplyFlags(cmd.Flags())
 
-		log.LineB(buf)
+		ctx := http.New(cfg, &cfg.Application, log)
+		req := ctx.Request("DELETE", fmt.Sprintf("/api/application/nodes/%s/allocations/%s", args[0], args[1]), nil)
+		if _, err = ctx.Execute(req); err != nil {
+			log.WithError(err)
+		}
 	},
 }
