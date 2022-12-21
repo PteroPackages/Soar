@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -98,4 +99,12 @@ func RequireArgsOverflow(input, required []string, overflow int) error {
 	}
 
 	return nil
+}
+
+func ValidateSchema(in []byte, schema interface{}) ([]byte, error) {
+	if err := json.Unmarshal(in, &schema); err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(schema)
 }

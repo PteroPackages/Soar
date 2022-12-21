@@ -2,7 +2,6 @@ package app
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -126,7 +125,21 @@ var createUserCmd = &cobra.Command{
 
 		switch {
 		case data != "":
-			payload, err = parseInputSource(data)
+			m, err := input.Parse(data)
+			if err != nil {
+				log.WithError(err).Error("failed to parse data input")
+				return
+			}
+
+			payload, err = input.Marshal(input.Definition{
+				"username":    input.StringNode,
+				"email":       input.StringNode,
+				"external_id": input.NullStringNode,
+				"first_name":  input.StringNode,
+				"last_name":   input.StringNode,
+				"root_admin":  input.BoolNode,
+				"password":    input.NullStringNode,
+			}, m)
 			if err != nil {
 				log.WithError(err).Error("failed to parse data input")
 				return
@@ -138,13 +151,29 @@ var createUserCmd = &cobra.Command{
 				return
 			}
 
-			payload, err = parseJSONSource(v)
+			payload, err = util.ValidateSchema(v, struct {
+				Username   string `json:"username"`
+				Email      string `json:"email"`
+				ExternalID string `json:"external_id,omitempty"`
+				FirstName  string `json:"first_name"`
+				LastName   string `json:"last_name"`
+				RootAdmin  bool   `json:"root_admin,omitempty"`
+				Password   string `json:"password,omitempty"`
+			}{})
 			if err != nil {
 				log.WithError(err).Error("failed to parse json input")
 				return
 			}
 		case js != "":
-			payload, err = parseJSONSource([]byte(js))
+			payload, err = util.ValidateSchema([]byte(js), struct {
+				Username   string `json:"username"`
+				Email      string `json:"email"`
+				ExternalID string `json:"external_id,omitempty"`
+				FirstName  string `json:"first_name"`
+				LastName   string `json:"last_name"`
+				RootAdmin  bool   `json:"root_admin,omitempty"`
+				Password   string `json:"password,omitempty"`
+			}{})
 			if err != nil {
 				log.WithError(err).Error("failed to parse json input")
 				return
@@ -173,44 +202,6 @@ var createUserCmd = &cobra.Command{
 
 		log.LineB(buf)
 	},
-}
-
-func parseInputSource(in string) ([]byte, error) {
-	m, err := input.Parse(in)
-	if err != nil {
-		return nil, err
-	}
-
-	d := input.Definition{
-		"username":    input.StringNode,
-		"email":       input.StringNode,
-		"external_id": input.NullStringNode,
-		"first_name":  input.StringNode,
-		"last_name":   input.StringNode,
-		"root_admin":  input.BoolNode,
-		"password":    input.NullStringNode,
-	}
-
-	return input.Marshal(d, m)
-}
-
-func parseJSONSource(d []byte) ([]byte, error) {
-	var schema struct {
-		Username   string `json:"username"`
-		Email      string `json:"email"`
-		ExternalID string `json:"external_id,omitempty"`
-		FirstName  string `json:"first_name"`
-		LastName   string `json:"last_name"`
-		RootAdmin  bool   `json:"root_admin,omitempty"`
-		Password   string `json:"password,omitempty"`
-	}
-
-	if err := json.Unmarshal(d, &schema); err != nil {
-		return nil, err
-	}
-
-	v, _ := json.Marshal(schema)
-	return v, nil
 }
 
 var deleteUserCmd = &cobra.Command{
