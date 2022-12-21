@@ -5,12 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Node uint8
 
 const (
 	StringNode Node = iota
+	ArrayStringNode
+	NullStringNode
 	NumberNode
 	BoolNode
 )
@@ -29,6 +32,14 @@ func Marshal(def Definition, input map[string]string) ([]byte, error) {
 		switch n {
 		case StringNode:
 			p[k] = v
+		case ArrayStringNode:
+			p[k] = strings.Split(v, ",")
+		case NullStringNode:
+			if v == "null" {
+				p[k] = nil
+			} else {
+				p[k] = v
+			}
 		case NumberNode:
 			r, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
