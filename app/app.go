@@ -29,6 +29,8 @@ func GroupCommands() *cobra.Command {
 	util.ApplyDefaultFlags(createAllocationsCmd)
 	util.ApplyDefaultFlags(deleteAllocationCmd)
 	util.ApplyDefaultFlags(getLocationsCmd)
+	util.ApplyDefaultFlags(createLocationCmd)
+	util.ApplyDefaultFlags(deleteLocationCmd)
 	util.ApplyDefaultFlags(getNestsCmd)
 	util.ApplyDefaultFlags(getNestEggsCmd)
 
@@ -63,6 +65,9 @@ func GroupCommands() *cobra.Command {
 	createAllocationsCmd.Flags().String("data-file", "", "a file path to the json data")
 	createAllocationsCmd.Flags().String("data-json", "", "the json data for the request")
 	getLocationsCmd.Flags().Int("id", 0, "the id of the location")
+	createLocationCmd.Flags().String("data", "", "a set of key-value pairs for the request")
+	createLocationCmd.Flags().String("data-file", "", "a file path to the json data")
+	createLocationCmd.Flags().String("data-json", "", "the json data for the request")
 	getNestsCmd.Flags().Int("id", 0, "the id of the nest")
 	getNestEggsCmd.Flags().Int("id", 0, "the id of the egg")
 
@@ -80,6 +85,8 @@ func GroupCommands() *cobra.Command {
 	cmd.AddCommand(createAllocationsCmd)
 	cmd.AddCommand(deleteAllocationCmd)
 	cmd.AddCommand(getLocationsCmd)
+	cmd.AddCommand(createLocationCmd)
+	cmd.AddCommand(deleteLocationCmd)
 	cmd.AddCommand(getNestsCmd)
 	cmd.AddCommand(getNestEggsCmd)
 
