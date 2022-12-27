@@ -26,6 +26,12 @@ func ApplyDefaultFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("no-parse-indent", "I", false, "don't indent the response body")
 }
 
+func ApplyDataFlags(cmd *cobra.Command) {
+	cmd.Flags().String("data", "", "a set of key-value pairs for the request")
+	cmd.Flags().String("data-file", "", "a file path to the json data")
+	cmd.Flags().String("data-json", "", "the json data for the request")
+}
+
 func ApplyFilterFlags(cmd *cobra.Command) {
 	cmd.Flags().Int("page", 0, "the page to request from")
 	cmd.Flags().Int("per-page", 0, "the number of results to return")
