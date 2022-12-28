@@ -10,7 +10,6 @@
 /test
 *.test
 *.sh
-*.cmd
 
 # Other files/directories
 .soar.yml
