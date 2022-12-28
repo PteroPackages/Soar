@@ -1,3 +1,5 @@
 package cmd
 
-var Version = "0.2.0"
+var Build = "unknown"
+
+var Version = "dev"

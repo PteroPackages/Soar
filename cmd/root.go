@@ -23,6 +23,15 @@ var rootCmd = &cobra.Command{
 	Version: Version,
 }
 
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "sends the soar version information",
+	Long:  "Sends the Soar version information.",
+	Run: func(cmd *cobra.Command, _ []string) {
+		log.Line("Soar version %s (build: %s)", Version, Build)
+	},
+}
+
 var initConfigCmd = &cobra.Command{
 	Use: "init [--dir path] [-f | --force]",
 	Run: func(cmd *cobra.Command, _ []string) {
@@ -143,6 +152,7 @@ func init() {
 	configCmd.Flags().Bool("no-color", false, "disable ansi color codes")
 	configCmd.Flags().BoolP("validate", "v", false, "validate the config")
 
+	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(app.GroupCommands())
 	rootCmd.AddCommand(client.GroupCommands())
