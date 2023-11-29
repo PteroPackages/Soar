@@ -13,3 +13,14 @@
 
 # Other files/directories
 .soar.yml
+
+/.shards/
+/.vscode/
+/bin/
+/docs/
+/lib/
+/test/
+
+*.sh
+*.cmd
+*.exe
