@@ -19,5 +19,9 @@ module Soar::Commands
         true
       end
     end
+
+    def on_error(ex)
+      pp! ex
+    end
   end
 end
