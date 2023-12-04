@@ -8,7 +8,7 @@ module Soar::Commands
       add_option 'h', "help"
     end
 
-    def pre_run(arguments : Cling::Arguments, optionns : Cling::Options) : Bool
+    def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
       Colorize.enabled = false if options.has? "no-color"
 
       if options.has? "help"
