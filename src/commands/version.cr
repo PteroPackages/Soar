@@ -5,9 +5,9 @@ module Soar::Commands
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-      stdout << "soar version " << Soar::VERSION << '\n'
-      # stdout << " [" << Soar::BUILD_HASH << "] ("
-      # stdout << Soar::BUILD_DATE << ")\n"
+      stdout << "soar version " << Soar::VERSION
+      stdout << " [" << Soar::BUILD_HASH << "] ("
+      stdout << Soar::BUILD_DATE << ")\n"
     end
   end
 end

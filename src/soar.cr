@@ -6,7 +6,13 @@ require "./commands/*"
 require "./config"
 
 module Soar
-  VERSION = "0.2.0"
+  VERSION    = "0.2.0"
+  BUILD_DATE = {% if flag?(:win32) %}
+                 {{ `powershell.exe -NoProfile Get-Date -Format "yyyy-MM-dd"`.stringify.chomp }}
+               {% else %}
+                 {{ `date +%F`.stringify.chomp }}
+               {% end %}
+  BUILD_HASH = {{ env("BUILD_HASH") || `git rev-parse HEAD`.stringify[0...8] }}
 
   class CLI < Commands::Base
     def setup : Nil
