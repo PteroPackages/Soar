@@ -18,6 +18,7 @@ module Soar
     def setup : Nil
       @name = "soar"
 
+      add_command Commands::Config.new
       add_command Commands::Version.new
     end
 
