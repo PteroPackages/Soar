@@ -52,7 +52,15 @@ module Soar
     getter logs : LogConfig
 
     def self.load : self
-      load(Path[Dir.current, ".soar.yml"]) || load(PATH) || Config.new
+      load_local || load_global || Config.new
+    end
+
+    def self.load_local : self?
+      load Path[Dir.current, ".soar.yml"]
+    end
+
+    def self.load_global : self?
+      load PATH
     end
 
     def self.load(path : String | Path) : self?
