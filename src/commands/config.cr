@@ -4,11 +4,25 @@ module Soar::Commands
       @name = "config"
 
       add_command Init.new
+      add_option 'g', "global"
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
       config = Soar::Config.load
       puts config.to_yaml[4..]
+
+      global = options.has? "global"
+      if global
+        config = Soar::Config.load_global
+      else
+        config = Soar::Config.load_local
+      end
+
+      if config.nil?
+        stderr.puts "failed to load #{global ? "global" : "local"} config"
+      else
+        stdout.puts config.to_yaml[4..]
+      end
     end
 
     private class Init < Base
