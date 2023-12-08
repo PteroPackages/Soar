@@ -4,6 +4,7 @@ module Soar::Commands
       @name = "config"
 
       add_command Init.new
+      add_command Copy.new
       add_option 'g', "global"
     end
 
@@ -60,6 +61,46 @@ module Soar::Commands
           stderr.puts "failed to initialize config:"
           stderr.puts ex
         end
+      end
+    end
+
+    private class Copy < Base
+      def setup : Nil
+        @name = "copy"
+
+        add_argument "from", required: true
+        add_argument "to", required: true
+        add_option 'f', "force"
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        from = arguments.get("from").as_s
+        to = arguments.get("to").as_s
+        return if from == to
+
+        case
+        when from == "global"
+          from = Soar::Config::PATH
+          to = Path[to, ".soar.yml"] unless to.ends_with? ".soar.yml"
+        when to == "global"
+          to = Soar::Config::PATH
+          from = Path[from, ".soar.yml"] unless from.ends_with? ".soar.yml"
+        else
+          from = Path[from, ".soar.yml"] unless from.ends_with? ".soar.yml"
+          to = Path[to, ".soar.yml"] unless to.ends_with? ".soar.yml"
+        end
+
+        unless File.file? from
+          stderr.puts "source config not found"
+          return
+        end
+
+        if File.file?(to) && !options.has?("force")
+          stderr.puts "destination config already exists"
+          return
+        end
+
+        File.copy from, to
       end
     end
   end
