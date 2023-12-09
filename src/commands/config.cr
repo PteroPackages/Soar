@@ -68,39 +68,39 @@ module Soar::Commands
       def setup : Nil
         @name = "copy"
 
-        add_argument "from", required: true
-        add_argument "to", required: true
+        add_argument "src", required: true
+        add_argument "dest", required: true
         add_option 'f', "force"
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        from = arguments.get("from").as_s
-        to = arguments.get("to").as_s
-        return if from == to
+        src = arguments.get("src").as_s
+        dest = arguments.get("dest").as_s
+        return if src == dest
 
         case
-        when from == "global"
-          from = Soar::Config::PATH
-          to = Path[to, ".soar.yml"] unless to.ends_with? ".soar.yml"
-        when to == "global"
-          to = Soar::Config::PATH
-          from = Path[from, ".soar.yml"] unless from.ends_with? ".soar.yml"
+        when src == "global"
+          src = Soar::Config::PATH
+          dest = Path[dest, ".soar.yml"] unless dest.ends_with? ".soar.yml"
+        when dest == "global"
+          dest = Soar::Config::PATH
+          src = Path[src, ".soar.yml"] unless src.ends_with? ".soar.yml"
         else
-          from = Path[from, ".soar.yml"] unless from.ends_with? ".soar.yml"
-          to = Path[to, ".soar.yml"] unless to.ends_with? ".soar.yml"
+          src = Path[src, ".soar.yml"] unless src.ends_with? ".soar.yml"
+          dest = Path[dest, ".soar.yml"] unless dest.ends_with? ".soar.yml"
         end
 
-        unless File.file? from
+        unless File.file? src
           stderr.puts "source config not found"
           return
         end
 
-        if File.file?(to) && !options.has?("force")
+        if File.file?(dest) && !options.has?("force")
           stderr.puts "destination config already exists"
           return
         end
 
-        File.copy from, to
+        File.copy src, dest
       end
     end
   end
