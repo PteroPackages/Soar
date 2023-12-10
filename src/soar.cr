@@ -1,4 +1,5 @@
 require "cling"
+require "colorize"
 require "crest"
 require "yaml"
 

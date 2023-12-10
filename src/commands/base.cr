@@ -23,5 +23,18 @@ module Soar::Commands
     def on_error(ex)
       pp! ex
     end
+
+    protected def warn(message : String) : Nil
+      stdout << "warn".colorize.yellow << ": " << message << '\n'
+    end
+
+    protected def error(message : String) : Nil
+      stderr << "error".colorize.red << ": " << message << '\n'
+    end
+
+    # TODO: show backtrace if debug mode
+    protected def error(ex : Exception) : Nil
+      error ex.to_s
+    end
   end
 end
