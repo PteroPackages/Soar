@@ -9,18 +9,15 @@ module Soar::Commands
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-      config = Soar::Config.load
-      puts config.to_yaml[4..]
-
       global = options.has? "global"
       if global
         config = Soar::Config.load_global
       else
-        config = Soar::Config.load_local
+        config = Soar::Config.load
       end
 
       if config.nil?
-        stderr.puts "failed to load #{global ? "global" : "local"} config"
+        error "failed to load #{global ? "global" : "local"} config"
       else
         stdout.puts config.to_yaml[4..]
       end
@@ -39,7 +36,7 @@ module Soar::Commands
 
         if dir = arguments.get?("dir").try &.as_s
           unless Dir.exists? dir
-            stderr.puts "directory does not exist"
+            error "directory does not exist"
             return
           end
 
@@ -50,16 +47,16 @@ module Soar::Commands
         end
 
         if File.file?(path) && !options.has?("force")
-          stderr.puts "a config file already exists at this location"
-          stderr.puts "re-run with the '--force' flag to overwrite"
+          error "a config file already exists at this location"
+          error "re-run with the '--force' flag to overwrite"
           return
         end
 
         begin
           File.write path, Soar::Config.new.to_yaml[4..]
         rescue ex
-          stderr.puts "failed to initialize config:"
-          stderr.puts ex
+          error "failed to initialize config:"
+          error ex
         end
       end
     end
@@ -91,12 +88,12 @@ module Soar::Commands
         end
 
         unless File.file? src
-          stderr.puts "source config not found"
+          error "source config not found"
           return
         end
 
         if File.file?(dest) && !options.has?("force")
-          stderr.puts "destination config already exists"
+          error "destination config already exists"
           return
         end
 
