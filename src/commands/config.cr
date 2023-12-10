@@ -5,16 +5,31 @@ module Soar::Commands
 
       add_command Init.new
       add_command Copy.new
+
       add_option 'g', "global"
+      add_option 'l', "local"
+    end
+
+    def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+      if options.has?("global") && options.has?("local")
+        error "cannot specify global and local option; pick one"
+        return false
+      end
+
+      true
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
       global = options.has? "global"
-      if global
-        config = Soar::Config.load_global
-      else
-        config = Soar::Config.load
-      end
+      local = options.has? "local"
+
+      config = if global
+                 Soar::Config.load_global
+               elsif local
+                 Soar::Config.load_local
+               else
+                 Soar::Config.load
+               end
 
       if config.nil?
         error "failed to load #{global ? "global" : "local"} config"
