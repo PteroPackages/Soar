@@ -4,6 +4,7 @@ require "crest"
 require "yaml"
 
 require "./commands/*"
+require "./commands/app/main"
 require "./config"
 
 module Soar
@@ -19,6 +20,7 @@ module Soar
     def setup : Nil
       @name = "soar"
 
+      add_command Commands::App::Main.new
       add_command Commands::Config.new
       add_command Commands::Version.new
     end
