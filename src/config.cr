@@ -46,8 +46,8 @@ module Soar
 
     @[YAML::Field(ignore: true)]
     property? resolved : Bool = false
-    property application : Auth?
-    property client : Auth?
+    property! application : Auth
+    property! client : Auth
     getter http : HTTPConfig
     getter logs : LogConfig
 
