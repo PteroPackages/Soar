@@ -11,8 +11,8 @@ module Soar::Commands::App
         config.application.url,
         headers: {
           "Authorization" => "Bearer #{config.application.key}",
-          "Content-Type"  => "application/json",
-          "Accept"        => "application/json",
+          "Content-Type"  => "application/vnd.pterodactyl.v1+json",
+          "Accept"        => "application/vnd.pterodactyl.v1+json",
         })
 
       Colorize.enabled = false unless config.logs.use_color?
