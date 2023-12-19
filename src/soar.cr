@@ -1,11 +1,13 @@
 require "cling"
 require "colorize"
 require "crest"
+require "json"
 require "yaml"
 
 require "./commands/*"
 require "./commands/app/main"
 require "./config"
+require "./models"
 
 module Soar
   VERSION    = "0.2.0"
