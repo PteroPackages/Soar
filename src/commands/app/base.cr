@@ -34,5 +34,9 @@ module Soar::Commands::App
       res = client.post path, data
       Models::FractalItem(T).from_json(res.body).attributes
     end
+
+    protected def request(*, delete path : String) : Nil
+      client.delete path
+    end
   end
 end
