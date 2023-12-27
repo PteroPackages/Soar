@@ -132,7 +132,7 @@ module Soar::Commands::App
       def setup : Nil
         @name = "get"
 
-        add_argument "id"
+        add_argument "id", required: true
         add_option 'e', "external"
         add_option "json"
       end
