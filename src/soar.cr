@@ -8,6 +8,7 @@ require "./commands/*"
 require "./commands/app/main"
 require "./config"
 require "./models"
+require "./resolver"
 
 module Soar
   VERSION    = "0.2.0"
