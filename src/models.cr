@@ -4,6 +4,18 @@ module Soar::Models
 
     getter object : String
     getter data : Array(FractalItem(T))
+    @[JSON::Field(key: "meta", root: "pagination")]
+    getter meta : FractalMeta
+  end
+
+  class FractalMeta
+    include JSON::Serializable
+
+    getter count : Int32
+    getter total : Int32
+    getter current_page : Int32
+    getter per_page : Int32
+    getter total_pages : Int32
   end
 
   class FractalItem(T)
