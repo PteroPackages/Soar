@@ -19,6 +19,7 @@ module Soar::Commands::App
         add_option "username", type: :single
         add_option "email", type: :single
         add_option "uuid", type: :single
+        add_option "json"
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -50,7 +51,26 @@ module Soar::Commands::App
         end
 
         users, meta = request get: path, as: Array(Models::User)
-        return if users.empty?
+        if users.empty?
+          unless options.has? "json"
+            stdout << "Showing 0 results from page "
+            stdout << meta.current_page << " of " << meta.total_pages << '\n'
+            stdout << "\n┃ ".colorize.light_gray << "total: ".colorize.dark_gray << meta.total
+            stdout << "\n┃ ".colorize.light_gray
+
+            if @filters.empty?
+              stdout << "no filters applied"
+            else
+              stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
+            end
+            return
+          end
+        end
+
+        if options.has? "json"
+          users.to_json stdout
+          return
+        end
 
         width = 2 + (Math.log(users.last.id.to_f + 1) / Math.log(10)).ceil.to_i
 
