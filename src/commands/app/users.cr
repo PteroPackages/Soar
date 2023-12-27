@@ -16,7 +16,7 @@ module Soar::Commands::App
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        users = request get: "/api/application/users", as: Array(Models::User)
+        users, meta = request get: "/api/application/users", as: Array(Models::User)
         return if users.empty?
 
         width = 2 + (Math.log(users.last.id.to_f + 1) / Math.log(10)).ceil.to_i
@@ -60,6 +60,11 @@ module Soar::Commands::App
 
           stdout << "\n\n"
         end
+
+        stdout << "Showing " << meta.count << " results from page "
+        stdout << meta.current_page << " of " << meta.total_pages << '\n'
+        stdout << "\n┃ ".colorize.light_gray << "total: ".colorize.dark_gray << meta.total
+        stdout << "\n┃ ".colorize.light_gray << "no filters or sorts applied".colorize.dark_gray
       end
     end
   end

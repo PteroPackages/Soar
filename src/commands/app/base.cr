@@ -18,9 +18,11 @@ module Soar::Commands::App
       Colorize.enabled = false unless config.logs.use_color?
     end
 
-    protected def request(*, get path : String, as type : Array(T).class) : Array(T) forall T
+    protected def request(*, get path : String, as type : Array(T).class) : {Array(T), Models::FractalMeta} forall T
       res = client.get path
-      Models::FractalList(T).from_json(res.body).data.map &.attributes
+      data = Models::FractalList(T).from_json(res.body)
+
+      {data.data.map(&.attributes), data.meta}
     end
 
     protected def request(*, get path : String, as type : T.class) : T forall T
