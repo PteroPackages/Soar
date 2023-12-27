@@ -6,6 +6,7 @@ module Soar::Commands::App
       add_command List.new
       add_command Get.new
       add_command Create.new
+      add_command Delete.new
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -270,6 +271,19 @@ module Soar::Commands::App
         else
           stdout << "N/A".colorize.dark_gray
         end
+      end
+    end
+
+    private class Delete < Base
+      def setup : Nil
+        @name = "delete"
+
+        add_argument "id", required: true
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        id = arguments.get("id").as_s # TODO: parse to integer once Cling upstream is fixed
+        request delete: "/api/application/users/#{id}"
       end
     end
   end
