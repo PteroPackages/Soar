@@ -11,12 +11,45 @@ module Soar::Commands::App
     end
 
     private class List < Base
+      @filters = [] of String
+
       def setup : Nil
         @name = "list"
+
+        add_option "username", type: :single
+        add_option "email", type: :single
+        add_option "uuid", type: :single
+      end
+
+      def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        super
+
+        @filters << "username" if options.has? "username"
+        @filters << "email" if options.has? "email"
+        @filters << "uuid" if options.has? "uuid"
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        users, meta = request get: "/api/application/users", as: Array(Models::User)
+        path = "/api/application/users"
+
+        unless @filters.empty?
+          path += "?"
+          path += URI::Params.build do |params|
+            if options.has? "username"
+              params.add "filter[username]", options.get("username").as_s
+            end
+
+            if options.has? "email"
+              params.add "filter[email]", options.get("email").as_s
+            end
+
+            if options.has? "uuid"
+              params.add "filter[uuid]", options.get("uuid").as_s
+            end
+          end
+        end
+
+        users, meta = request get: path, as: Array(Models::User)
         return if users.empty?
 
         width = 2 + (Math.log(users.last.id.to_f + 1) / Math.log(10)).ceil.to_i
@@ -64,7 +97,13 @@ module Soar::Commands::App
         stdout << "Showing " << meta.count << " results from page "
         stdout << meta.current_page << " of " << meta.total_pages << '\n'
         stdout << "\n┃ ".colorize.light_gray << "total: ".colorize.dark_gray << meta.total
-        stdout << "\n┃ ".colorize.light_gray << "no filters or sorts applied".colorize.dark_gray
+        stdout << "\n┃ ".colorize.light_gray
+
+        if @filters.empty?
+          stdout << "no filters applied"
+        else
+          stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
+        end
       end
     end
   end
