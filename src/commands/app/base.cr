@@ -29,5 +29,10 @@ module Soar::Commands::App
       res = client.get path
       Models::FractalItem(T).from_json(res.body).attributes
     end
+
+    protected def request(*, post path : String, data : _, as type : T.class) : T forall T
+      res = client.post path, data
+      Models::FractalItem(T).from_json(res.body).attributes
+    end
   end
 end
