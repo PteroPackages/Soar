@@ -27,7 +27,7 @@ module Soar::Models
     property? root_admin : Bool
     @[JSON::Field(key: "2fa")]
     property? two_factor : Bool
-    getter created_at : String
-    getter updated_at : String?
+    getter created_at : Time
+    getter updated_at : Time?
   end
 end
