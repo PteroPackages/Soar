@@ -1,4 +1,0 @@
-git add src/models.cr
-git commit -m "feat(models): add server model & formatting"
-git add .
-git commit -m "feat(app): implement server/list commands"
