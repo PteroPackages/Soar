@@ -79,4 +79,93 @@ module Soar::Models
       end
     end
   end
+
+  class Server
+    include JSON::Serializable
+
+    getter id : Int32
+    property external_id : String?
+    getter uuid : String
+    getter identifier : String
+    property name : String
+    property description : String?
+    property status : Status = :none
+    # getter limits
+    # getter feature_limits
+    property user : Int32
+    getter node : Int32
+    getter allocation : Int32
+    getter nest : Int32
+    getter egg : Int32
+    # getter container
+    getter created_at : Time
+    getter updated_at : Time?
+
+    enum Status
+      None
+      Installing
+      InstallFailed
+      Suspended
+      RestoringBackup
+    end
+
+    def to_s(io : IO, width : Int32) : Nil
+      base = case status
+             when .none?
+               :light_gray
+             when .installing?, .restoring_backup?
+               :yellow
+             else
+               :red
+             end
+
+      Colorize.with.bold.on(base).surround(io) do |_io|
+        _io << id.to_s.center(width)
+      end
+
+      if external = external_id
+        io << ' '
+        Colorize.with.dark_gray.surround(io) do |_io|
+          _io << '[' << external << ']'
+        end
+      end
+
+      if !Colorize.enabled? && !status.none?
+        io << '(' << status << ')'
+      end
+
+      io << '\n' << identifier << uuid.sub(identifier, "").colorize.dark_gray
+      io << "\n\n┃ ".colorize.light_gray << "name:    ".colorize.bold << name
+
+      io << "\n┃ ".colorize.light_gray << "about:   ".colorize.bold
+      if (desc = description) && desc.presence
+        if desc.size > 60
+          desc = desc[0..60] + "...".colorize.dark_gray.to_s
+        end
+
+        io << desc
+      else
+        io << "N/A".colorize.dark_gray
+      end
+
+      io << "\n┃ ".colorize.light_gray << "status:  ".colorize.bold
+      case status
+      in .none?             then io << "N/A".colorize.dark_gray
+      in .installing?       then io << "installing"
+      in .install_failed?   then io << "install failed"
+      in .suspended?        then io << "suspended"
+      in .restoring_backup? then io << "restoring backup"
+      end
+
+      io << "\n┃ ".colorize.light_gray << "created: ".colorize.bold
+      created_at.to_s(io, "%F %R")
+
+      io << "\n┃ ".colorize.light_gray << "updated: ".colorize.bold
+      if updated = updated_at
+        updated.to_s(io, "%F %R")
+      else
+        io << "N/A".colorize.dark_gray
+      end
+    end
+  end
 end
