@@ -20,6 +20,7 @@ module Soar::Commands::App
         add_option "desc", type: :single
         add_option "uuid", type: :single
         add_option "image", type: :single
+        add_option "json"
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
