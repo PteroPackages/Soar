@@ -38,5 +38,16 @@ module Soar::Commands::App
     protected def request(*, delete path : String) : Nil
       client.delete path
     end
+
+    private macro def_filter_params(**options)
+      path += "?"
+      path += URI::Params.build do |params|
+        {% for key, name in options %}
+          if options.has? {{ key.stringify }}
+            params.add "filter[{{ name.id }}]", options.get({{ key.stringify }}).as_s
+          end
+        {% end %}
+      end
+    end
   end
 end

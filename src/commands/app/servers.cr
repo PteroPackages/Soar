@@ -27,33 +27,15 @@ module Soar::Commands::App
         super
 
         @filters << "name" if options.has? "name"
-        @filters << "desc" if options.has? "desc"
+        @filters << "description" if options.has? "desc"
         @filters << "uuid" if options.has? "uuid"
         @filters << "image" if options.has? "image"
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
         path = "/api/application/servers"
-
         unless @filters.empty?
-          path += "?"
-          path += URI::Params.build do |params|
-            if options.has? "name"
-              params.add "filter[name]", options.get("name").as_s
-            end
-
-            if options.has? "desc"
-              params.add "filter[description]", options.get("desc").as_s
-            end
-
-            if options.has? "uuid"
-              params.add "filter[uuid]", options.get("uuid").as_s
-            end
-
-            if options.has? "image"
-              params.add "filter[image]", options.get("image").as_s
-            end
-          end
+          def_filter_params name: "name", desc: "description", uuid: "uuid", image: "image"
         end
 
         servers, meta = request get: path, as: Array(Models::Server)

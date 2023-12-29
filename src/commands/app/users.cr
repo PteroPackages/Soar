@@ -35,22 +35,8 @@ module Soar::Commands::App
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
         path = "/api/application/users"
-
         unless @filters.empty?
-          path += "?"
-          path += URI::Params.build do |params|
-            if options.has? "username"
-              params.add "filter[username]", options.get("username").as_s
-            end
-
-            if options.has? "email"
-              params.add "filter[email]", options.get("email").as_s
-            end
-
-            if options.has? "uuid"
-              params.add "filter[uuid]", options.get("uuid").as_s
-            end
-          end
+          def_filter_params username: "username", email: "email", uuid: "uuid"
         end
 
         users, meta = request get: path, as: Array(Models::User)
