@@ -3,19 +3,19 @@ module Soar::Commands::App
     protected getter config : Soar::Config { raise "unreachable" }
     protected getter client : Crest::Resource { raise "unreachable" }
 
-    def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool?
-      super
+    def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+      return false unless super
 
-      @config = Soar::Config.load_with_options options
+      @config = Soar::Config.load_with options
       @client = Crest::Resource.new(
-        config.application.url,
+        config.app.url,
         headers: {
-          "Authorization" => "Bearer #{config.application.key}",
+          "Authorization" => "Bearer #{config.app.key}",
           "Content-Type"  => "application/vnd.pterodactyl.v1+json",
           "Accept"        => "application/vnd.pterodactyl.v1+json",
         })
 
-      Colorize.enabled = false unless config.logs.use_color?
+      true
     end
 
     protected def request(*, get path : String, as type : Array(T).class) : {Array(T), Models::FractalMeta} forall T
