@@ -31,11 +31,25 @@ module Soar::Commands
                  Soar::Config.load
                end
 
-      if config.nil?
-        error "failed to load #{global ? "global" : "local"} config"
-      else
-        stdout.puts config.to_yaml[4..]
-      end
+      return error "failed to load #{global ? "global" : "local"} config" if config.nil?
+
+      {% for field in %i(app client) %}
+        stdout << "{{ field.id }} url: ".colorize.bold
+        if config.{{ field.id }}?
+          stdout << config.{{ field.id }}.url << '\n'
+        else
+          stdout << "not set".colorize.dark_gray << '\n'
+        end
+
+        stdout << "{{ field.id }} key: ".colorize.bold
+        if config.{{ field.id }}?
+          stdout << config.{{ field.id }}.key << '\n'
+        else
+          stdout << "not set".colorize.dark_gray << "\n\n"
+        end
+      {% end %}
+
+      stdout << "ratelimit: ".colorize.bold << config.ratelimit << '\n'
     end
 
     private class Init < Base
