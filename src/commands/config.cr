@@ -33,21 +33,33 @@ module Soar::Commands
 
       return error "failed to load #{global ? "global" : "local"} config" if config.nil?
 
-      {% for field in %i(app client) %}
-        stdout << "{{ field.id }} url: ".colorize.bold
-        if config.{{ field.id }}?
-          stdout << config.{{ field.id }}.url << '\n'
-        else
-          stdout << "not set".colorize.dark_gray << '\n'
-        end
+      stdout << "app url: ".colorize.bold
+      if config.app?
+        stdout << config.app.url << '\n'
+      else
+        stdout << "not set".colorize.dark_gray << '\n'
+      end
 
-        stdout << "{{ field.id }} key: ".colorize.bold
-        if config.{{ field.id }}?
-          stdout << config.{{ field.id }}.key << '\n'
-        else
-          stdout << "not set".colorize.dark_gray << "\n\n"
-        end
-      {% end %}
+      stdout << "app key: ".colorize.bold
+      if config.app?
+        stdout << config.app.key << "\n\n"
+      else
+        stdout << "not set".colorize.dark_gray << "\n\n"
+      end
+
+      stdout << "client url: ".colorize.bold
+      if config.client?
+        stdout << config.client.url << '\n'
+      else
+        stdout << "not set".colorize.dark_gray << '\n'
+      end
+
+      stdout << "client key: ".colorize.bold
+      if config.client?
+        stdout << config.client.key << "\n\n"
+      else
+        stdout << "not set".colorize.dark_gray << "\n\n"
+      end
 
       stdout << "ratelimit: ".colorize.bold << config.ratelimit << '\n'
     end
