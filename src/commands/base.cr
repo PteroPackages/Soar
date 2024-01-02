@@ -20,8 +20,36 @@ module Soar::Commands
       end
     end
 
-    def on_error(ex)
-      pp! ex
+    def on_error(ex : Exception)
+      case ex
+      when Cling::CommandError
+        error ex.to_s
+        error "see 'soar --help' for more information"
+      else
+        error "unexpected exception:"
+        error ex.to_s
+        error "please report this on the Soar GitHub issues page:"
+        error "https://github.com/PteroPackages/Soar/issues"
+      end
+    end
+
+    def on_missing_arguments(args : Array(String))
+      error "missing required argument#{"s" if args.size > 1} for this command:"
+      error args.join ", "
+    end
+
+    def on_unknown_arguments(args : Array(String))
+      error "unexpected argument#{"s" if args.size > 1} for this command:"
+      error args.join ", "
+    end
+
+    def on_invalid_option(message : String)
+      error message
+    end
+
+    def on_unknown_options(options : Array(String))
+      error "unexpected option#{"s" if options.size > 1} for this command:"
+      error options.join ", "
     end
 
     protected def warn(message : String) : Nil
