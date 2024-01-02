@@ -4,6 +4,7 @@ module Soar::Commands
       @name = "config"
 
       add_command Init.new
+      add_command Set.new
       add_command Copy.new
 
       add_option 'g', "global"
@@ -139,6 +140,79 @@ module Soar::Commands
         end
 
         File.copy src, dest
+      end
+    end
+
+    private class Set < Base
+      def setup : Nil
+        @name = "set"
+
+        add_argument "key"
+        add_argument "value"
+        add_option 'i', "input"
+        add_option 'g', "global"
+        add_option 'l', "local"
+      end
+
+      def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+        return false unless super
+
+        unless options.has? "input"
+          args = [] of String
+          args << "key" unless arguments.has? "key"
+          args << "value" unless arguments.has? "value"
+          return true if args.empty?
+
+          on_missing_arguments args
+          return false
+        end
+
+        true
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        if options.has? "input"
+          if stdin.closed?
+            error "cannot read from input file (already closed)"
+            return
+          end
+
+          input = Resolver.parse_json_or_map stdin.gets_to_end.chomp
+        else
+          input = {arguments.get("key").as_s => arguments.get("value").as_s}
+        end
+
+        global = options.has? "global"
+        local = options.has? "local"
+        config = if global
+                   Soar::Config.load_global
+                 elsif local
+                   Soar::Config.load_local
+                 else
+                   Soar::Config.load
+                 end
+
+        return error "failed to load #{global ? "global" : "local"} config" if config.nil?
+
+        input.each do |key, value|
+          case key
+          when "app.url"
+            config.app.url = value
+          when "app.key"
+            config.app.key = value
+          when "client.url"
+            config.client.url = value
+          when "client.key"
+            config.client.key = value
+          when "ratelimit"
+            config.ratelimit = value
+          else
+            warn "invalid config key '#{key}'"
+          end
+        end
+
+        path = global ? Soar::Config::PATH : Path[Dir.current, ".soar.yml"]
+        File.write path, config.to_yaml[4..]
       end
     end
   end
