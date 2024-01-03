@@ -25,12 +25,14 @@ module Soar::Commands::App
         add_option "json"
       end
 
-      def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+      def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
         return false unless super
 
         @filters << "username" if options.has? "username"
         @filters << "email" if options.has? "email"
         @filters << "uuid" if options.has? "uuid"
+
+        true
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
