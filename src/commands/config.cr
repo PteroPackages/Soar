@@ -12,6 +12,8 @@ module Soar::Commands
     end
 
     def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+      return false unless super
+
       if options.has?("global") && options.has?("local")
         error "cannot specify global and local option; pick one"
         return false
@@ -74,8 +76,6 @@ module Soar::Commands
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        path : Path
-
         if dir = arguments.get?("dir").try &.as_s
           unless Dir.exists? dir
             error "directory does not exist"
@@ -84,7 +84,7 @@ module Soar::Commands
 
           path = Path[dir, ".soar.yml"]
         else
-          path = path = Soar::Config::PATH
+          path = Soar::Config::PATH
           Dir.mkdir_p path.dirname
         end
 
@@ -117,11 +117,10 @@ module Soar::Commands
         dest = arguments.get("dest").as_s
         return if src == dest
 
-        case
-        when src == "global"
+        if src == "global"
           src = Soar::Config::PATH
           dest = Path[dest, ".soar.yml"] unless dest.ends_with? ".soar.yml"
-        when dest == "global"
+        elsif dest == "global"
           dest = Soar::Config::PATH
           src = Path[src, ".soar.yml"] unless src.ends_with? ".soar.yml"
         else

@@ -26,7 +26,7 @@ module Soar::Commands::App
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        super
+        return false unless super
 
         @filters << "username" if options.has? "username"
         @filters << "email" if options.has? "email"
@@ -52,6 +52,8 @@ module Soar::Commands::App
             else
               stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
             end
+            stdout.puts
+
             return
           end
         end
@@ -77,6 +79,7 @@ module Soar::Commands::App
         else
           stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
         end
+        stdout.puts
       end
     end
 
@@ -105,6 +108,7 @@ module Soar::Commands::App
 
         width = 2 + (Math.log(user.id.to_f + 1) / Math.log(10)).ceil.to_i
         user.to_s(stdout, width)
+        stdout.puts
       end
     end
 
@@ -117,7 +121,8 @@ module Soar::Commands::App
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
-        super
+        return false unless super
+
         has_data = options.has? "data"
         has_input = options.has? "input"
 
@@ -154,6 +159,7 @@ module Soar::Commands::App
         user = request post: "/api/application/users", data: input, as: Models::User
         width = 2 + (Math.log(user.id.to_f + 1) / Math.log(10)).ceil.to_i
         user.to_s(stdout, width)
+        stdout.puts
       end
     end
 

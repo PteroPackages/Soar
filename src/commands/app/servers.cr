@@ -24,7 +24,7 @@ module Soar::Commands::App
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        super
+        return false unless super
 
         @filters << "name" if options.has? "name"
         @filters << "description" if options.has? "desc"
@@ -51,6 +51,8 @@ module Soar::Commands::App
             else
               stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
             end
+            stdout.puts
+
             return
           end
         end
@@ -76,6 +78,7 @@ module Soar::Commands::App
         else
           stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
         end
+        stdout.puts
       end
     end
   end
