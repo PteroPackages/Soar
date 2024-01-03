@@ -1,4 +1,18 @@
 module Soar::Models
+  class Error
+    include JSON::Serializable
+
+    getter code : String
+    getter status : String
+    getter detail : String
+  end
+
+  class FractalError
+    include JSON::Serializable
+
+    getter errors : Array(Error)
+  end
+
   class FractalList(T)
     include JSON::Serializable
 

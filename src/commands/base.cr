@@ -25,6 +25,25 @@ module Soar::Commands
       when Cling::CommandError
         error ex.to_s
         error "see 'soar --help' for more information"
+      when Crest::RequestFailed
+        case ex.http_code
+        when .in?(400..499)
+          data = Models::FractalError.from_json(ex.response.body).errors
+
+          error "#{data.size} error#{"s" if data.size > 1} received"
+          data.each do |err|
+            stderr << "\n┃ ".colorize.bold << '[' << err.status << "] "
+            stderr << err.code.colorize.bold << '\n'
+            stderr << "┃ ".colorize.bold << err.detail << '\n'
+          end
+        when .in?(500..512)
+          error "unexpected response: #{ex.http_code}"
+          error "data:"
+          stderr.puts ex.response.body
+        else
+          error "unknown http status: #{ex.http_code}"
+          error "request cancelled"
+        end
       else
         error "unexpected exception:"
         error ex.to_s
