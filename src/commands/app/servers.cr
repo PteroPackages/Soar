@@ -5,6 +5,7 @@ module Soar::Commands::App
 
       add_command List.new
       add_command Get.new
+      add_command Create.new
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -108,6 +109,44 @@ module Soar::Commands::App
           return
         end
 
+        width = 2 + (Math.log(server.id.to_f + 1) / Math.log(10)).ceil.to_i
+        server.to_s(stdout, width)
+        stdout.puts
+      end
+    end
+
+    private class Create < Base
+      def setup : Nil
+        @name = "create"
+
+        add_argument "data", required: true
+        add_option 'i', "input"
+      end
+
+      def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+        return false unless super
+
+        unless arguments.has?("data") || options.has?("input")
+          on_missing_arguments %w[data]
+          return false
+        end
+
+        true
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        if options.has? "input"
+          if stdin.closed?
+            error "cannot read from input file (already closed)"
+            system_exit
+          end
+
+          input = stdin.gets_to_end.chomp
+        else
+          input = arguments.get("data").as_s
+        end
+
+        server = request post: "/api/application/servers", data: input, as: Models::Server
         width = 2 + (Math.log(server.id.to_f + 1) / Math.log(10)).ceil.to_i
         server.to_s(stdout, width)
         stdout.puts
