@@ -4,6 +4,7 @@ module Soar::Commands::App
       @name = "servers"
 
       add_command List.new
+      add_command Get.new
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -80,6 +81,35 @@ module Soar::Commands::App
         else
           stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
         end
+        stdout.puts
+      end
+    end
+
+    private class Get < Base
+      def setup : Nil
+        @name = "get"
+
+        add_argument "id", required: true
+        add_option 'e', "external"
+        add_option "json"
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        arg = arguments.get("id").as_s
+
+        if options.has? "external"
+          server = request get: "/api/application/servers/external/#{arg}", as: Models::Server
+        else
+          server = request get: "/api/application/servers/#{arg}", as: Models::Server
+        end
+
+        if options.has? "json"
+          server.to_json stdout
+          return
+        end
+
+        width = 2 + (Math.log(server.id.to_f + 1) / Math.log(10)).ceil.to_i
+        server.to_s(stdout, width)
         stdout.puts
       end
     end
