@@ -5,7 +5,7 @@ module Soar
     PATH = {% if flag?(:win32) %}
              Path[ENV["APPDATA"], "soar", ".soar.yml"]
            {% else %}
-             Path[ENV["XDG_DATA_HOME"] || Path.home / ".local" / "share" / "soar", ".soar.yml"]
+             Path[ENV["XDG_DATA_HOME"]? || Path.home / ".local" / "share" / "soar", ".soar.yml"]
            {% end %}
 
     class Error < Exception
