@@ -22,6 +22,8 @@ module Soar::Commands
 
     def on_error(ex : Exception)
       case ex
+      when SystemExit
+        exit 1
       when Cling::CommandError
         error ex.to_s
         error "see 'soar --help' for more information"
@@ -50,6 +52,8 @@ module Soar::Commands
         error "please report this on the Soar GitHub issues page:"
         error "https://github.com/PteroPackages/Soar/issues"
       end
+
+      exit 1
     end
 
     def on_missing_arguments(args : Array(String))
@@ -82,6 +86,10 @@ module Soar::Commands
     # TODO: show backtrace if debug mode
     protected def error(ex : Exception) : Nil
       error ex.to_s
+    end
+
+    protected def system_exit : NoReturn
+      raise SystemExit.new
     end
   end
 end

@@ -32,4 +32,7 @@ module Soar
       stdout.puts help_template
     end
   end
+
+  class SystemExit < Exception
+  end
 end

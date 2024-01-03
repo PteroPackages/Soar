@@ -143,7 +143,7 @@ module Soar::Commands::App
         if options.has? "input"
           if stdin.closed?
             error "cannot read from input file (already closed)"
-            return
+            system_exit
           end
 
           input = Resolver.parse_json_or_map stdin.gets_to_end.chomp
@@ -154,7 +154,7 @@ module Soar::Commands::App
         {"username", "email", "first_name", "last_name"}.each do |name|
           unless input.has_key? name
             error "Missing required key '#{name}' to create user"
-            return
+            system_exit
           end
         end
 

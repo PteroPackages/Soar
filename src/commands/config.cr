@@ -34,7 +34,10 @@ module Soar::Commands
                  Soar::Config.load
                end
 
-      return error "failed to load #{global ? "global" : "local"} config" if config.nil?
+      if config.nil?
+        error "failed to load #{global ? "global" : "local"} config"
+        system_exit
+      end
 
       stdout << "app url: ".colorize.bold
       if config.app?
@@ -79,7 +82,7 @@ module Soar::Commands
         if dir = arguments.get?("dir").try &.as_s
           unless Dir.exists? dir
             error "directory does not exist"
-            return
+            system_exit
           end
 
           path = Path[dir, ".soar.yml"]
@@ -91,7 +94,7 @@ module Soar::Commands
         if File.file?(path) && !options.has?("force")
           error "a config file already exists at this location"
           error "re-run with the '--force' flag to overwrite"
-          return
+          system_exit
         end
 
         begin
@@ -130,12 +133,12 @@ module Soar::Commands
 
         unless File.file? src
           error "source config not found"
-          return
+          system_exit
         end
 
         if File.file?(dest) && !options.has?("force")
           error "destination config already exists"
-          return
+          system_exit
         end
 
         File.copy src, dest
@@ -173,7 +176,7 @@ module Soar::Commands
         if options.has? "input"
           if stdin.closed?
             error "cannot read from input file (already closed)"
-            return
+            system_exit
           end
 
           input = Resolver.parse_json_or_map stdin.gets_to_end.chomp
@@ -191,7 +194,10 @@ module Soar::Commands
                    Soar::Config.load
                  end
 
-        return error "failed to load #{global ? "global" : "local"} config" if config.nil?
+        if config.nil?
+          error "failed to load #{global ? "global" : "local"} config"
+          system_exit
+        end
 
         input.each do |key, value|
           case key
