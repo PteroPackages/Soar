@@ -1,4 +1,5 @@
 require "./base"
+require "./locations"
 require "./servers"
 require "./users"
 
@@ -7,6 +8,7 @@ module Soar::Commands::App
     def setup : Nil
       @name = "app"
 
+      add_command App::Locations.new
       add_command App::Servers.new
       add_command App::Users.new
     end
