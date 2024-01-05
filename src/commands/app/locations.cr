@@ -4,6 +4,7 @@ module Soar::Commands::App
       @name = "locations"
 
       add_command List.new
+      add_command Get.new
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -76,6 +77,28 @@ module Soar::Commands::App
         else
           stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
         end
+        stdout.puts
+      end
+    end
+
+    private class Get < Base
+      def setup : Nil
+        @name = "get"
+
+        add_argument "id", required: true
+        add_option "json"
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        location = request get: "/api/application/locations/#{arguments.get("id")}", as: Models::Location
+
+        if options.has? "json"
+          location.to_json stdout
+          return
+        end
+
+        width = 2 + (Math.log(location.id.to_f + 1) / Math.log(10)).ceil.to_i
+        location.to_s(stdout, width)
         stdout.puts
       end
     end
