@@ -24,6 +24,8 @@ module Soar::Commands::App
         add_option "uuid", type: :single
         add_option "image", type: :single
         add_option "json"
+        add_option "page", type: :single
+        add_option "per-page", type: :single
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
@@ -38,10 +40,8 @@ module Soar::Commands::App
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        path = "/api/application/servers"
-        unless @filters.empty?
-          def_filter_params name: "name", desc: "description", uuid: "uuid", image: "image"
-        end
+        path = "/api/application/servers?"
+        def_base_and_filter_params name: "name", desc: "description", uuid: "uuid", image: "image"
 
         servers, meta = request get: path, as: Array(Models::Server)
         if servers.empty?

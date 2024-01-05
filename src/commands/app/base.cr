@@ -67,5 +67,23 @@ module Soar::Commands::App
         {% end %}
       end
     end
+
+    private macro def_base_and_filter_params(**options)
+      path += URI::Params.build do |params|
+        if options.has? "page"
+          params.add "page", options.get("page").as_s
+        end
+
+        if options.has? "per-page"
+          params.add "per_page", options.get("per-page").as_s
+        end
+
+        {% for key, name in options %}
+          if options.has? {{ key.stringify }}
+            params.add "filter[{{ name.id }}]", options.get({{ key.stringify }}).as_s
+          end
+        {% end %}
+      end
+    end
   end
 end

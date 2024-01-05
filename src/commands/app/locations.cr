@@ -20,6 +20,8 @@ module Soar::Commands::App
         add_option "short", type: :single
         add_option "long", type: :single
         add_option "json"
+        add_option "page", type: :single
+        add_option "per-page", type: :single
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
@@ -32,10 +34,8 @@ module Soar::Commands::App
       end
 
       def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-        path = "/api/application/locations"
-        unless @filters.empty?
-          def_filter_params short: "short", long: "long"
-        end
+        path = "/api/application/locations?"
+        def_base_and_filter_params short: "short", long: "long"
 
         locations, meta = request get: path, as: Array(Models::Location)
         if locations.empty?
