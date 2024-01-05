@@ -50,6 +50,14 @@ module Soar
     # TODO: will this still be needed?
     def self.load_with(options : Cling::Options) : self
       config = load
+      if value = options.get?("cfg-url")
+        config.app.url = config.client.url = value.as_s
+      end
+
+      if value = options.get?("cfg-key")
+        config.app.key = config.client.key = value.as_s
+      end
+
       if value = options.get?("retry-ratelimit")
         config.ratelimit = value.as_s
       end

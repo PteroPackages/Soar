@@ -3,6 +3,13 @@ module Soar::Commands::App
     protected getter config : Soar::Config { raise "unreachable" }
     protected getter client : Crest::Resource { raise "unreachable" }
 
+    def initialize
+      super
+
+      add_option "cfg-url", type: :single
+      add_option "cfg-key", type: :single
+    end
+
     def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
       return false unless super
 
