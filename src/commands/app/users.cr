@@ -43,39 +43,17 @@ module Soar::Commands::App
         def_base_and_filter_params username: "username", email: "email", uuid: "uuid"
 
         users, meta = request get: path, as: Array(Models::User)
-        if users.empty?
-          unless options.has? "json"
-            stdout << "Showing 0 results from page "
-            stdout << meta.current_page << " of " << meta.total_pages << '\n'
-            stdout << "\n┃ ".colorize.light_gray << "total: ".colorize.dark_gray << meta.total
-            stdout << "\n┃ ".colorize.light_gray
-
-            if @filters.empty?
-              stdout << "no filters applied\n".colorize.dark_gray
-            else
-              stdout << "filters: ".colorize.dark_gray << @filters.join(", ") << '\n'
-            end
-
-            if sort = options.get?("sort")
-              stdout << "sort: ".colorize.dark_gray << sort << '\n'
-            else
-              stdout << "no sort applied".colorize.dark_gray
-            end
-            stdout.puts
-
-            return
-          end
-        end
-
         if options.has? "json"
           users.to_json stdout
           return
         end
 
-        width = 2 + (Math.log(users.last.id.to_f + 1) / Math.log(10)).ceil.to_i
-        users.each do |user|
-          user.to_s(stdout, width)
-          stdout << "\n\n"
+        unless users.empty?
+          width = 2 + (Math.log(users.last.id.to_f + 1) / Math.log(10)).ceil.to_i
+          users.each do |user|
+            user.to_s(stdout, width)
+            stdout << "\n\n"
+          end
         end
 
         stdout << "Showing " << meta.count << " results from page "
@@ -84,17 +62,17 @@ module Soar::Commands::App
         stdout << "\n┃ ".colorize.light_gray
 
         if @filters.empty?
-          stdout << "no filters applied\n".colorize.dark_gray
+          stdout << "no filters applied".colorize.dark_gray
         else
-          stdout << "filters: ".colorize.dark_gray << @filters.join(", ") << '\n'
+          stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
         end
 
+        stdout << "\n┃ ".colorize.light_gray
         if sort = options.get?("sort")
           stdout << "sort: ".colorize.dark_gray << sort << '\n'
         else
-          stdout << "no sort applied".colorize.dark_gray
+          stdout << "no sort applied\n".colorize.dark_gray
         end
-        stdout.puts
       end
     end
 
