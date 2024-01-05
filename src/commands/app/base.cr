@@ -14,6 +14,16 @@ module Soar::Commands::App
       return false unless super
 
       @config = Soar::Config.load_with options
+      unless config.app.url?
+        error "missing panel URL in config"
+        system_exit
+      end
+
+      unless config.app.key?
+        error "missing panel API key in config"
+        system_exit
+      end
+
       @client = Crest::Resource.new(
         config.app.url,
         headers: {
