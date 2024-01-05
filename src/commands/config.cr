@@ -40,28 +40,28 @@ module Soar::Commands
       end
 
       stdout << "app url: ".colorize.bold
-      if config.app?
+      if config.app.url?
         stdout << config.app.url << '\n'
       else
         stdout << "not set".colorize.dark_gray << '\n'
       end
 
       stdout << "app key: ".colorize.bold
-      if config.app?
+      if config.app.key?
         stdout << config.app.key << "\n\n"
       else
         stdout << "not set".colorize.dark_gray << "\n\n"
       end
 
       stdout << "client url: ".colorize.bold
-      if config.client?
+      if config.client.url?
         stdout << config.client.url << '\n'
       else
         stdout << "not set".colorize.dark_gray << '\n'
       end
 
       stdout << "client key: ".colorize.bold
-      if config.client?
+      if config.client.key?
         stdout << config.client.key << "\n\n"
       else
         stdout << "not set".colorize.dark_gray << "\n\n"
