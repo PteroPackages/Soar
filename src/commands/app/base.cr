@@ -8,6 +8,7 @@ module Soar::Commands::App
 
       add_option "cfg-url", type: :single
       add_option "cfg-key", type: :single
+      add_option 'R', "retry-ratelimit", type: :single
     end
 
     def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
