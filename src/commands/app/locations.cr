@@ -22,6 +22,7 @@ module Soar::Commands::App
         add_option "json"
         add_option "page", type: :single
         add_option "per-page", type: :single
+        add_option "sort", type: :single
       end
 
       def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
@@ -46,9 +47,15 @@ module Soar::Commands::App
             stdout << "\n┃ ".colorize.light_gray
 
             if @filters.empty?
-              stdout << "no filters applied"
+              stdout << "no filters applied\n".colorize.dark_gray
             else
-              stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
+              stdout << "filters: ".colorize.dark_gray << @filters.join(", ") << '\n'
+            end
+
+            if sort = options.get?("sort")
+              stdout << "sort: ".colorize.dark_gray << sort << '\n'
+            else
+              stdout << "no sort applied".colorize.dark_gray
             end
             stdout.puts
 
@@ -73,9 +80,15 @@ module Soar::Commands::App
         stdout << "\n┃ ".colorize.light_gray
 
         if @filters.empty?
-          stdout << "no filters applied"
+          stdout << "no filters applied\n".colorize.dark_gray
         else
-          stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
+          stdout << "filters: ".colorize.dark_gray << @filters.join(", ") << '\n'
+        end
+
+        if sort = options.get?("sort")
+          stdout << "sort: ".colorize.dark_gray << sort << '\n'
+        else
+          stdout << "no sort applied".colorize.dark_gray
         end
         stdout.puts
       end

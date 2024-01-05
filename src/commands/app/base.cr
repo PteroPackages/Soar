@@ -83,6 +83,10 @@ module Soar::Commands::App
             params.add "filter[{{ name.id }}]", options.get({{ key.stringify }}).as_s
           end
         {% end %}
+
+        if options.has? "sort"
+          params.add "sort", options.get("sort").as_s
+        end
       end
     end
   end
