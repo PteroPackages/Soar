@@ -5,6 +5,7 @@ module Soar::Commands::App
 
       add_command List.new
       add_command Get.new
+      add_command Create.new
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -72,6 +73,50 @@ module Soar::Commands::App
           return
         end
 
+        width = 2 + (Math.log(location.id.to_f + 1) / Math.log(10)).ceil.to_i
+        location.to_s(stdout, width)
+        stdout.puts
+      end
+    end
+
+    private class Create < Base
+      def setup : Nil
+        @name = "create"
+
+        add_option 'd', "data", type: :single
+        add_option 'i', "input"
+      end
+
+      def pre_run(arguments : Cling::Arguments, options : Cling::Options) : Bool
+        return false unless super
+
+        has_data = options.has? "data"
+        has_input = options.has? "input"
+
+        if has_data && has_input
+          error "cannot specify 'data' and 'input' flag; pick one"
+          return false
+        elsif !has_data && !has_input
+          error "either 'data' or 'input' option must be specified"
+          return false
+        end
+
+        true
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        if options.has? "input"
+          if stdin.closed?
+            error "cannot read from input file (already closed)"
+            system_exit
+          end
+
+          input = Resolver.parse_json_or_map stdin.gets_to_end.chomp
+        else
+          input = Resolver.parse_json_or_map options.get("data").as_s
+        end
+
+        location = request post: "/api/application/locations", data: input, as: Models::Location
         width = 2 + (Math.log(location.id.to_f + 1) / Math.log(10)).ceil.to_i
         location.to_s(stdout, width)
         stdout.puts
