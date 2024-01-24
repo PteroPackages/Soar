@@ -6,6 +6,7 @@ module Soar::Commands::App
       add_command List.new
       add_command Get.new
       add_command Create.new
+      add_command Delete.new
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
@@ -120,6 +121,19 @@ module Soar::Commands::App
         width = 2 + (Math.log(location.id.to_f + 1) / Math.log(10)).ceil.to_i
         location.to_s(stdout, width)
         stdout.puts
+      end
+    end
+
+    private class Delete < Base
+      def setup : Nil
+        @name = "delete"
+
+        add_argument "id", required: true
+      end
+
+      def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
+        id = arguments.get("id").as_s
+        request delete: "/api/application/locations/#{id}"
       end
     end
   end
