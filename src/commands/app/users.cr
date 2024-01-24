@@ -126,13 +126,6 @@ module Soar::Commands::App
           input = Resolver.parse_json_or_map options.get("data").as_s
         end
 
-        {"username", "email", "first_name", "last_name"}.each do |name|
-          unless input.has_key? name
-            error "Missing required key '#{name}' to create user"
-            system_exit
-          end
-        end
-
         user = request post: "/api/application/users", data: input, as: Models::User
         width = 2 + (Math.log(user.id.to_f + 1) / Math.log(10)).ceil.to_i
         user.to_s(stdout, width)
