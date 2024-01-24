@@ -56,23 +56,7 @@ module Soar::Commands::App
           end
         end
 
-        stdout << "Showing " << meta.count << " results from page "
-        stdout << meta.current_page << " of " << meta.total_pages << '\n'
-        stdout << "\n┃ ".colorize.light_gray << "total: ".colorize.dark_gray << meta.total
-        stdout << "\n┃ ".colorize.light_gray
-
-        if @filters.empty?
-          stdout << "no filters applied".colorize.dark_gray
-        else
-          stdout << "filters: ".colorize.dark_gray << @filters.join(", ")
-        end
-
-        stdout << "\n┃ ".colorize.light_gray
-        if sort = options.get?("sort")
-          stdout << "sort: ".colorize.dark_gray << sort << '\n'
-        else
-          stdout << "no sort applied\n".colorize.dark_gray
-        end
+        meta.to_s(stdout, @filters, options.get?("sort").try &.as_s)
       end
     end
 

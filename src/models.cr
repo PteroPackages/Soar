@@ -30,6 +30,32 @@ module Soar::Models
     getter current_page : Int32
     getter per_page : Int32
     getter total_pages : Int32
+
+    def to_s(io : IO, filters : Array(String)? = nil, sort : String? = nil) : Nil
+      io << "Showing " << count << " results from page "
+      io << current_page << " of " << total_pages << '\n'
+      io << "\n┃ ".colorize.light_gray << "total: ".colorize.dark_gray << total
+
+      if filters
+        io << "\n┃ ".colorize.light_gray
+
+        if filters.empty?
+          io << "no filters applied".colorize.dark_gray
+        else
+          io << "filters: ".colorize.dark_gray << filters.join(", ")
+        end
+      end
+
+      if sort || filters
+        io << "\n┃ ".colorize.light_gray
+
+        if sort
+          io << "sort: ".colorize.dark_gray << sort << '\n'
+        else
+          io << "no sort applied\n".colorize.dark_gray
+        end
+      end
+    end
   end
 
   class FractalItem(T)
